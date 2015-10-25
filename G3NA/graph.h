@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unordered_map>
 //#define STACKVIEW 1
 #define INFOCOUNT 5
 void forceDirectedLayout(float *,float *,int nodes, float *matrix);
@@ -45,7 +46,8 @@ public:
     int edges;
     float er,eg,eb,ea;
     float nr,ng,nb,na;
-    std::vector<std::string> nodeVec;
+    //std::vector<std::string> nodeVec;
+	std::unordered_map<std::string,int> nodeListMap;
 
     int centerx;
     int centery;

@@ -46,30 +46,71 @@ displayName = true;
      }
      char n1[256],n2[256];
      //std::string n1,n2;
+	 int ctr = 0,ctr2 = 0;
      while(fscanf(fp,"%s\t%s\n",n1,n2) == 2)
      {
         // printf("%s %s\n",n1,n2);
          std::string node1 = n1;
          std::string node2 = n2;
+		 
+
+		 //int addMap = -1,addVec = -1;
+		 std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(node1);
+		 if (found == nodeListMap.end())
+		 {
+		//	 std::cout << "Not Found";
+			 std::pair<std::string, int> item(node1, ctr);
+			 nodeListMap.insert(item);
+			 ctr++;
+			
+		 }
+		 else
+		 {
+		
+		 }
+		 
+		 std::unordered_map<std::string, int>::const_iterator found2 = nodeListMap.find(node2);
+		 if (found2 == nodeListMap.end())
+		 {
+			// std::cout << "Not Found";
+			 std::pair<std::string, int> item(node2, ctr);
+			 nodeListMap.insert(item);
+			 
+			 ctr++;
+		 }
+		 else
+		 {
+			
+		 }
+	
+		 /*
          if (std::find(nodeVec.begin(), nodeVec.end(), node1) != nodeVec.end())
          {
             //std::cout<<"Found "<<node1<<std::endl;
+			 
          }
          else
-         {     nodeVec.push_back(node1);      }
+         {     nodeVec.push_back(node1);   
+		 ctr2++;
+		 
+		 }
 
          if (std::find(nodeVec.begin(), nodeVec.end(), node2) != nodeVec.end())
          {
              //std::cout<<"Found "<<node2<<std::endl;
          }
          else
-         {     nodeVec.push_back(node2);      }
-          //std::cout<<"Total Nodes : "<<nodeVec.size()<<std::endl;
-
+         { 
+		 nodeVec.push_back(node2);      
+		 ctr2++;
+		 }*/
+		 
      }
-
+/*
      std::cout<<"--Total Nodes : "<<nodeVec.size()<<std::endl;
-     nodes = nodeVec.size();
+	 nodes = nodeVec.size();*/
+	 std::cout << "--Total Nodes : " << nodeListMap.size() << std::endl;
+	 nodes = nodeListMap.size();
      edgeMatrix = new float[nodes * nodes];
      edges=0;
      fclose(fp);
@@ -81,11 +122,18 @@ displayName = true;
          std::string node2 = n2;
          //int *index1,*index2;
 
-         std::vector<std::string>::iterator index1 = std::find(nodeVec.begin(), nodeVec.end(), node1);
+        /*std::vector<std::string>::iterator index1 = std::find(nodeVec.begin(), nodeVec.end(), node1);
          std::vector<std::string>::iterator index2 = std::find(nodeVec.begin(), nodeVec.end(), node2);
-         //std::cout<<index1-nodeVec.begin()<<"-"<<index2-nodeVec.begin()<<std::endl;
-         edgeMatrix[(index1-nodeVec.begin())*nodes+(index2-nodeVec.begin())] = 1;
-         edgeMatrix[(index2-nodeVec.begin())*nodes+(index1-nodeVec.begin())] = 1;
+
+		 edgeMatrix[(index1 - nodeVec.begin())*nodes + (index2 - nodeVec.begin())] = 1;
+		 edgeMatrix[(index2 - nodeVec.begin())*nodes + (index1 - nodeVec.begin())] = 1;*/
+
+		 std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(node1);
+		 std::unordered_map<std::string, int>::const_iterator found2 = nodeListMap.find(node2);
+         
+		 edgeMatrix[(found->second)*nodes + (found2->second)] = 1;
+		 edgeMatrix[(found2->second)*nodes + (found->second)] = 1;
+
          edges++;
      }
      std::cout<<"--Total Edges : "<<edges<<std::endl;
@@ -132,9 +180,12 @@ void graph::clusterization(char *filename)
         int clusterid = atoi(cluster);
         //int *index1,*index2;
 
-        std::vector<std::string>::iterator index1 = std::find(nodeVec.begin(), nodeVec.end(), node1);
-        //printf("%s = %d\n",n1,(index1-nodeVec.begin()));
-            coinfo[(index1-nodeVec.begin()) * INFOCOUNT + 4] = clusterid;
+        /*std::vector<std::string>::iterator index1 = std::find(nodeVec.begin(), nodeVec.end(), node1);
+		coinfo[(index1 - nodeVec.begin()) * INFOCOUNT + 4] = clusterid;*/
+
+		std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(node1);
+		coinfo[(found->second) * INFOCOUNT + 4] = clusterid;
+        
 
     }
     fflush(stdout);

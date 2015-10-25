@@ -44,12 +44,14 @@ void Alignment::readFile(char *filename)
         //int *index1,*index2;
        // printf("%s %s -->",n1,n2);
 
-        std::vector<std::string>::iterator index1 = std::find(g1->nodeVec.begin(), g1->nodeVec.end(), node1);
+       /* std::vector<std::string>::iterator index1 = std::find(g1->nodeVec.begin(), g1->nodeVec.end(), node1);
         std::vector<std::string>::iterator index2 = std::find(g2->nodeVec.begin(), g2->nodeVec.end(), node2);
-       // printf("%d =  %d, %d \n",edges,index1- graph1->nodeVec.begin(),index2-graph2->nodeVec.begin());
-        int i1 =index1-(g1->nodeVec.begin());
-        int i2 =index2-(g2->nodeVec.begin());
-//        edgeAlignMatrix[i1 * rows + i2] = 1.0f;
+
+		// printf("%d =  %d, %d \n",edges,index1- graph1->nodeVec.begin(),index2-graph2->nodeVec.begin());
+		int i1 = index1 - (g1->nodeVec.begin());
+		int i2 = index2 - (g2->nodeVec.begin());
+		
+		/ /      edgeAlignMatrix[i1 * rows + i2] = 1.0f;
         if(i1 >= 0 && i2 >= 0)
         {
             g1_vertices.push_back(i1);
@@ -60,6 +62,25 @@ void Alignment::readFile(char *filename)
         {
             printf("%s <--> %s-error\n",n1,n2);
         }
+		
+		*/
+
+		std::unordered_map<std::string, int>::const_iterator found = g1->nodeListMap.find(node1);
+		std::unordered_map<std::string, int>::const_iterator found2 =g2->nodeListMap.find(node2);
+
+       
+		// edgeAlignMatrix[i1 * rows + i2] = 1.0f;
+		if ((found->second) >= 0 && (found2->second) >= 0)
+		{
+			g1_vertices.push_back((found->second));
+			g2_vertices.push_back((found2->second));
+			edges++;
+		}
+		else
+		{
+			printf("%s <--> %s-error\n", n1, n2);
+		}
+
 
 
     }

@@ -437,7 +437,7 @@ void PerspDisplay() {
 		drawGraph(&graphT);
 	}
 		
-		
+	/*
 	gpuDeviceSync();
 		
 		for (int i = 0; i < graphDatabase.size(); i++)
@@ -445,14 +445,8 @@ void PerspDisplay() {
 			graph graphT = graphDatabase.at(i);
 		
 		copyForceDirectedGPU(&graphT);
-	}
-
-	/*/
-	drawGraph(graphT);
-	if (gpuEnabled){
-		gpuDeviceSync();
-		copyForceDirectedGPU(graphT);
 	}*/
+
 
 
 
@@ -589,7 +583,7 @@ int main(int argc, char *argv[]) {
 	glutMouseFunc(mouseEventHandler);
 	glutMotionFunc(motionEventHandler);
 	glutKeyboardFunc(keyboardEventHandler);
-	glutIdleFunc(PerspDisplay);
+	//glutIdleFunc(PerspDisplay);
 	glutMainLoop();
 	return(0);
 }
