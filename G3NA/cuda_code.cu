@@ -177,7 +177,7 @@ if(id < graphsize){
 extern "C"
 cudaError_t runForceDirectedGPU(graph *g)
 {
-printf("running kernel\n");
+//printf("running kernel\n");
 //testforceDirectedKernel<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
 forceDirectedKernel2d<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
 cudaDeviceSynchronize();

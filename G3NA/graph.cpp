@@ -7,7 +7,7 @@
 extern "C"
 cudaError_t gpuSetup(graph *);
 
- graph::graph(char *graphname, char *filename,char *filenamecluster,int x,int y,int w,int h,int z)
+ graph::graph(char *graphname, char *filename,char *filenamecluster,int x,int y,int z,int w,int h)
 {
 displayName = false;
 addName(graphname,x,y,z,w,h);

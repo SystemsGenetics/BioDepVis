@@ -22,6 +22,7 @@
     <ClCompile Include="alignment.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="graph.cpp" />
+    <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="miscgl.cpp" />
@@ -33,12 +34,17 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="graph.h" />
+    <ClInclude Include="json\json-forwards.h" />
+    <ClInclude Include="json\json.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="cuda_code.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EB7F5B27-DD9F-42B7-A63E-23D5DF593663}</ProjectGuid>
@@ -113,6 +119,9 @@
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
 copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
+    <CudaCompile>
+      <AdditionalOptions>--use_fast_math %(AdditionalOptions)</AdditionalOptions>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
