@@ -4,8 +4,8 @@ SRC = G3NA
 INC=$(SRC)
 LIB=-lGL -lGLU -lglut
 
-all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o
-	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o $(LIB) -o G3NAV
+all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o
+	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o $(LIB) -o G3NAV.exe
 
 main.o:	$(SRC)/main.cpp
 	$(NVCC) -c -std=c++11 $(SRC)/main.cpp -I $(INC)
@@ -34,8 +34,11 @@ jsoncpp.o: $(SRC)/jsoncpp.cpp
 cuda_code.o: $(SRC)/cuda_code.cu
 	$(NVCC) -c -std=c++11 $(SRC)/cuda_code.cu
 
+miscgl.o: $(SRC)/miscgl.cpp
+	$(NVCC) -c -std=c++11 $(SRC)/miscgl.cpp
 clean:
 	rm -rf *.o
+	rm -rf G3NAV.exe
 #/alignment.cpp  G3NA/Camera.cpp  G3NA/graph.cpp  G3NA/jsoncpp.cpp  G3NA/main.cpp  G3NA/Matrix.cpp  G3NA/miscgl.cpp  G3NA/Utility.cpp  G3NA/Vector.cpp
 
 
