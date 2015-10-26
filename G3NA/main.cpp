@@ -8,8 +8,11 @@
 // Minor Modifications by Yujie Shu, 2012
 //
 #include "Camera.h"
-
+#ifdef _WIN32
 #include "json\json.h"
+#else
+#include "json/json.h"
+#endif
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
