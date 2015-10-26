@@ -297,6 +297,12 @@ void drawGraph(graph *g)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 
+
+}
+
+void runForceDirected(graph *g)
+{
+	printf("Running Force Directed");
 	if (animate == true){
 		if (!gpuEnabled)
 			forceDirectedLayout(g->coords, g->coinfo, g->nodes, g->edgeMatrix);
@@ -308,8 +314,8 @@ void drawGraph(graph *g)
 
 		}
 	}
-}
 
+}
 
 
 void drawAlignment(Alignment *align, bool animatable = true)
@@ -338,6 +344,8 @@ void drawAlignment(Alignment *align, bool animatable = true)
 	}
 
 }
+
+
 
 void calculateFPS()
 {
@@ -437,20 +445,33 @@ void PerspDisplay() {
 		drawGraph(&graphT);
 	}
 		
-	/*
-	gpuDeviceSync();
-		
-		for (int i = 0; i < graphDatabase.size(); i++)
-		{
-			graph graphT = graphDatabase.at(i);
-		
-		copyForceDirectedGPU(&graphT);
-	}*/
-
+	
+	
 
 
 
 	glutSwapBuffers();
+}
+
+void idle()
+{
+	for (int i = 0; i < graphDatabase.size(); i++)
+	{
+		graph graphT = graphDatabase.at(i);
+
+		runForceDirected(&graphT);
+	}
+
+	gpuDeviceSync();
+
+	for (int i = 0; i < graphDatabase.size(); i++)
+	{
+		graph graphT = graphDatabase.at(i);
+
+		copyForceDirectedGPU(&graphT);
+	}
+
+	glutPostRedisplay();
 }
 
 void mouseEventHandler(int button, int state, int x, int y) {
@@ -584,6 +605,7 @@ int main(int argc, char *argv[]) {
 	glutMotionFunc(motionEventHandler);
 	glutKeyboardFunc(keyboardEventHandler);
 	//glutIdleFunc(PerspDisplay);
+	glutIdleFunc(idle);
 	glutMainLoop();
 	return(0);
 }

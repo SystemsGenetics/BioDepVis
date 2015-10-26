@@ -30,6 +30,7 @@ public:
     void clusterization(char *);
     void convertEdgeMatrixToVerticeList();
     void readGraph(char *);
+	
     graph extractGraph(int *);
     float *coords;
     float *coinfo; //dx,dy,dz,radius

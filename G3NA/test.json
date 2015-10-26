@@ -8,107 +8,8 @@
             "x": 0,
             "y": 0,
             "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph2": {
-            "id": 2,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 30,
-            "y": 0,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph3": {
-            "id": 3,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 60,
-            "y": 0,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph4": {
-            "id": 4,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 90,
-            "y": 0,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph5": {
-            "id": 5,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 120,
-            "y": 0,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph6": {
-            "id": 6,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 0,
-            "y": 30,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph7": {
-            "id": 7,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 30,
-            "y": 30,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph8": {
-            "id": 8,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 60,
-            "y": 30,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-        "graph9": {
-            "id": 9,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 90,
-            "y": 30,
-            "z": 0,
-            "w": 20,
-            "h": 20
-        },
-         "graph10": {
-            "id": 10,
-            "name": "Maize",
-            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
-            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 120,
-            "y": 30,
-            "z": 0,
-            "w": 20,
-            "h": 20
+            "w": 200,
+            "h": 200
         }
 
     },
@@ -116,5 +17,5 @@
         "alignment1": [ 1, 2 ],
         "alignment2": [ 1, 3 ],
         "alignment3": [ 2, 3 ]
-}
+    }
 }
