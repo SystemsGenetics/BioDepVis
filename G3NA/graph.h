@@ -55,7 +55,7 @@ public:
     int centerz;
     int width;
     int height;
-    char *name;
+    char name[256];
     bool displayName;
 
     void addName(char *,int,int,int,int,int);

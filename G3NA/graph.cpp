@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "color.h"
+#include <string>
 #include <cuda_runtime.h>
 // This is the 'elder trick of the...' - Tell the compiler this function is defined in other place
 extern "C"
@@ -10,8 +11,10 @@ cudaError_t gpuSetup(graph *);
  graph::graph(char *graphname, char *filename,char *filenamecluster,int x,int y,int z,int w,int h)
 {
 displayName = false;
-addName(graphname,x,y,z,w,h);
-printf(" Reading Filename : %s\n",filename);
+strncpy(name, graphname, strlen(graphname));
+addName(name, x, y, z, w, h);
+
+printf(" Reading %s Filename : %s\n",graphname, filename);
 readGraph(filename);
 allocate(x,y,w,h,z);
 clusterization(filenamecluster);
@@ -23,7 +26,6 @@ if (cuerr != cudaSuccess) printf("CUDA Error: %s\n", cudaGetErrorString( cuerr )
 
 void graph::addName(char *graphname,int x,int y,int z,int w,int h)
 {
-name = graphname;
 centerx = x;
 centery = y;
 centerz = z;

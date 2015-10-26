@@ -7,6 +7,7 @@
 // Minor Modifications by Donald House, 2009
 // Minor Modifications by Yujie Shu, 2012
 //
+
 #include "Camera.h"
 #ifdef _WIN32
 #include "json\json.h"
@@ -128,12 +129,12 @@ void makeGrid() {
 
 char* filereader()
 {
-
+	
 	int array_size = 65536; // define the size of character array
 	char * array = new char[array_size]; // allocating an array of 1kb
 	int position = 0; //this will be used incremently to fill characters in the array 
 
-	ifstream fin("C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\G3NA\\test.json"); //opening an input stream for file test.txt
+	ifstream fin("test.json"); //opening an input stream for file test.txt
 	/*checking whether file could be opened or not. If file does not exist or don't have read permissions, file
 	stream could not be opened.*/
 	if (fin.is_open())
@@ -222,7 +223,9 @@ void parser()
 		
 		Json::Value graphTemp = graphStruct[itr.key().asString().c_str()];
 		int id = graphTemp["id"].asInt();
-		std::string graphName = graphTemp["name"].asString();
+		std::string graphNameTemp = graphTemp["name"].asString();
+		char graphname[256];
+		strncpy(graphname, graphNameTemp.c_str(), graphNameTemp.size()+1); 
 		std::string fileloc = graphTemp["fileLocation"].asString(); 
 		std::string clusterloc = graphTemp["clusterLocation"].asString();
 		int x = graphTemp["x"].asInt();
@@ -230,8 +233,8 @@ void parser()
 		int z = graphTemp["z"].asInt();
 		int w = graphTemp["w"].asInt();
 		int h = graphTemp["h"].asInt();
-		printf("ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphName.c_str(),fileloc.c_str(),clusterloc.c_str(), x, y, z, w, h);
-		graph graphT("Test", (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
+		printf("ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(),fileloc.c_str(),clusterloc.c_str(), x, y, z, w, h);
+		graph graphT(graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
 		graphT.allocateEdgeColor(edgeColor[id-1][0], edgeColor[id-1][1], edgeColor[id][2], edgeColor[id-1][3]);
 		graphDatabase.push_back(graphT);
 		printf("Load Complete\n");
@@ -305,7 +308,7 @@ void drawGraph(graph *g)
 
 void runForceDirected(graph *g)
 {
-	printf("Running Force Directed");
+	
 	if (animate == true){
 		if (!gpuEnabled)
 			forceDirectedLayout(g->coords, g->coinfo, g->nodes, g->edgeMatrix);
