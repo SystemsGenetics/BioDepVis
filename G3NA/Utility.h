@@ -46,7 +46,7 @@
 /*
   Boolean type
 */
-enum boolean{FALSE, TRUE};
+//enum boolean{FALSE, TRUE};
 
 /*
   computes sqrt(a^2 + b^2) without destructive underflow or overflow

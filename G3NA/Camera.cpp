@@ -203,8 +203,7 @@ void Camera::SetCenterOfFocus(Vector3d NewAim) {
  * draws an opengl window with the camera orientation
  * W and H are the width and height of the window respectively
  */
-
-float min(float a, float b)
+/*float min(float a, float b)
 {
 	if (a <= b)
 		return a;
@@ -218,7 +217,7 @@ float max(float a, float b)
 	else
 		return b;
 	
-}
+}*/
 void Camera::PerspectiveDisplay(int W, int H) {
 
   // set up the projection matrix

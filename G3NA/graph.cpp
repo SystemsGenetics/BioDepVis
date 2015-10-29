@@ -4,6 +4,12 @@
 #include "color.h"
 #include <string>
 #include <cuda_runtime.h>
+
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/freeglut.h>
+#endif
 // This is the 'elder trick of the...' - Tell the compiler this function is defined in other place
 extern "C"
 cudaError_t gpuSetup(graph *);

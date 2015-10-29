@@ -7,7 +7,8 @@
 // Minor Modifications by Donald House, 2009
 // Minor Modifications by Yujie Shu, 2012
 //
-
+#include <GL/glew.h>
+#include "util.h"
 #include "Camera.h"
 #ifdef _WIN32
 #include "json\json.h"
@@ -17,15 +18,12 @@
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
-#  include <GL/freeglut.h>
+#  include <GL\freeglut.h>
 #endif
 #include "alignment.h"
 #include "graph.h"
-//#define SOCIALNETWORK 1
-//#define CONSERVENETWORK 1
-//#define STACKVIEW 1
-#define SINGLEGRAPH 1
 #include <cuda_runtime.h>
+
 
 
 //  Standard Input\Output C Library
@@ -86,7 +84,7 @@ Camera *camera;
 // draws a simple grid
 void makeGrid() {
 	glColor3f(0.0, 0.0, 0.0);
-
+	
 	glLineWidth(1.0);
 
 	for (float i = -12; i < 12; i++) {
@@ -189,16 +187,16 @@ void PrintJSONValue(const Json::Value &val)
 }
 
 #define MAXCOLOR 255.0f
-float edgeColor[10][4] = { { 166 / MAXCOLOR, 206, 227, 0.5f },
-{ 31 / MAXCOLOR, 120 / MAXCOLOR, 180 / MAXCOLOR, 0.5f },
-{ 178 / MAXCOLOR, 223 / MAXCOLOR, 138 / MAXCOLOR, 0.5f },
-{ 51 / MAXCOLOR, 160 / MAXCOLOR, 44 / MAXCOLOR, 0.5f },
-{ 251 / MAXCOLOR, 154 / MAXCOLOR, 153 / MAXCOLOR, 0.5f },
-{ 227 / MAXCOLOR, 26 / MAXCOLOR, 28 / MAXCOLOR, 0.5f },
-{ 253 / MAXCOLOR, 191 / MAXCOLOR, 111 / MAXCOLOR, 0.5f },
-{ 255 / MAXCOLOR, 127 / MAXCOLOR, 0 / MAXCOLOR, 0.5f },
-{ 202 / MAXCOLOR, 178 / MAXCOLOR, 214 / MAXCOLOR, 0.5f },
-{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, 0.5f } };
+float edgeColor[10][4] = { { 166 / MAXCOLOR, 206, 227, 0.1f },
+{ 31 / MAXCOLOR, 120 / MAXCOLOR, 180 / MAXCOLOR, 0.1f },
+{ 178 / MAXCOLOR, 223 / MAXCOLOR, 138 / MAXCOLOR, 0.1f },
+{ 51 / MAXCOLOR, 160 / MAXCOLOR, 44 / MAXCOLOR, 0.1f },
+{ 251 / MAXCOLOR, 154 / MAXCOLOR, 153 / MAXCOLOR, 0.1f },
+{ 227 / MAXCOLOR, 26 / MAXCOLOR, 28 / MAXCOLOR, 0.1f },
+{ 253 / MAXCOLOR, 191 / MAXCOLOR, 111 / MAXCOLOR, 0.1f },
+{ 255 / MAXCOLOR, 127 / MAXCOLOR, 0 / MAXCOLOR, 0.1f },
+{ 202 / MAXCOLOR, 178 / MAXCOLOR, 214 / MAXCOLOR, 0.1f },
+{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, 0.1f } };
 
 void parser()
 {
@@ -242,9 +240,18 @@ void parser()
 	}
 }
 
+
+
+
+unsigned int m_vertexShader, m_fragmentShader;
+char *vertexsource, *fragmentsource;
+GLuint shaderprogram;
+
 void init() {
 	// set up camera
 	// parameters are eye point, aim point, up vector
+	cudaError_t cuerr;
+	
 	parser();
 	camera = new Camera(Vector3d(0, 10, 400), Vector3d(0, 0, 0),
 		Vector3d(0, 1, 0));
@@ -253,13 +260,106 @@ void init() {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 50.0 };
+	//
+	GLfloat light_position[] = { 1.0,1.0,1.0, 0.0 };
+	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	
+	
+
+	//glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	//glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	  //glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 
-	cudaError_t cuerr;
+	/*
+
+	m_vertexShader=  glCreateShader(GL_VERTEX_SHADER);
+	m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 
+	vertexsource = filetobuf("vertexshader.vert");
+	fragmentsource = filetobuf("fragmentshader.frag");
+
+	int IsCompiled_VS, IsCompiled_FS, maxLength, IsLinked;
+	char *vertexInfoLog, *fragmentInfoLog, *shaderProgramInfoLog;
+
+	glShaderSource(m_vertexShader, 1, (const GLchar**)&vertexsource, 0);
+	glCompileShader(m_vertexShader);
+	glGetShaderiv(m_vertexShader, GL_COMPILE_STATUS, &IsCompiled_VS);
+	if (IsCompiled_VS == FALSE)
+	{
+		glGetShaderiv(m_vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		
+		vertexInfoLog = (char *)malloc(maxLength);
+
+		glGetShaderInfoLog(m_vertexShader, maxLength, &maxLength, vertexInfoLog);
+
+		
+		printf("Ersror : %s\n", vertexInfoLog);
+		free(vertexInfoLog);
+		
+		getchar();
+		exit(0);
+	}
+	glShaderSource(m_fragmentShader, 1, (const GLchar**)&fragmentsource, 0);
+	glCompileShader(m_fragmentShader);
+	glGetShaderiv(m_fragmentShader, GL_COMPILE_STATUS, &IsCompiled_FS);
+	if (IsCompiled_FS == FALSE)
+	{
+		glGetShaderiv(m_fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
+
+		
+		fragmentInfoLog = (char *)malloc(maxLength);
+
+		glGetShaderInfoLog(m_fragmentShader, maxLength, &maxLength, fragmentInfoLog);
+
+
+		printf("Ersror : %s\n", fragmentInfoLog);
+		free(fragmentInfoLog);
+
+		getchar();
+		exit(0);
+	}
+
+	shaderprogram = glCreateProgram();
+
+
+	glAttachShader(shaderprogram, m_vertexShader);
+	glAttachShader(shaderprogram, m_fragmentShader);
+	glLinkProgram(shaderprogram);
+
+	glGetProgramiv(shaderprogram, GL_LINK_STATUS, (int *)&IsLinked);
+	if (IsLinked == FALSE)
+	{
+		
+		glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, &maxLength);
+
+	
+		shaderProgramInfoLog = (char *)malloc(maxLength);
+
+		glGetProgramInfoLog(shaderprogram, maxLength, &maxLength, shaderProgramInfoLog);
+
+		
+		printf("Ersror : %s\n", shaderProgramInfoLog);
+		free(shaderProgramInfoLog);
+		return;
+	}
+	printf("Vertex Shader ID : %d \n Fragment Shader ID : %d \n", m_vertexShader, m_fragmentShader);
+	*/
 
 }
 
@@ -270,7 +370,7 @@ void drawGraph(graph *g)
 	{
 		printw(g->centerx, g->centery + g->height / 2, g->centerz, g->name);
 	}
-
+	 
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -280,12 +380,11 @@ void drawGraph(graph *g)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-
+	//glDisable(GL_LIGHTING);
 	glLineWidth(0.001f);
 	glColor4f(g->er, g->eg, g->eb, g->ea);
-
 	glDrawElements(GL_LINES, g->edges * 2, GL_UNSIGNED_INT, g->verticeEdgeList);
-
+	//glEnable(GL_LIGHTING);
 	/*float val = (rand()%201)/200.0f * 360.0f;
 	float cr,cg,cb;
 	HSVtoRGB(&cr,&cg,&cb,val,0.5,0.5);
@@ -296,11 +395,13 @@ void drawGraph(graph *g)
 		glColorPointer(4, GL_FLOAT, 0, g->color);
 		glEnableClientState(GL_COLOR_ARRAY);
 	}
-	glPointSize(2.0f);
+
+	glUseProgram(shaderprogram);
+	glPointSize(4.0f);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisable(GL_BLEND);
-
+	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 
 
@@ -587,6 +688,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 
 
 	case 27:		// esc
+		glDeleteProgram(shaderprogram);
 		exit(0);
 	}
 
@@ -597,14 +699,42 @@ int main(int argc, char *argv[]) {
 
 	// set up opengl window
 	glutInit(&argc, argv);
+	//glewInit();
+	/*
+	if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
+		printf("Ready for GLSL\n");
+	else {
+		printf("Not totally ready :( \n");
+		getchar();
+		exit(1);
+	}
+	*/
+	
+
+
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(WIDTH, HEIGHT);
 	glutInitWindowPosition(50, 50);
 	persp_win = glutCreateWindow("G3NAV");
 
+	// initialize necessary OpenGL extensions
+	glewInit();
+
+	if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5"))
+	{
+		fprintf(stderr, "The following required OpenGL extensions missing:\n\tGL_VERSION_2_0\n\tGL_VERSION_1_5\n");
+		exit(EXIT_SUCCESS);
+	}
+
+	if (!glewIsSupported("GL_ARB_multitexture GL_ARB_vertex_buffer_object GL_EXT_geometry_shader4"))
+	{
+		fprintf(stderr, "The following required OpenGL extensions missing:\n\tGL_ARB_multitexture\n\tGL_ARB_vertex_buffer_object\n\tGL_EXT_geometry_shader4.\n");
+		exit(EXIT_SUCCESS);
+	}
+
+
 	// initialize the camera and such
 	init();
-
 	// set up opengl callback functions
 	glutDisplayFunc(PerspDisplay);
 	glutMouseFunc(mouseEventHandler);
