@@ -1,3 +1,5 @@
+//Not Working
+
 #version 330
 out vec4 vFragColor;
 
@@ -24,3 +26,4 @@ void main(void)
     vec4 S = light_specular*mat_specular* spec;
     vFragColor = vec4(Color,1) * diffuse + S;
 }
+
