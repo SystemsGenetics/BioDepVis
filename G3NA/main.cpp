@@ -8,6 +8,11 @@
 // Minor Modifications by Yujie Shu, 2012
 //
 #include <GL/glew.h>
+
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include <GL/wglew.h>
+#endif
+#define GLEW_STATIC
 #include "util.h"
 #include "Camera.h"
 #ifdef _WIN32
@@ -272,7 +277,32 @@ void parser()
 	}
 }
 
+unsigned int width_particle = 64, height_particle = 64;
+unsigned char *data_particle;
+GLuint textures;
+void loadTexture()
+{
 
+	data_particle = loadBMPRaw("particle.bmp", width_particle, height_particle, false);
+	
+	
+	glGenTextures(1, &textures);
+	glBindTexture(GL_TEXTURE_2D, textures);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
+
+
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_particle, height_particle, 0, GL_BGR, GL_UNSIGNED_BYTE, data_particle);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	
+	
+
+	delete[] data_particle;
+}
 
 
 unsigned int m_vertexShader, m_fragmentShader;
@@ -300,7 +330,7 @@ void init() {
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	
-
+	loadTexture();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 	/*
@@ -430,13 +460,50 @@ void drawGraph(graph *g)
 		glEnableClientState(GL_COLOR_ARRAY);
 	}
 
-	glUseProgram(shaderprogram);
-	glPointSize(4.0f);
+	glBindTexture(GL_TEXTURE_2D, textures);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+
+
+	//Orig
+	glPointSize(8.0f);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
 	glDisableClientState(GL_COLOR_ARRAY);
-	glDisable(GL_BLEND);
-	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
+	
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
+
+
+	//Orig
+	glDisable(GL_BLEND);
+}
+
+void Test()
+{
+
+	glEnable(GL_BLEND);
+
+	glBindTexture(GL_TEXTURE_2D, textures);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for (int i = 0; i < 10; i++)
+	{
+
+		glVertex3f(0, i * 10, 0);
+	}
+	glEnd();
+	//New
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
 
 
 }
@@ -571,7 +638,7 @@ void PerspDisplay() {
 	camera->PerspectiveDisplay(WIDTH, HEIGHT);
 
 
-
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -583,7 +650,7 @@ void PerspDisplay() {
 	{
 		graph *graphT = graphDatabase.at(i);
 		drawGraph(graphT);
-		printf("Drawing %s \n ", graphT->name);
+	//printf("Drawing %s \n ", graphT->name);
 	}
 		
 	for (int i = 0; i < alignmentDatabase.size(); i++)
@@ -592,9 +659,22 @@ void PerspDisplay() {
 		drawAlignment(alignT);
 
 	}
-	
-	
-	printf("---\n");
+	//Test();
+	/*
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0, 0.0);
+	glVertex3f(0, 0, 200);
+	glTexCoord2f(1.0, 0.0);
+	glVertex3f(0, 100, 200);
+	glTexCoord2f(1.0, 1.0);
+	glVertex3f(100,100, 200);
+	glTexCoord2f(0.0, 1.0);
+	glVertex3f(100, 0, 200);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	*/
 
 	glutSwapBuffers();
 }
@@ -733,7 +813,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 
 
 	case 27:		// esc
-		glDeleteProgram(shaderprogram);
+		//glDeleteProgram(shaderprogram);
 		exit(0);
 	}
 
@@ -776,7 +856,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "The following required OpenGL extensions missing:\n\tGL_ARB_multitexture\n\tGL_ARB_vertex_buffer_object\n\tGL_EXT_geometry_shader4.\n");
 		exit(EXIT_SUCCESS);
 	}
-
+	
 
 	// initialize the camera and such
 	init();

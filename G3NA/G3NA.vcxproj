@@ -27,6 +27,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="miscgl.cpp" />
+    <ClCompile Include="texture.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Vector.cpp" />
   </ItemGroup>
@@ -50,6 +51,10 @@
     <None Include="test.json" />
     <None Include="testmultiple.json" />
     <None Include="vertexshader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="particle.bmp" />
+    <Image Include="Sphere.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EB7F5B27-DD9F-42B7-A63E-23D5DF593663}</ProjectGuid>
@@ -145,7 +150,8 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cufft.lib;cudart_static.lib;freeglut.lib</AdditionalDependencies>
+      <AdditionalDependencies>cufft.lib;cudart_static.lib;freeglut.lib;glew64.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
@@ -189,6 +195,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>cudart.lib;glew64.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
