@@ -50,6 +50,7 @@
     <None Include="fragmentshader.frag" />
     <None Include="test.json" />
     <None Include="testmultiple.json" />
+    <None Include="testSingle.json" />
     <None Include="vertexshader.vert" />
   </ItemGroup>
   <ItemGroup>

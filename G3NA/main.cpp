@@ -296,7 +296,7 @@ void loadTexture()
 
 
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width_particle, height_particle, 0, GL_BGR, GL_UNSIGNED_BYTE, data_particle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_particle, height_particle, 0, GL_BGR, GL_UNSIGNED_BYTE, data_particle);
 	//glGenerateMipmap(GL_TEXTURE_2D);
 	
 	
