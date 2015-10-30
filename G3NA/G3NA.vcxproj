@@ -48,6 +48,7 @@
   <ItemGroup>
     <None Include="fragmentshader.frag" />
     <None Include="test.json" />
+    <None Include="testmultiple.json" />
     <None Include="vertexshader.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -66,8 +66,8 @@ bool showalignment = false;
 bool showGrid = false;
 bool gpuEnabled = true;
 
-std::vector <graph> graphDatabase;
-std::vector <Alignment> alignmentDatabase;
+std::vector <graph*> graphDatabase;
+std::vector <Alignment*> alignmentDatabase;
 
 //graph *graph1,*graph2,*graph3, *graph4,*graph5;
 //Alignment *alignment_graph,*alignment_betgraph1,*alignment_betgraph2,*alignment_betgraph3;
@@ -131,7 +131,7 @@ char* filereader()
 	char * array = new char[array_size]; // allocating an array of 1kb
 	int position = 0; //this will be used incremently to fill characters in the array 
 
-	ifstream fin("test.json"); //opening an input stream for file test.txt
+	ifstream fin("testmultiple.json"); //opening an input stream for file test.txt
 	/*checking whether file could be opened or not. If file does not exist or don't have read permissions, file
 	stream could not be opened.*/
 	if (fin.is_open())
@@ -221,8 +221,9 @@ void parser()
 		Json::Value graphTemp = graphStruct[itr.key().asString().c_str()];
 		int id = graphTemp["id"].asInt();
 		std::string graphNameTemp = graphTemp["name"].asString();
-		char graphname[256];
-		strncpy(graphname, graphNameTemp.c_str(), graphNameTemp.size()+1); 
+		char *graphname =  new char [graphNameTemp.size() + 1];
+		strcpy(graphname, graphNameTemp.c_str()); 
+		//graphname[graphNameTemp.size() + 1] = '\0';
 		std::string fileloc = graphTemp["fileLocation"].asString(); 
 		std::string clusterloc = graphTemp["clusterLocation"].asString();
 		int x = graphTemp["x"].asInt();
@@ -230,9 +231,9 @@ void parser()
 		int z = graphTemp["z"].asInt();
 		int w = graphTemp["w"].asInt();
 		int h = graphTemp["h"].asInt();
-		printf("ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(),fileloc.c_str(),clusterloc.c_str(), x, y, z, w, h);
-		graph graphT(id,graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
-		graphT.allocateEdgeColor(edgeColor[id-1][0], edgeColor[id-1][1], edgeColor[id][2], edgeColor[id-1][3]);
+		printf("<------------>ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(),fileloc.c_str(),clusterloc.c_str(), x, y, z, w, h);
+		graph *graphT = new graph(id,graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
+		graphT->allocateEdgeColor(edgeColor[id-1][0], edgeColor[id-1][1], edgeColor[id][2], edgeColor[id-1][3]);
 		graphDatabase.push_back(graphT);
 		printf("Load Complete\n");
 
@@ -250,7 +251,7 @@ void parser()
 			int indexRight = -1;
 			for (int i = 0; i < graphDatabase.size(); i++)
 			{
-				if (graphDatabase.at(i).id == leftG)
+				if (graphDatabase.at(i)->id == leftG)
 				{
 					indexLeft = i; break;
 				}
@@ -258,14 +259,14 @@ void parser()
 			}
 			for (int i = 0; i < graphDatabase.size(); i++)
 			{
-				if (graphDatabase.at(i).id == rightG)
+				if (graphDatabase.at(i)->id == rightG)
 				{
 					indexRight = i; break;
 				}
 
 			}
 			if (indexLeft != -1 && indexRight != -1){
-				Alignment Temp((char *)filelocation.c_str(), &(graphDatabase.at(indexLeft)), &(graphDatabase.at(indexRight)));
+				Alignment *Temp = new Alignment((char *)filelocation.c_str(), (graphDatabase.at(indexLeft)), (graphDatabase.at(indexRight)));
 				alignmentDatabase.push_back(Temp);
 			}
 	}
@@ -400,6 +401,7 @@ void drawGraph(graph *g)
 
 	if (g->displayName == true)
 	{
+		
 		printw(g->centerx, g->centery + g->height / 2, g->centerz, g->name);
 	}
 	 
@@ -545,7 +547,7 @@ void printw(float x, float y, float z, char* format, ...)
 
 	//  Write formatted output using a pointer to the list of arguments
 	vsnprintf(text, len, format, args);
-
+	
 	//  End using variable argument list 
 	va_end(args);
 
@@ -561,15 +563,6 @@ void printw(float x, float y, float z, char* format, ...)
 }
 
 
-void drawFPS()
-{
-	//  Load the identity matrix so that FPS string being drawn
-	//  won't get animates
-	glLoadIdentity();
-
-	//  Print the FPS to the window
-	printw(100, 100, -25, "FPS: %4.2f", fps);
-}
 
 void PerspDisplay() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -588,20 +581,20 @@ void PerspDisplay() {
 	
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
-		graph graphT = graphDatabase.at(i);
-		drawGraph(&graphT);
+		graph *graphT = graphDatabase.at(i);
+		drawGraph(graphT);
+		printf("Drawing %s \n ", graphT->name);
 	}
 		
 	for (int i = 0; i < alignmentDatabase.size(); i++)
 	{
-		Alignment alignT = alignmentDatabase.at(i);
-		drawAlignment(&alignT);
+		Alignment *alignT = alignmentDatabase.at(i);
+		drawAlignment(alignT);
 
 	}
 	
 	
-
-
+	printf("---\n");
 
 	glutSwapBuffers();
 }
@@ -610,25 +603,25 @@ void idle()
 {
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
-		graph graphT = graphDatabase.at(i);
+		graph *graphT = graphDatabase.at(i);
 
-		runForceDirected(&graphT);
+		runForceDirected(graphT);
 	}
 
 	for (int i = 0; i < alignmentDatabase.size(); i++)
 	{
-		Alignment alignT = alignmentDatabase.at(i);
+		Alignment *alignT = alignmentDatabase.at(i);
 
-		runAlignmentLayout(&alignT);
+		runAlignmentLayout(alignT);
 	}
 
 	gpuDeviceSync();
 
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
-		graph graphT = graphDatabase.at(i);
+		graph *graphT = graphDatabase.at(i);
 
-		copyForceDirectedGPU(&graphT);
+		copyForceDirectedGPU(graphT);
 	}
 
 	
