@@ -61,7 +61,6 @@ int HEIGHT = 1000;
 //Beg of my Dec
 
 bool animate = false;
-bool animateAlignment = false;
 bool cluster = false;
 bool showalignment = false;
 bool showGrid = false;
@@ -232,11 +231,43 @@ void parser()
 		int w = graphTemp["w"].asInt();
 		int h = graphTemp["h"].asInt();
 		printf("ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(),fileloc.c_str(),clusterloc.c_str(), x, y, z, w, h);
-		graph graphT(graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
+		graph graphT(id,graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
 		graphT.allocateEdgeColor(edgeColor[id-1][0], edgeColor[id-1][1], edgeColor[id][2], edgeColor[id-1][3]);
 		graphDatabase.push_back(graphT);
 		printf("Load Complete\n");
 
+	}
+	
+	for (Json::ValueIterator itr = alignmentStruct.begin(); itr != alignmentStruct.end(); itr++)
+	{
+		PrintJSONValue(itr.key());
+		Json::Value alignmentTemp = alignmentStruct[itr.key().asString().c_str()];
+			int leftG = alignmentTemp["graphID1"].asInt();
+			int rightG = alignmentTemp["graphID2"].asInt();
+			std::string filelocation = alignmentTemp["filelocation"].asString();
+			printf("Perform Alignment on %d %d using %s \n ", leftG, rightG, filelocation.c_str());
+			int indexLeft = -1;
+			int indexRight = -1;
+			for (int i = 0; i < graphDatabase.size(); i++)
+			{
+				if (graphDatabase.at(i).id == leftG)
+				{
+					indexLeft = i; break;
+				}
+
+			}
+			for (int i = 0; i < graphDatabase.size(); i++)
+			{
+				if (graphDatabase.at(i).id == rightG)
+				{
+					indexRight = i; break;
+				}
+
+			}
+			if (indexLeft != -1 && indexRight != -1){
+				Alignment Temp((char *)filelocation.c_str(), &(graphDatabase.at(indexLeft)), &(graphDatabase.at(indexRight)));
+				alignmentDatabase.push_back(Temp);
+			}
 	}
 }
 
@@ -268,21 +299,22 @@ void init() {
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	
-	
-
-	//glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	//glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-
-	//glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	  //glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
+	/*
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	*/
+
 
 	/*
 
@@ -424,11 +456,25 @@ void runForceDirected(graph *g)
 
 }
 
-
-void drawAlignment(Alignment *align, bool animatable = true)
+void runAlignmentLayout(Alignment * a)
 {
 
+	if (animate == true)
+	{
+		if (gpuEnabled){
+			cudaError_t cuerr = runAlignmentForceGPU(a);
+			if (cuerr != cudaSuccess)
+				cout << "CUDA Error: " << cudaGetErrorString(cuerr) << endl;
+		}
+	}
 
+}
+
+
+void drawAlignment(Alignment *align)
+{
+
+	if (animate == true)
 	align->update();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -442,13 +488,7 @@ void drawAlignment(Alignment *align, bool animatable = true)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-	if (animateAlignment == true && animatable == true)
-	{
-		cudaError_t cuerr = runAlignmentForceGPU(align);
-		// check for errors is always a good practice!
-		if (cuerr != cudaSuccess)
-			cout << "CUDA Error: " << cudaGetErrorString(cuerr) << endl;
-	}
+
 
 }
 
@@ -552,6 +592,12 @@ void PerspDisplay() {
 		drawGraph(&graphT);
 	}
 		
+	for (int i = 0; i < alignmentDatabase.size(); i++)
+	{
+		Alignment alignT = alignmentDatabase.at(i);
+		drawAlignment(&alignT);
+
+	}
 	
 	
 
@@ -569,6 +615,13 @@ void idle()
 		runForceDirected(&graphT);
 	}
 
+	for (int i = 0; i < alignmentDatabase.size(); i++)
+	{
+		Alignment alignT = alignmentDatabase.at(i);
+
+		runAlignmentLayout(&alignT);
+	}
+
 	gpuDeviceSync();
 
 	for (int i = 0; i < graphDatabase.size(); i++)
@@ -577,6 +630,8 @@ void idle()
 
 		copyForceDirectedGPU(&graphT);
 	}
+
+	
 
 	glutPostRedisplay();
 }
@@ -618,9 +673,6 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 		showalignment = !showalignment;
 		break;
 
-	case '/':
-		animateAlignment = !animateAlignment;
-		break;
 		//Camera
 	case 'w': case 'W':
 		printf("w pressed\n");

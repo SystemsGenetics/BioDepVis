@@ -14,8 +14,9 @@
 extern "C"
 cudaError_t gpuSetup(graph *);
 
- graph::graph(char *graphname, char *filename,char *filenamecluster,int x,int y,int z,int w,int h)
+ graph::graph(int iid, char *graphname, char *filename,char *filenamecluster,int x,int y,int z,int w,int h)
 {
+	id = iid;
 displayName = false;
 strncpy(name, graphname, strlen(graphname));
 addName(name, x, y, z, w, h);

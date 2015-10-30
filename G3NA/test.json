@@ -10,12 +10,25 @@
             "z": 0,
             "w": 200,
             "h": 200
+        },
+        "graph2": {
+            "id": 2,
+            "name": "Rice",
+            "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R.tab",
+            "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R.tab.cluster",
+            "x": -200,
+            "y": 0,
+            "z": 0,
+            "w": 200,
+            "h": 200
         }
 
     },
     "alignment": {
-        "alignment1": [ 1, 2 ],
-        "alignment2": [ 1, 3 ],
-        "alignment3": [ 2, 3 ]
+        "alignment1": {
+            "graphID1" : 1,
+            "graphID2" : 2,
+            "filelocation" :  "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\MR.tab"
+        }
     }
 }

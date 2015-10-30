@@ -59,7 +59,8 @@ public:
     bool displayName;
 
     void addName(char *,int,int,int,int,int);
-    graph(char *,char *,char *,int,int,int,int,int);
+    graph(int,char *,char *,char *,int,int,int,int,int);
+	int id;
 
 };
 

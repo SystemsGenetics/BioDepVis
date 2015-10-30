@@ -177,7 +177,7 @@ if(id < graphsize){
 extern "C"
 cudaError_t runForceDirectedGPU(graph *g)
 {
-printf("running kernel\n");
+//printf("running kernel\n");
 //testforceDirectedKernel<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
 forceDirectedKernel2d<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
 //cudaDeviceSynchronize();
@@ -256,18 +256,7 @@ extern "C"
 cudaError_t runAlignmentForceGPU(Alignment *algn)
 {
 printf("running alignment kernel\n");
-//testforceDirectedKernel<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
-#ifdef STACKVIEW
-printf("Running stack kernel\n");
-//forceAlignStackKernel2d<<<(int)( algn->rows/256)+1,256>>>(algn->rows,algn->cols,algn->g1->coords_d,algn->g2->coords_d,algn->g1->coinfo_d,algn->g2->coinfo_d,algn->edgeAlignMatrix_d);
-forceAlignStackKernel2d<<<(int)((algn->rows+0)/256)+1,256>>>(algn->rows,algn->cols,algn->g1->coords_d,algn->g2->coords_d,algn->g1->coinfo_d,algn->g2->coinfo_d,algn->edgeAlignMatrix_d);
-//forceAlignStackKernel2d<<<(int)((algn->cols+0)/256)+1,256>>>(algn->cols,algn->rows,algn->g2->coords_d,algn->g1->coords_d,algn->g2->coinfo_d,algn->g2->coinfo_d,algn->edgeAlignMatrix_d);
-#else
 printf("Running Normal Kernel\n");
 forceAlignKernel2d<<<(int)( algn->rows/256)+1,256>>>(algn->rows,algn->cols,algn->g1->coords_d,algn->g2->coords_d,algn->edgeAlignMatrix_d);
-#endif
-//cudaDeviceSynchronize();
-//cudaMemcpy(algn->g1->coords,algn->g1->coords_d,algn->g1->nodes * sizeof(float)*3, cudaMemcpyDeviceToHost);
-//cudaMemcpy(algn->g2->coords,algn->g2->coords_d,algn->g2->nodes * sizeof(float)*3, cudaMemcpyDeviceToHost);
 return cudaGetLastError();
 }
