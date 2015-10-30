@@ -4,7 +4,7 @@
 #include "color.h"
 #include <string>
 #include <cuda_runtime.h>
-
+#define NODEALPHA 1.0f
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
@@ -45,7 +45,7 @@ displayName = true;
  void graph::readGraph(char* filename)
  {
      er=1.0f;eg=1.0f;eb=1.0f;ea=1.0f;
-     nr=1.0f;ng=1.0f;nb=1.0f,na=1.0f;
+	 nr = 1.0f; ng = 1.0f; nb = 1.0f, na = NODEALPHA;
      FILE *fp;
      fp = fopen(filename,"r");
      if(fp == NULL)
@@ -213,14 +213,14 @@ void graph::clusterization(char *filename)
     color[i*4+0]=r;
     color[i*4+1]=g;
     color[i*4+2]=b;
-    color[i*4+3]=1.0;
+    color[i*4+3]=NODEALPHA;
     }
     else
     {
         color[i*4+0]=1.0f;
         color[i*4+1]=1.0f;
         color[i*4+2]=1.0f;
-        color[i*4+3]=0.3f;
+		color[i * 4 + 3] = NODEALPHA;
     }
 
     }
