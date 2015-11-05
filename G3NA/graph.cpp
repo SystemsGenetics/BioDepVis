@@ -150,7 +150,17 @@ displayName = true;
 
 
  }
+ void graph::cleanup()
+ {
+	 free(edgeMatrix);
+	 free(coinfo);
+	 free(coords);
+	 free(color);
 
+	 cudaFree(coords_d);
+	 cudaFree(coinfo_d); //dx,dy,dz,radius
+	 cudaFree(edgeMatrix_d);
+ }
 void graph::allocate(int xc,int yc,int w,int h,int z)
 {
     srand(2);

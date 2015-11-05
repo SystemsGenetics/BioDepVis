@@ -27,6 +27,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="miscgl.cpp" />
+    <ClCompile Include="parse.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Vector.cpp" />
@@ -35,6 +36,7 @@
     <ClInclude Include="alignment.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="color.h" />
+    <ClInclude Include="G3NA.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="json\json-forwards.h" />
     <ClInclude Include="json\json.h" />

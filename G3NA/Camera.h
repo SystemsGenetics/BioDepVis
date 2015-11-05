@@ -47,6 +47,9 @@ public:
   Vector3d Aim;
   Vector3d Up;
 
+
+  Matrix4x4 proj_matrix;
+  Matrix4x4 view_matrix;
   float NearPlane;
   float FarPlane;
   float Fov;

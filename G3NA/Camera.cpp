@@ -30,9 +30,9 @@ int MousePrevY;
 
 const float epsilon = 0.0001;
 
-GLdouble MvMatrix[16];
-GLdouble ProjMatrix[16];
-GLint ViewPort[4];
+//GLdouble MvMatrix[16];
+//GLdouble ProjMatrix[16];
+//GLint ViewPort[4];
 
 int CameraMode = INACTIVE;
 
@@ -218,6 +218,8 @@ float max(float a, float b)
 		return b;
 	
 }*/
+#define M_PI 3.14
+#define ONE_DEG_IN_RAD (2.0 * M_PI ) / 360;
 void Camera::PerspectiveDisplay(int W, int H) {
 
   // set up the projection matrix
@@ -226,7 +228,7 @@ void Camera::PerspectiveDisplay(int W, int H) {
   NearPlane = 0.0001;
 //  Fov = min (max(60.0 + Zoom, 1.0), 179.0);
   Fov = min (max(30 + Zoom, 1.0), 270.0);
-  gluPerspective(Fov, (float) W/(float) H, NearPlane, FarPlane);
+  gluPerspective(Fov, (float)W / (float)H, NearPlane, FarPlane);
  // gluLookAt(0, 5, 50, 0, 0, 0, 0, 1, 0);
 
 
@@ -239,13 +241,58 @@ void Camera::PerspectiveDisplay(int W, int H) {
 
   glRotatef(CurrentElev, 1, 0, 0);
   glRotatef(CurrentAzim, 0, 1, 0);
+  /*
+  float fov_rad = Fov * ONE_DEG_IN_RAD;
+  float range = tan(fov_rad / 2.0f) * NearPlane;
+  float sx = (2.0f * NearPlane) / (range * (float)W / (float)H + range * (float)W / (float)H);
+  float sy = NearPlane / range;
+  float sz = -(FarPlane + NearPlane) / (FarPlane - NearPlane);
+  float pz = -(2.0f * FarPlane * NearPlane) / (FarPlane - NearPlane);
 
+  proj_matrix[0] = Vector4d(sx,0,0,0);
+  proj_matrix[1] = Vector4d(0,sy,0,0);
+  proj_matrix[2] = Vector4d(0,0,sz,-1);
+  proj_matrix[3] = Vector4d(0, 0, pz, 0);
+
+
+  //View Matrix
+  Vector3d zaxis = (Pos - Aim).normalize();    // The "forward" vector.
+  Vector3d xaxis = (Up % zaxis).normalize();// The "right" vector.
+  Vector3d yaxis = zaxis % xaxis;     // The "up" vector.
+
+  // Create a 4x4 orientation matrix from the right, up, and forward vectors
+  // This is transposed which is equivalent to performing an inverse 
+  // if the matrix is orthonormalized (in this case, it is).
+  Matrix4x4 orientation;
+	  orientation[0] = Vector4d(xaxis.x, yaxis.x, zaxis.x, 0);
+	  orientation[1] = Vector4d(xaxis.y, yaxis.y, zaxis.y, 0);
+	  orientation[2] = Vector4d(xaxis.z, yaxis.z, zaxis.z, 0);
+	  orientation[3] = Vector4d(0, 0, 0, 1);
+  
+
+  // Create a 4x4 translation matrix.
+  // The eye position is negated which is equivalent
+  // to the inverse of the translation matrix. 
+  // T(v)^-1 == T(-v)
+	  Matrix4x4 translation;
+	  translation[0] = Vector4d(1, 0, 0, 0);
+	  translation[1] = Vector4d(0, 1, 0, 0);
+	  translation[2] = Vector4d(0, 0, 1, 0);
+	  translation[3] = Vector4d(-Pos.x, -Pos.y, -Pos.z, 1);
+  
+
+  // Combine the orientation and translation to compute 
+  // the final view matrix
+  view_matrix = orientation * translation;*/
+  
 }
 
 /*
  * mouse event handler function... should be called in the
  * mouse event handler function of your own code
  */
+
+
 void Camera::HandleMouseEvent(int button, int state, int x, int y) {
   double realy, wx, wy, wz;
 
@@ -298,6 +345,8 @@ void Camera::HandleMouseEvent(int button, int state, int x, int y) {
         break;
     }
   }
+
+
 }
 
 

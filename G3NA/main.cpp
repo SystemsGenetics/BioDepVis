@@ -15,11 +15,7 @@
 #define GLEW_STATIC
 #include "util.h"
 #include "Camera.h"
-#ifdef _WIN32
-#include "json\json.h"
-#else
-#include "json/json.h"
-#endif
+
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
@@ -28,14 +24,12 @@
 #include "alignment.h"
 #include "graph.h"
 #include <cuda_runtime.h>
+#include "Matrix.h"
 
+#include "G3NA.h"
 
+float searchRadius = 40;
 
-//  Standard Input\Output C Library
-#include <stdio.h>
-
-//  To use functions with variables arguments
-#include <stdarg.h>
 
 
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_24;
@@ -55,7 +49,8 @@ int frameCount = 0;
 //  currentTime - previousTime is the time elapsed
 //  between every call of the Idle function
 int currentTime = 0, previousTime = 0;
-
+//int graphSelected = -1, nodeSelected = -1;
+std::vector <nodeSelectedStruct> selectedVector;
 
 //  Number of frames per second
 float fps = 0;
@@ -70,218 +65,20 @@ bool cluster = false;
 bool showalignment = false;
 bool showGrid = false;
 bool gpuEnabled = true;
+bool searchArea = false;
 
 std::vector <graph*> graphDatabase;
 std::vector <Alignment*> alignmentDatabase;
 
-//graph *graph1,*graph2,*graph3, *graph4,*graph5;
-//Alignment *alignment_graph,*alignment_betgraph1,*alignment_betgraph2,*alignment_betgraph3;
-
-void printw(float x, float y, float z, char* format, ...);
-
-//End of My Dec    
+unsigned int m_vertexShader, m_fragmentShader;
+char *vertexsource, *fragmentsource;
+GLuint shaderprogram;   
 int persp_win;
-
 Camera *camera;
-
-
-// draws a simple grid
-void makeGrid() {
-	glColor3f(0.0, 0.0, 0.0);
-	
-	glLineWidth(1.0);
-
-	for (float i = -12; i < 12; i++) {
-		for (float j = -12; j < 12; j++) {
-			glBegin(GL_LINES);
-			glVertex3f(i, 0, j);
-			glVertex3f(i, 0, j + 1);
-			glEnd();
-			glBegin(GL_LINES);
-			glVertex3f(i, 0, j);
-			glVertex3f(i + 1, 0, j);
-			glEnd();
-
-			if (j == 11){
-				glBegin(GL_LINES);
-				glVertex3f(i, 0, j + 1);
-				glVertex3f(i + 1, 0, j + 1);
-				glEnd();
-			}
-			if (i == 11){
-				glBegin(GL_LINES);
-				glVertex3f(i + 1, 0, j);
-				glVertex3f(i + 1, 0, j + 1);
-				glEnd();
-			}
-		}
-	}
-
-	glLineWidth(2.0);
-	glBegin(GL_LINES);
-	glVertex3f(-12, 0, 0);
-	glVertex3f(12, 0, 0);
-	glEnd();
-	glBegin(GL_LINES);
-	glVertex3f(0, 0, -12);
-	glVertex3f(0, 0, 12);
-	glEnd();
-	glLineWidth(1.0);
-}
-
-char* filereader()
-{
-	
-	int array_size = 65536; // define the size of character array
-	char * array = new char[array_size]; // allocating an array of 1kb
-	int position = 0; //this will be used incremently to fill characters in the array 
-
-	ifstream fin("test.json"); //opening an input stream for file test.txt
-	/*checking whether file could be opened or not. If file does not exist or don't have read permissions, file
-	stream could not be opened.*/
-	if (fin.is_open())
-	{
-		//file opened successfully so we are here
-		cout << "File Opened successfully!!!. Reading data from file into array" << endl;
-		//this loop run until end of file (eof) does not occur
-		while (!fin.eof() && position < array_size)
-		{
-			fin.get(array[position]); //reading one character from file to array
-			position++;
-		}
-		array[position - 1] = '\0'; //placing character array terminating character
-
-		/*cout << "Displaying Array..." << endl << endl;
-		//this loop display all the charaters in array till \0
-		for (int i = 0; array[i] != '\0'; i++)
-		{
-		cout << array[i];
-		}*/
-		return array;
-	}
-	else //file could not be opened
-	{
-		cout << "File could not be opened." << endl;
-		return NULL;
-	}
-
-}
-
-void PrintJSONValue(const Json::Value &val)
-{
-	if (val.isString()) {
-		printf("string(%s)\n", val.asString().c_str());
-	}
-	else if (val.isBool()) {
-		printf("bool(%d)\n", val.asBool());
-	}
-	else if (val.isInt()) {
-		printf("int(%d)\n", val.asInt());
-	}
-	else if (val.isUInt()) {
-		printf("uint(%u)\n", val.asUInt());
-	}
-	else if (val.isDouble()) {
-		printf("double(%f)\n", val.asDouble());
-	}
-	else
-	{
-		printf("unknown type=[%d]", val.type());
-	}
-}
-
-#define MAXCOLOR 255.0f
-
-#define EDGEALPHA 0.2f
-float edgeColor[10][4] = { { 166 / MAXCOLOR, 206, 227, EDGEALPHA },
-{ 31 / MAXCOLOR, 120 / MAXCOLOR, 180 / MAXCOLOR, EDGEALPHA },
-{ 178 / MAXCOLOR, 223 / MAXCOLOR, 138 / MAXCOLOR, EDGEALPHA },
-{ 51 / MAXCOLOR, 160 / MAXCOLOR, 44 / MAXCOLOR, EDGEALPHA },
-{ 251 / MAXCOLOR, 154 / MAXCOLOR, 153 / MAXCOLOR, EDGEALPHA },
-{ 227 / MAXCOLOR, 26 / MAXCOLOR, 28 / MAXCOLOR, EDGEALPHA },
-{ 253 / MAXCOLOR, 191 / MAXCOLOR, 111 / MAXCOLOR, EDGEALPHA },
-{ 255 / MAXCOLOR, 127 / MAXCOLOR, 0 / MAXCOLOR, EDGEALPHA },
-{ 202 / MAXCOLOR, 178 / MAXCOLOR, 214 / MAXCOLOR, EDGEALPHA },
-{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, EDGEALPHA } };
-
-void parser()
-{
-	Json::Reader reader;
-	Json::Value root;
-	char *fileinfo = filereader();
-	bool parseStatus = reader.parse(fileinfo, root);
-	if (parseStatus == true)
-		printf("Parsed Successful");
-	else
-		printf("Parse Failed");
-	
-	Json::Value graphStruct = root["graph"];
-	Json::Value alignmentStruct = root["alignment"];
-
-	printf(" {type=[%d], size=%d}", graphStruct.type(), graphStruct.size());
-
-
-	for (Json::ValueIterator itr = graphStruct.begin(); itr != graphStruct.end(); itr++)
-	{
-		PrintJSONValue(itr.key());
-		
-		Json::Value graphTemp = graphStruct[itr.key().asString().c_str()];
-		int id = graphTemp["id"].asInt();
-		std::string graphNameTemp = graphTemp["name"].asString();
-		char *graphname =  new char [graphNameTemp.size() + 1];
-		strcpy(graphname, graphNameTemp.c_str()); 
-		//graphname[graphNameTemp.size() + 1] = '\0';
-		std::string fileloc = graphTemp["fileLocation"].asString(); 
-		std::string clusterloc = graphTemp["clusterLocation"].asString();
-		int x = graphTemp["x"].asInt();
-		int y = graphTemp["y"].asInt();
-		int z = graphTemp["z"].asInt();
-		int w = graphTemp["w"].asInt();
-		int h = graphTemp["h"].asInt();
-		printf("<------------>ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(),fileloc.c_str(),clusterloc.c_str(), x, y, z, w, h);
-		graph *graphT = new graph(id,graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
-		graphT->allocateEdgeColor(edgeColor[id-1][0], edgeColor[id-1][1], edgeColor[id][2], edgeColor[id-1][3]);
-		graphDatabase.push_back(graphT);
-		printf("Load Complete\n");
-
-	}
-	
-	for (Json::ValueIterator itr = alignmentStruct.begin(); itr != alignmentStruct.end(); itr++)
-	{
-		PrintJSONValue(itr.key());
-		Json::Value alignmentTemp = alignmentStruct[itr.key().asString().c_str()];
-			int leftG = alignmentTemp["graphID1"].asInt();
-			int rightG = alignmentTemp["graphID2"].asInt();
-			std::string filelocation = alignmentTemp["filelocation"].asString();
-			printf("Perform Alignment on %d %d using %s \n ", leftG, rightG, filelocation.c_str());
-			int indexLeft = -1;
-			int indexRight = -1;
-			for (int i = 0; i < graphDatabase.size(); i++)
-			{
-				if (graphDatabase.at(i)->id == leftG)
-				{
-					indexLeft = i; break;
-				}
-
-			}
-			for (int i = 0; i < graphDatabase.size(); i++)
-			{
-				if (graphDatabase.at(i)->id == rightG)
-				{
-					indexRight = i; break;
-				}
-
-			}
-			if (indexLeft != -1 && indexRight != -1){
-				Alignment *Temp = new Alignment((char *)filelocation.c_str(), (graphDatabase.at(indexLeft)), (graphDatabase.at(indexRight)));
-				alignmentDatabase.push_back(Temp);
-			}
-	}
-}
-
 unsigned int width_particle = 64, height_particle = 64;
 unsigned char *data_particle;
 GLuint textures;
+
 void loadTexture()
 {
 
@@ -307,16 +104,16 @@ void loadTexture()
 }
 
 
-unsigned int m_vertexShader, m_fragmentShader;
-char *vertexsource, *fragmentsource;
-GLuint shaderprogram;
+int pointSize;
+int m_damping;
+
 
 void init() {
 	// set up camera
 	// parameters are eye point, aim point, up vector
 	cudaError_t cuerr;
 	
-	parser();
+	parser(&graphDatabase, &alignmentDatabase);
 	camera = new Camera(Vector3d(0, 10, 400), Vector3d(0, 0, 0),
 		Vector3d(0, 1, 0));
 
@@ -425,12 +222,18 @@ void init() {
 	}
 	printf("Vertex Shader ID : %d \n Fragment Shader ID : %d \n", m_vertexShader, m_fragmentShader);
 	*/
-
 }
+
+
+
+
+
+
+
 
 void drawGraph(graph *g)
 {
-
+	glColor3f(1, 1, 1);
 	if (g->displayName == true)
 	{
 		
@@ -565,30 +368,6 @@ void drawAlignment(Alignment *align)
 
 
 
-void calculateFPS()
-{
-	//  Increase frame count
-	frameCount++;
-
-	//  Get the number of milliseconds since glutInit called
-	//  (or first call to glutGet(GLUT ELAPSED TIME)).
-	currentTime = glutGet(GLUT_ELAPSED_TIME);
-
-	//  Calculate time passed
-	int timeInterval = currentTime - previousTime;
-
-	if (timeInterval > 1000)
-	{
-		//  calculate the number of frames per second
-		fps = frameCount / (timeInterval / 1000.0f);
-
-		//  Set time
-		previousTime = currentTime;
-
-		//  Reset frame count
-		frameCount = 0;
-	}
-}
 
 
 
@@ -640,21 +419,17 @@ void PerspDisplay() {
 	camera->PerspectiveDisplay(WIDTH, HEIGHT);
 
 
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	if (showGrid)
-		makeGrid();
-
-	
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
 		graph *graphT = graphDatabase.at(i);
 		drawGraph(graphT);
-	//printf("Drawing %s \n ", graphT->name);
+		//printf("Drawing %s \n ", graphT->name);
 	}
-		
+
 	for (int i = 0; i < alignmentDatabase.size(); i++)
 	{
 		Alignment *alignT = alignmentDatabase.at(i);
@@ -678,8 +453,32 @@ void PerspDisplay() {
 	glDisable(GL_TEXTURE_2D);
 	*/
 
+	//if (graphSelected != -1 || nodeSelected != -1){
+	if (selectedVector.size() > 0){
+		for (int i = 0; i < selectedVector.size(); i++){
+			int nodeSelected = selectedVector.at(i).nodeSelected;
+			int graphSelected = selectedVector.at(i).graphSelected;
+			glColor3f(1.0, 1.0, 0.0);
+			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
+			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
+			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
+			glLoadIdentity();
+			glPushMatrix();
+			glTranslatef(vx,vy,vz);
+			glutSolidSphere(1, 20, 20);
+			glPopMatrix();
+		}
+	}
+
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(0, 0);
+	glVertex2f(0, 10);
+	glVertex2f(10, 10);
+	glVertex2f(10, 0);
+	glEnd();
 	glutSwapBuffers();
 }
+
 
 void idle()
 {
@@ -711,9 +510,147 @@ void idle()
 	glutPostRedisplay();
 }
 
+void cleanup()
+{
+	printf("Performing Cleanup");
+	for (int i = 0; i < graphDatabase.size(); i++)
+	{
+		graphDatabase.at(i)->cleanup();
+		free(graphDatabase.at(i));
+	}
+	for (int i = 0; i < alignmentDatabase.size(); i++)
+	{
+		alignmentDatabase.at(i)->cleanup();
+		free(alignmentDatabase.at(i));
+	}
+}
+
+Vector3d ClosestPoint(const Vector3d A, const Vector3d B,
+	const Vector3d P, double *t)
+{
+	Vector3d AB = B - A;
+	double ab_square = AB * AB;
+	Vector3d AP = P - A;
+	double ap_dot_ab = AP * AB;
+	// t is a projection param when we project vector AP onto AB 
+	*t = ap_dot_ab / ab_square;
+	// calculate the closest point 
+	Vector3d Q = A + AB * (*t);
+	return Q;
+}
+
+
+bool RayTest( const Vector3d start, const Vector3d end, Vector3d center,
+	Vector3d *pt, double *t, double epsilon)
+{
+
+	*pt = ClosestPoint(start, end, center, t);
+	//double len = Distance(*pt, m_pos);
+	double len = (*pt - center).norm();
+	double m_radius = 5;
+	return len < (m_radius + epsilon);
+}
+
+bool RayTestPoints(const Vector3d &start, const Vector3d &end,
+	unsigned int *id, double *t, double epsilon)
+{
+	//unsigned int pointID = m_count + 1;
+	bool foundCollision = false;
+	double minDistToStart = 10000000.0;
+	double dst;
+	Vector3d pt;
+
+	for (int i = 0; i < graphDatabase.size(); i++)
+	{
+		for (int j = 0; j < graphDatabase.at(i)->nodes;j++)
+		if (RayTest(start, end, graphDatabase.at(i)->coords[j*3 + 0], &pt, t, epsilon))
+		{
+		
+			printf("Valid %d \n---\n", j, graphDatabase.at(i)->nodeListMap["A"]);
+		}
+	}
+	
+	return true;
+}
+
+float PointToLineDistance(const Vector3d &a, const Vector3d &b, const Vector3d &point){
+	Vector3d lineDirection = (b - a).normalize(); Vector3d pointDirection = point - a;
+	float t = pointDirection * lineDirection;
+	Vector3d projection = a + (lineDirection * t);
+
+	float ShortestDistance = (projection - point).norm();
+	return ShortestDistance;
+}
+
+void GetPickRay(int mouseX, int mouseY)
+{
+	Vector3d m_start;
+	Vector3d m_end;
+	double matModelView[16], matProjection[16];
+	int viewport[4];
+	glLoadIdentity();
+	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView);
+	glGetDoublev(GL_PROJECTION_MATRIX, matProjection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	double winX = (double)mouseX;
+	double winY = viewport[3] - (double)mouseY;
+	gluUnProject(winX, winY, 0.0, matModelView, matProjection,
+		viewport, &m_start.x, &m_start.y, &m_start.z);
+	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
+		viewport, &m_end.x, &m_end.y, &m_end.z);
+	double t;
+	
+
+	float w;
+	//int graphSelected = -1;
+	//int nodeSelected = -1;
+	
+	float min = 5.0f;
+	if (searchArea != true)
+		min = searchRadius;
+		//RayTestPoints(m_start, m_end, 0, &t, 0.0001f);
+	selectedVector.clear();
+	for (int i = 0; i < graphDatabase.size(); i++)
+	{
+		for (int j = 0; j < graphDatabase.at(i)->nodes; j++)
+		{
+			float d = PointToLineDistance(m_start, m_end, Vector3d(graphDatabase.at(i)->coords[j * 3 + 0], graphDatabase.at(i)->coords[j * 3 + 1], graphDatabase.at(i)->coords[j * 3 + 2]));
+			//printf("%d=%f\n", j, d);
+			if (d < min)
+				{
+					nodeSelectedStruct tmp;
+				printf("Valid %d = %f\n", j, d);
+				tmp.nodeSelected = j;
+				tmp.graphSelected = i;
+				
+				if (searchArea != true)
+				{
+					min = d;
+					selectedVector.clear();
+				}
+						selectedVector.push_back(tmp);
+					
+				}
+			}
+		printf("Search Length : %d Less than %f \n----\n",selectedVector.size(),min);
+	}
+//	printf("graphSelected = %d %d\n", graphSelected, nodeSelected);
+
+}
+
+
+
+
+
+
+
 void mouseEventHandler(int button, int state, int x, int y) {
 	// let the camera handle some specific mouse events (similar to maya)
 	camera->HandleMouseEvent(button, state, x, y);
+	
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP){
+		GetPickRay(x, y);
+}
 	glutPostRedisplay();
 }
 #define SHIFT 15
@@ -809,13 +746,20 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 		camera->Aim.z -= SHIFT;
 		break;
 
+	case 't': case 'T':
+		searchArea = !searchArea;
+		break;
 
-
-
-
+	case '+':
+		searchRadius++;
+		break;
+	case '-':
+		searchRadius++;
+		break;
 
 	case 27:		// esc
 		//glDeleteProgram(shaderprogram);
+		cleanup();
 		exit(0);
 	}
 
@@ -859,6 +803,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_SUCCESS);
 	}
 	
+
 
 	// initialize the camera and such
 	init();

@@ -4,7 +4,7 @@
 #include <cuda.h>
 #include "graph.h"
 #include "alignment.h"
-#define MAX_DISPLACEMENT_SQUARED 10.0f
+#define MAX_DISPLACEMENT_SQUARED 2.0f
 // Kernel that executes on the CUDA device
 
 
@@ -121,37 +121,68 @@ if(id < graphsize){
     }
   }
 }
+/*
+__global__ void forceDirectedKernel2d(int graphsize, float *nodePosition, float *nodeProperty, float *matrixEdge)
+{
+	int i = threadIdx.x + blockIdx.x *  blockDim.x;
+	int j;
+	if (i < graphsize)
+	{
+		for (j = 0; j < graphsize; j++)
+		{
+			float dx = nodePosition[j * 3 + 0] - nodePosition[i * 3 + 0];
+			float dy = nodePosition[j * 3 + 1] - nodePosition[i * 3 + 1];
+			float distance = sqrt(dx * dx + dy * dy);
+			if (distance != 0)
+			{
+				if ()
+				nodeProperty[i*INFOCOUNT + 0] = 
+
+
+
+
+			}
+
+		}
+
+	}
+}*/
+
 
 __global__ void forceDirectedKernel2d(int graphsize,float *nodePosition, float *nodeProperty, float *matrixEdge)
 {
 int id = threadIdx.x + blockIdx.x *  blockDim.x;
 if(id < graphsize){
     //printf("%d => %2.3f %2.3f %2.3f\n",id,nodePosition[id].x, nodePosition[id].y, nodePosition[id].z);
-    float K_r = 25.0f; //2
-    float K_s = 15.0f; //1
-    float L = 1.2f;
-    float delta_t = 0.004f;
+    float K_r = 0.2; //2
+    float K_s = 1.0   ; //1
+    float L = 2.2;
+    float delta_t = 1;
     int i,j = 0;
     i = id;
+	float time;
+	for (time = 0; time < 1;time=time+delta_t)
     {
         for(j = 0;j < graphsize;j++)
         {
             float dx = nodePosition[j*3+0] - nodePosition[i*3+0];
             float dy = nodePosition[j*3+1] - nodePosition[i*3+1];
-            if(dx != 0 && dy!= 0 && i!=j )
+            if(dx != 0 & & dy!= 0 && i!=j )
             {
                 float distance  = sqrt(dx * dx + dy * dy);
                 float force =0.0f,force2=0.0f;
 
 
-                if(matrixEdge[i * graphsize + j] == 0)
-                force = K_r / (distance * distance);
-                if(matrixEdge[i * graphsize + j] == 1)
+                
+                
+                if(matrixEdge[i * graphsize + j] == 1.0f)
                 force2 =  K_s * (distance - L);
+				else
+					force = K_r / (distance * distance);
             nodeProperty[i*INFOCOUNT+0] = nodeProperty[i*INFOCOUNT+0] - ((force * dx)/distance) +((force2*dx)/distance) ;
             nodeProperty[i*INFOCOUNT+1] = nodeProperty[i*INFOCOUNT+1] - ((force * dy)/distance) +((force2*dy)/distance) ;
-            nodeProperty[j*INFOCOUNT+0] = nodeProperty[j*INFOCOUNT+0] + ((force * dx)/distance) -((force2*dx)/distance) ;
-            nodeProperty[j*INFOCOUNT+1] = nodeProperty[j*INFOCOUNT+1] + ((force * dy)/distance) -((force2*dy)/distance) ;
+            //nodeProperty[j*INFOCOUNT+0] = nodeProperty[j*INFOCOUNT+0] + ((force * dx)/distance) -((force2*dx)/distance) ;
+            //nodeProperty[j*INFOCOUNT+1] = nodeProperty[j*INFOCOUNT+1] + ((force * dy)/distance) -((force2*dy)/distance) ;
             }
 
         }
@@ -165,11 +196,15 @@ if(id < graphsize){
             d_x = d_x * s;
             d_y = d_y * s;
         }
+
+
         nodePosition[i*3+2] += 0.0f;
-        nodePosition[i*3+1] += d_y;
-        nodePosition[i*3+0] += d_x;
-        nodeProperty[i*INFOCOUNT+0] *= .06f;
-        nodeProperty[i*INFOCOUNT+1] *= .06f;
+        nodePosition[i*3+1] += d_y * .84;
+        nodePosition[i*3+0] += d_x * .84f;
+        nodeProperty[i*INFOCOUNT+0] *= .6f;
+        nodeProperty[i*INFOCOUNT+1] *= .6f;
+		//nodeProperty[i*INFOCOUNT + 0] = 0;
+		//nodeProperty[i*INFOCOUNT + 1] = 0;
     }
   }
 }

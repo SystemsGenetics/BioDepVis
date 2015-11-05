@@ -30,6 +30,11 @@ Alignment::Alignment(char *filename,graph *graph1,graph *graph2)
 
     update();
 }
+void Alignment::cleanup()
+{
+	free(edgeAlignMatrix);
+	cudaFree(edgeAlignMatrix_d);
+}
 void Alignment::readFile(char *filename)
 {
     FILE *fp2;

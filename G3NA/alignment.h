@@ -9,6 +9,7 @@ public:
     graph *g2;
     void run();
     void update();
+	void cleanup();
     float *edgeAlignMatrix;
     float *edgeAlignMatrix_d;
     int rows;
