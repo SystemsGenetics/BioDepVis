@@ -19,6 +19,60 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\algebra3.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\arcball.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_add_controls.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_bitmaps.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_bitmap_img_data.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_button.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_checkbox.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_column.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_commandline.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_control.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_edittext.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_filebrowser.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_checkbox_0.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_checkbox_0_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_checkbox_1.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_checkbox_1_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_downarrow.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_leftarrow.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_listbox_down.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_listbox_up.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_listbox_up_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_radiobutton_0.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_radiobutton_0_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_radiobutton_1.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_radiobutton_1_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_rightarrow.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_spindown_0.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_spindown_1.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_spindown_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_spinup_0.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_spinup_1.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_spinup_dis.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_img_uparrow.c" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_list.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_listbox.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_mouse_iaction.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_node.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_panel.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_radio.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_rollout.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_rotation.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_scrollbar.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_separator.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_spinner.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_statictext.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_string.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_textbox.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_translation.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_tree.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_treepanel.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_window.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\quaternion.cpp" />
+    <ClCompile Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\viewmodel.cpp" />
     <ClCompile Include="alignment.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="graph.cpp" />
@@ -33,6 +87,13 @@
     <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\algebra3.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\arcball.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_internal.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\glui_internal_control.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\include\GL\glui.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\quaternion.h" />
+    <ClInclude Include="..\..\..\..\..\Downloads\glui-2.35\glui-2.35\src\viewmodel.h" />
     <ClInclude Include="alignment.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="color.h" />
@@ -114,7 +175,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\inc;$(IncludePath)</IncludePath>
+    <IncludePath>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\inc;C:\Users\SmaugMe\Downloads\glui-2.35\glui-2.35\src\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v7.5\common\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

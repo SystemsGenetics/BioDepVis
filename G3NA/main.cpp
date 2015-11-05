@@ -27,9 +27,14 @@
 #include "Matrix.h"
 
 #include "G3NA.h"
+#include "Gl\glui.h"
 
 float searchRadius = 40;
 
+GLUI *glui;
+int   wireframe = 0;
+int   segments = 8;
+int   main_window;
 
 
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_24;
@@ -222,6 +227,11 @@ void init() {
 	}
 	printf("Vertex Shader ID : %d \n Fragment Shader ID : %d \n", m_vertexShader, m_fragmentShader);
 	*/
+	GLUI *glui = GLUI_Master.create_glui("GLUI");
+	new GLUI_Checkbox(glui, "Wireframe", &wireframe);
+	(new GLUI_Spinner(glui, "Segments:", &segments))
+		->set_int_limits(3, 60);
+	
 }
 
 
@@ -803,7 +813,6 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_SUCCESS);
 	}
 	
-
 
 	// initialize the camera and such
 	init();
