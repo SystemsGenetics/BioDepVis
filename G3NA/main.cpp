@@ -30,11 +30,13 @@
 #include "Gl\glui.h"
 
 float searchRadius = 40;
-
 GLUI *glui;
+GLUI_EditText*description;
+GLUI_List *gotermList;
+
 int   wireframe = 0;
 int   segments = 8;
-int   main_window;
+
 
 
 GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_24;
@@ -227,10 +229,9 @@ void init() {
 	}
 	printf("Vertex Shader ID : %d \n Fragment Shader ID : %d \n", m_vertexShader, m_fragmentShader);
 	*/
-	GLUI *glui = GLUI_Master.create_glui("GLUI");
-	new GLUI_Checkbox(glui, "Wireframe", &wireframe);
-	(new GLUI_Spinner(glui, "Segments:", &segments))
-		->set_int_limits(3, 60);
+
+
+
 	
 }
 
@@ -480,18 +481,18 @@ void PerspDisplay() {
 		}
 	}
 
-	glBegin(GL_LINE_LOOP);
-	glVertex2f(0, 0);
-	glVertex2f(0, 10);
-	glVertex2f(10, 10);
-	glVertex2f(10, 0);
-	glEnd();
 	glutSwapBuffers();
 }
 
 
 void idle()
 {
+
+
+	if (glutGetWindow() != persp_win)
+		glutSetWindow(persp_win);
+
+
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
 		graph *graphT = graphDatabase.at(i);
@@ -592,6 +593,27 @@ float PointToLineDistance(const Vector3d &a, const Vector3d &b, const Vector3d &
 	return ShortestDistance;
 }
 
+
+std::string lookupName(int graphIndex, int nodeIndex)
+{
+	for (int i = 0; i < graphDatabase.at(graphIndex)->nodes; i++)
+	{
+		for (auto it = graphDatabase.at(graphIndex)->nodeListMap.begin(); it != graphDatabase.at(graphIndex)->nodeListMap.end(); ++it)
+		{
+			if (it->second == nodeIndex)
+				return it->first;
+		}
+
+	}
+
+}
+
+GLUI_List *selectList;
+int listBoxVal;
+std::string text = "Hello World!";
+int   obj = 0;
+int counter = 0;
+
 void GetPickRay(int mouseX, int mouseY)
 {
 	Vector3d m_start;
@@ -620,6 +642,7 @@ void GetPickRay(int mouseX, int mouseY)
 		min = searchRadius;
 		//RayTestPoints(m_start, m_end, 0, &t, 0.0001f);
 	selectedVector.clear();
+	selectList->delete_all();
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
 		for (int j = 0; j < graphDatabase.at(i)->nodes; j++)
@@ -637,11 +660,21 @@ void GetPickRay(int mouseX, int mouseY)
 				{
 					min = d;
 					selectedVector.clear();
-				}
-						selectedVector.push_back(tmp);
+					selectList->delete_all();
 					
 				}
+						selectedVector.push_back(tmp);
+						
+						char tmpc[256]; 
+						std::string nodename = lookupName(tmp.graphSelected, tmp.nodeSelected);
+						sprintf(tmpc, "%s",nodename.c_str());
+						selectList->add_item(selectedVector.size()-1, tmpc);
+
+				}
 			}
+		selectList->update_size();
+		selectList->update_and_draw_text();
+		
 		printf("Search Length : %d Less than %f \n----\n",selectedVector.size(),min);
 	}
 //	printf("graphSelected = %d %d\n", graphSelected, nodeSelected);
@@ -761,10 +794,10 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 		break;
 
 	case '+':
-		searchRadius++;
+		searchRadius=+10;		
 		break;
 	case '-':
-		searchRadius++;
+		searchRadius=-10;
 		break;
 
 	case 27:		// esc
@@ -774,6 +807,25 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 	}
 
 	glutPostRedisplay();
+}
+
+
+
+
+void control_cb(int control)
+{
+
+	printf("callback: %d\n", control);
+	if (control == 1)
+	{
+		int id = selectList->get_current_item();
+		GLUI_List_Item *item = selectList->get_item_ptr(id);
+	
+		printf("ID : %d = \n", id);
+		description->set_text(item->text);
+
+	}
+
 }
 
 int main(int argc, char *argv[]) {
@@ -798,6 +850,10 @@ int main(int argc, char *argv[]) {
 	glutInitWindowPosition(50, 50);
 	persp_win = glutCreateWindow("G3NAV");
 
+
+
+
+
 	// initialize necessary OpenGL extensions
 	glewInit();
 
@@ -816,13 +872,45 @@ int main(int argc, char *argv[]) {
 
 	// initialize the camera and such
 	init();
+	
+
 	// set up opengl callback functions
 	glutDisplayFunc(PerspDisplay);
 	glutMouseFunc(mouseEventHandler);
 	glutMotionFunc(motionEventHandler);
 	glutKeyboardFunc(keyboardEventHandler);
-	//glutIdleFunc(PerspDisplay);
 	glutIdleFunc(idle);
+
+	//GLUI
+	
+
+	
+	glui = GLUI_Master.create_glui("GLUI", GLUI_SUBWINDOW_RIGHT, 0, 0); /* name, flags,x, and y */
+	
+	new GLUI_Separator(glui);
+	new GLUI_StaticText(glui, "Selected Results");
+	new GLUI_Separator(glui);
+	selectList = new GLUI_List(glui, true, 1, control_cb);
+	selectList->set_w(220);
+	new GLUI_Separator(glui);
+	new GLUI_StaticText(glui, "Description");
+	description = new GLUI_EditText(glui, "");
+	description->disable();
+	description->set_w(220);
+	description->set_h(40);
+	new GLUI_Separator(glui);
+	new GLUI_StaticText(glui, "Go:Term List");
+	gotermList = new GLUI_List(glui, true, 2, control_cb);
+	gotermList->set_w(220);
+	
+
+	glui->set_main_gfx_window(persp_win);
+
+	/* We register the idle callback with GLUI, *not* with GLUT */
+	//GLUI_Master.set_glutIdleFunc( myGlutIdle );
+	GLUI_Master.set_glutIdleFunc(idle);
+	
+	
 	glutMainLoop();
 	return(0);
 }
