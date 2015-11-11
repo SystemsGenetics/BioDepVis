@@ -1,11 +1,21 @@
 CC=g++
 NVCC=nvcc
 SRC = G3NA
-INC=$(SRC)
-LIB=-lGL -lGLU -lglut
+INC=/usr/local/Cellar/glui/2.36/include -I /usr/local/Cellar/glew/1.11.0/include/
+GLUILIB=-L /usr/local/Cellar/glui/2.36/lib 
+GLEWLIB=-L /usr/local/Cellar/glew/1.11.0/lib 
+PLATFORM= $(shell uname -s)
 
-all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o
-	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o $(LIB) -o G3NAV.exe
+ifeq "$(PLATFORM)" "Darwin"
+	LIB=-Xlinker -framework,GLUT -Xlinker -framework,OpenGL 
+endif
+
+ifeq "$(PLATFORM)" "Linux"
+	LIB=-lGL -lGLU -lglut -lGLEW -lglui
+endif
+
+all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o
+	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o $(LIB) $(GLUILIB) $(GLEWLIB) -lGLEW -lglui -o G3NAV.exe
 
 main.o:	$(SRC)/main.cpp
 	$(NVCC) -c -std=c++11 $(SRC)/main.cpp -I $(INC)
@@ -36,6 +46,12 @@ cuda_code.o: $(SRC)/cuda_code.cu
 
 miscgl.o: $(SRC)/miscgl.cpp
 	$(NVCC) -c -std=c++11 $(SRC)/miscgl.cpp
+
+texture.o: $(SRC)/texture.cpp
+	$(NVCC) -c -std=c++11 $(SRC)/texture.cpp
+
+parse.o: $(SRC)/parse.cpp
+	$(NVCC) -c -std=c++11 $(SRC)/parse.cpp
 clean:
 	rm -rf *.o
 	rm -rf G3NAV.exe

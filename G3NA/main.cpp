@@ -7,7 +7,13 @@
 // Minor Modifications by Donald House, 2009
 // Minor Modifications by Yujie Shu, 2012
 //
+
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include "Gl\glui.h"
+#else
 #include <GL/glew.h>
+#endif
+
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include <GL/wglew.h>
@@ -27,7 +33,11 @@
 #include "Matrix.h"
 
 #include "G3NA.h"
+#ifdef __APPLE__
+#include <GL/glui.h>
+#else
 #include "Gl\glui.h"
+#endif
 
 float searchRadius = 40;
 GLUI *glui;
