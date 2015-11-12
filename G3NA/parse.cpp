@@ -92,7 +92,7 @@ float edgeColor[10][4] = { { 166 / MAXCOLOR, 206, 227, EDGEALPHA },
 { 202 / MAXCOLOR, 178 / MAXCOLOR, 214 / MAXCOLOR, EDGEALPHA },
 { 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, EDGEALPHA } };
 
-void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad)
+void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr)
 {
 	Json::Reader reader;
 	Json::Value root;
@@ -121,13 +121,14 @@ void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad)
 		//graphname[graphNameTemp.size() + 1] = '\0';
 		std::string fileloc = graphTemp["fileLocation"].asString();
 		std::string clusterloc = graphTemp["clusterLocation"].asString();
+		std::string nodeOntology = graphTemp["Ontology"].asString();
 		int x = graphTemp["x"].asInt();
 		int y = graphTemp["y"].asInt();
 		int z = graphTemp["z"].asInt();
 		int w = graphTemp["w"].asInt();
 		int h = graphTemp["h"].asInt();
-		printf("<------------>ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(), fileloc.c_str(), clusterloc.c_str(), x, y, z, w, h);
-		graph *graphT = new graph(id, graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), x, y, z, w, h);
+		printf("<------------>ID : %d\n Name : %s\n Loc: %s\n Cluster : %s\n Ont: %s\n X: %d\n Y: %d\n Z: %d\n W: %d\n H: %d\n", id, graphNameTemp.c_str(), fileloc.c_str(), clusterloc.c_str(),nodeOntology.c_str(), x, y, z, w, h);
+		graph *graphT = new graph(id, graphname, (char *)fileloc.c_str(), (char *)clusterloc.c_str(), (char *)nodeOntology.c_str(), x, y, z, w, h,ontologyDatabasePtr);
 		graphT->allocateEdgeColor(edgeColor[id - 1][0], edgeColor[id - 1][1], edgeColor[id][2], edgeColor[id - 1][3]);
 		gd->push_back(graphT);
 		printf("Load Complete\n");
@@ -167,3 +168,4 @@ void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad)
 	}
 	free(fileinfo);
 }
+

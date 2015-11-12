@@ -2,12 +2,15 @@
 #define _G3NA_H
 #include "graph.h";
 #include "alignment.h"
-void parser(std::vector <graph*> *, std::vector <Alignment*> *);
+#include "util.h"
+#include <unordered_map>
+#include<vector>
+
+
+
+
+void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *);
 void printw(float x, float y, float z, char* format, ...);
 
-struct nodeSelectedStruct
-{
-	int nodeSelected;
-	int graphSelected;
-};
+
 #endif

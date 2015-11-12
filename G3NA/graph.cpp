@@ -4,6 +4,11 @@
 #include "color.h"
 #include <string>
 #include <cuda_runtime.h>
+#include <istream>
+#include <iostream>
+#include <vector>
+#include <string>
+
 #define NODEALPHA 1.0f
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
@@ -14,7 +19,7 @@
 extern "C"
 cudaError_t gpuSetup(graph *);
 
- graph::graph(int iid, char *graphname, char *filename,char *filenamecluster,int x,int y,int z,int w,int h)
+graph::graph(int iid, char *graphname, char *filename, char *filenamecluster, char *ontFile, int x, int y, int z, int w, int h, std::unordered_map<std::string, ontStruct> *ontologyDBPtr)
 {
 	id = iid;
 displayName = false;
@@ -26,6 +31,7 @@ readGraph(filename);
 allocate(x,y,w,h,z);
 clusterization(filenamecluster);
 convertEdgeMatrixToVerticeList();
+readOntology(ontFile,ontologyDBPtr);
 cudaError_t cuerr;
 cuerr=gpuSetup(this);
 if (cuerr != cudaSuccess) printf("CUDA Error: %s\n", cudaGetErrorString( cuerr ));
@@ -119,7 +125,9 @@ displayName = true;
      std::cout<<"--Total Nodes : "<<nodeVec.size()<<std::endl;
 	 nodes = nodeVec.size();*/
 	 std::cout << "--Total Nodes : " << nodeListMap.size() << std::endl;
+
 	 nodes = nodeListMap.size();
+	 goTerm = new std::vector<std::string>[nodes];
      edgeMatrix = new float[nodes * nodes];
      edges=0;
      fclose(fp);
@@ -300,3 +308,97 @@ void graph::convertEdgeMatrixToVerticeList()
     printf("Count = %d vs %d\n",count  ,edges);
     fflush(stdout);
 }
+
+void graph::UpdateOntologyInfo(std::string name, std::string golistString, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr)
+{
+	std::vector<std::string> goList;
+	std::stringstream ss(golistString);
+
+	std::string term;
+
+	while (std::getline(ss, term, ',')) {
+		//std::cout << term << '\n';
+
+		goList.push_back(term);
+	}
+
+	/*while (ss >> term)
+	{
+		goList.push_back(term);
+
+		if (ss.peek() == ',')
+			ss.ignore();
+	}*/
+
+	
+	
+	std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
+
+	if (found == nodeListMap.end())
+	{
+		return;
+	}
+	
+	for (int i = 0; i < goList.size(); i++)
+		if (std::find(goTerm[found->second].begin(), goTerm[found->second].end(), goList.at(i)) != goTerm[found->second].end()) {
+			/* v contains x */
+			
+		}
+		else {
+			/* v does not contain x */
+			nodeSelectedStruct tmp;
+			tmp.graphSelected = id-1; tmp.nodeSelected = found->second;
+			goTerm[found->second].push_back(goList.at(i));
+			std::unordered_map<std::string, ontStruct>::const_iterator foundOnt = ontologyDatabasePtr->find(goList.at(i));
+			if (foundOnt != ontologyDatabasePtr->end())
+			ontologyDatabasePtr->at(goList.at(i)).connectedNodes.push_back(tmp);
+			
+		}
+		
+
+
+}
+
+void graph::readOntology(char *filename, std::unordered_map<std::string, ontStruct> *ontologyDBPtr)
+{
+	typedef std::vector<std::vector<std::string> > Rows;
+	Rows rows;
+	std::ifstream input(filename);
+	char const row_delim = '\n';
+	char const field_delim = '\t';
+	for (std::string row; getline(input, row, row_delim);) {
+		rows.push_back(Rows::value_type());
+		std::istringstream ss(row);
+		int index = 0;
+		std::string  name;
+		std::string goterm;
+		for (std::string field; getline(ss, field, field_delim);) {
+			rows.back().push_back(field);
+
+			if (index == 1)
+				name = field;
+			if (index == 9){
+				goterm = field;
+				std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
+				if (found != nodeListMap.end() && goterm!= "")
+					UpdateOntologyInfo(name, goterm,ontologyDBPtr);
+				break;
+			}
+
+			index++;
+			
+		}
+
+	}
+}
+
+
+
+/*std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
+
+if (found != nodeListMap.end())
+{
+	UpdateOntologyInfo(name, goterm);
+}*/
+
+

@@ -81,6 +81,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="miscgl.cpp" />
+    <ClCompile Include="Ont.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="Utility.cpp" />

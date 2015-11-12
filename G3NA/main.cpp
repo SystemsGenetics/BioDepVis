@@ -1,15 +1,8 @@
-//
-// CameraExample.cpp
-//
-// Example program to show how to use Chris Root's OpenGL Camera Class
-// 
-// Christopher Root, 2006
-// Minor Modifications by Donald House, 2009
-// Minor Modifications by Yujie Shu, 2012
-//
-
+//P;aing 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include <GL/glew.h>
 #include "Gl\glui.h"
+
 #else
 #include <GL/glew.h>
 #endif
@@ -42,6 +35,7 @@
 float searchRadius = 40;
 GLUI *glui;
 GLUI_EditText*description;
+GLUI_EditText*goDescription;
 GLUI_List *gotermList;
 
 int   wireframe = 0;
@@ -84,8 +78,11 @@ bool showGrid = false;
 bool gpuEnabled = true;
 bool searchArea = false;
 
+
+std::vector <nodeSelectedStruct> *SelectedGoPtr;
 std::vector <graph*> graphDatabase;
 std::vector <Alignment*> alignmentDatabase;
+std::unordered_map<std::string, ontStruct> ontologyDB;
 
 unsigned int m_vertexShader, m_fragmentShader;
 char *vertexsource, *fragmentsource;
@@ -130,7 +127,7 @@ void init() {
 	// parameters are eye point, aim point, up vector
 	cudaError_t cuerr;
 	
-	parser(&graphDatabase, &alignmentDatabase);
+	parser(&graphDatabase, &alignmentDatabase,&ontologyDB);
 	camera = new Camera(Vector3d(0, 10, 400), Vector3d(0, 0, 0),
 		Vector3d(0, 1, 0));
 
@@ -491,6 +488,26 @@ void PerspDisplay() {
 		}
 	}
 
+	if (SelectedGoPtr != NULL)
+	{
+		for (int i = 0; i < SelectedGoPtr->size(); i++)
+		{
+			int nodeSelected = SelectedGoPtr->at(i).nodeSelected;
+			int graphSelected = SelectedGoPtr->at(i).graphSelected;
+			glColor3f(1.0, 0.0, 1.0);
+			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
+			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
+			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
+			glLoadIdentity();
+			glPushMatrix();
+			glTranslatef(vx, vy, vz);
+			glutSolidSphere(1, 20, 20);
+			glPopMatrix();
+
+		}
+
+	}
+
 	glutSwapBuffers();
 }
 
@@ -653,6 +670,8 @@ void GetPickRay(int mouseX, int mouseY)
 		//RayTestPoints(m_start, m_end, 0, &t, 0.0001f);
 	selectedVector.clear();
 	selectList->delete_all();
+	gotermList->delete_all();
+	SelectedGoPtr = NULL;
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
 		for (int j = 0; j < graphDatabase.at(i)->nodes; j++)
@@ -833,13 +852,33 @@ void control_cb(int control)
 	
 		printf("ID : %d = \n", id);
 		description->set_text(item->text);
+		gotermList->delete_all();
 
+		std::vector <std::string> goList = graphDatabase.at(selectedVector[id].graphSelected)->goTerm[selectedVector[id].nodeSelected];
+		/*sort(goList.begin(), goList.end());
+		goList.erase(unique(goList.begin(), goList.end()), goList.end());*/
+		for (int i = 0; i < goList.size();i++)
+			gotermList->add_item(i, goList.at(i).c_str());	
+	}
+
+	if (control == 2)
+	{
+		int id = gotermList->get_current_item();
+		GLUI_List_Item *item = gotermList->get_item_ptr(id);
+		std::string goname = item->text;
+
+		goDescription->set_text(ontologyDB.at(goname).def.c_str());
+		SelectedGoPtr = &(ontologyDB.at(goname).connectedNodes);
 	}
 
 }
 
+
+void readOntFile(std::unordered_map<std::string, ontStruct> *);
 int main(int argc, char *argv[]) {
 
+
+	readOntFile(&ontologyDB);
 	// set up opengl window
 	glutInit(&argc, argv);
 	//glewInit();
@@ -912,7 +951,10 @@ int main(int argc, char *argv[]) {
 	new GLUI_StaticText(glui, "Go:Term List");
 	gotermList = new GLUI_List(glui, true, 2, control_cb);
 	gotermList->set_w(220);
-	
+	goDescription = new GLUI_EditText(glui, "");
+	goDescription->disable();
+	goDescription->set_w(220);
+	goDescription->set_h(40);
 
 	glui->set_main_gfx_window(persp_win);
 

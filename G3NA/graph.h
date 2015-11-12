@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unordered_map>
+#include "util.h"
+
+
 //#define STACKVIEW 1
 #define INFOCOUNT 5
 void forceDirectedLayout(float *,float *,int nodes, float *matrix);
@@ -31,6 +34,9 @@ public:
     void convertEdgeMatrixToVerticeList();
     void readGraph(char *);
 	void cleanup();
+	void readOntology(char *, std::unordered_map<std::string, ontStruct> *);
+	void graph::UpdateOntologyInfo(std::string, std::string, std::unordered_map<std::string, ontStruct> *);
+	
 	
     graph extractGraph(int *);
     float *coords;
@@ -58,9 +64,10 @@ public:
     int height;
     char name[256];
     bool displayName;
+	std::vector <std::string> *goTerm;
 
     void addName(char *,int,int,int,int,int);
-    graph(int,char *,char *,char *,int,int,int,int,int);
+	graph(int, char *, char *, char *, char *, int, int, int, int, int, std::unordered_map<std::string, ontStruct> *);
 	int id;
 
 };
