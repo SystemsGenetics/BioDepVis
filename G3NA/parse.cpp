@@ -80,7 +80,7 @@ void PrintJSONValue(const Json::Value &val)
 
 #define MAXCOLOR 255.0f
 
-#define EDGEALPHA 0.2f
+#define EDGEALPHA 0.1f
 float edgeColor[10][4] = { { 166 / MAXCOLOR, 206, 227, EDGEALPHA },
 { 31 / MAXCOLOR, 120 / MAXCOLOR, 180 / MAXCOLOR, EDGEALPHA },
 { 178 / MAXCOLOR, 223 / MAXCOLOR, 138 / MAXCOLOR, EDGEALPHA },

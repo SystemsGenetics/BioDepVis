@@ -28,15 +28,18 @@
 #include "G3NA.h"
 #ifdef __APPLE__
 #include <GL/glui.h>
-#else
-#include "Gl\glui.h"
+#elif (WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include "Gl/glui.h"
 #endif
 
 float searchRadius = 40;
 GLUI *glui;
+GLUI *searchglui;
 GLUI_EditText*description;
 GLUI_EditText*goDescription;
 GLUI_List *gotermList;
+GLUI_EditText *searchBox;
+GLUI_Button *searchButton;
 
 int   wireframe = 0;
 int   segments = 8;
@@ -62,6 +65,7 @@ int frameCount = 0;
 int currentTime = 0, previousTime = 0;
 //int graphSelected = -1, nodeSelected = -1;
 std::vector <nodeSelectedStruct> selectedVector;
+std::vector <nodeSelectedStruct> searchSelectedVector;
 
 //  Number of frames per second
 float fps = 0;
@@ -96,7 +100,7 @@ GLuint textures;
 void loadTexture()
 {
 
-	data_particle = loadBMPRaw("particle.bmp", width_particle, height_particle, false);
+	data_particle = loadBMPRaw("simple2.bmp", width_particle, height_particle, false);
 	
 	
 	glGenTextures(1, &textures);
@@ -135,29 +139,50 @@ void init() {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
-	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat mat_shininess[] = { 50.0 };
-	//
-	GLfloat light_position[] = { 1.0,1.0,1.0, 0.0 };
-	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+
 	
 	loadTexture();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
-	/*
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	
+	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
 
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	GLfloat light1_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+	GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light1_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light1_position[] = { -2.0, 2.0, 1.0, 1.0 };
+	GLfloat spot_direction[] = { -1.0, -1.0, 0.0 };
+
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.5);
+	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
+	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.2);
+
+	glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0);
+	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+	glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
+
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	*/
+
+
+	GLfloat mat_amb[] = { 0.1, 0.5, 0.8, 1.0 };
+	glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,mat_amb);
+	
+//	glEnable(GL_LIGHT0);
+//	glEnable(GL_LIGHT1);
+//   glEnable(GL_LIGHTING);
+	
+	//glEnable(GL_BLEND);
 
 
 	/*
@@ -290,7 +315,7 @@ void drawGraph(graph *g)
 
 
 	//Orig
-	glPointSize(8.0f);
+	glPointSize(4.0f);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
@@ -508,6 +533,25 @@ void PerspDisplay() {
 
 	}
 
+	if (searchSelectedVector.size() > 0)
+	{
+		for (int i = 0; i < searchSelectedVector.size(); i++)
+		{
+			int nodeSelected = searchSelectedVector.at(i).nodeSelected;
+			int graphSelected = searchSelectedVector.at(i).graphSelected;
+			glColor3f(0.0, 1.0, 1.0);
+			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
+			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
+			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
+			glLoadIdentity();
+			glPushMatrix();
+			glTranslatef(vx, vy, vz);
+			glutSolidSphere(1, 20, 20);
+			glPopMatrix();
+
+		}
+
+	}
 	glutSwapBuffers();
 }
 
@@ -860,16 +904,45 @@ void control_cb(int control)
 		for (int i = 0; i < goList.size();i++)
 			gotermList->add_item(i, goList.at(i).c_str());	
 	}
-
+	//Go Terms
 	if (control == 2)
 	{
 		int id = gotermList->get_current_item();
 		GLUI_List_Item *item = gotermList->get_item_ptr(id);
 		std::string goname = item->text;
 
-		goDescription->set_text(ontologyDB.at(goname).def.c_str());
+		goDescription->set_text(ontologyDB.at(goname).name+ "\n"+ontologyDB.at(goname).def.c_str());
 		SelectedGoPtr = &(ontologyDB.at(goname).connectedNodes);
 	}
+	//Search Box
+	if (control == 3)
+
+	{
+		selectList->delete_all();
+		gotermList->delete_all();
+		description->set_text("");
+		selectList->redraw();
+		gotermList->redraw();
+		std::string searchString = searchBox->get_text();
+		printf("Done :\n");
+		searchSelectedVector.clear();
+		for (auto local_it = ontologyDB.begin(); local_it != ontologyDB.end(); ++local_it){
+			std::size_t found = local_it->second.def.find(searchString);
+			if (found != std::string::npos)
+			{
+				for (auto nodeIt = local_it->second.connectedNodes.begin(); nodeIt != local_it->second.connectedNodes.end(); ++nodeIt)
+				{
+					nodeSelectedStruct tmp;
+					tmp.graphSelected = nodeIt->graphSelected; tmp.nodeSelected = nodeIt->nodeSelected;
+					searchSelectedVector.push_back(tmp);
+				}
+			//	break;
+			}
+		}
+		
+
+	}
+
 
 }
 
@@ -934,7 +1007,8 @@ int main(int argc, char *argv[]) {
 	
 
 	
-	glui = GLUI_Master.create_glui("GLUI", GLUI_SUBWINDOW_RIGHT, 0, 0); /* name, flags,x, and y */
+	glui = GLUI_Master.create_glui("GUI", GLUI_SUBWINDOW_RIGHT, 0, 0); /* name, flags,x, and y */
+	searchglui = GLUI_Master.create_glui("Search Windowh", GLUI_SUBWINDOW_TOP, 1800, 0); /* name, flags,x, and y */
 	
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Selected Results");
@@ -943,19 +1017,29 @@ int main(int argc, char *argv[]) {
 	selectList->set_w(220);
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Description");
-	description = new GLUI_EditText(glui, "");
+	/*description = new GLUI_EditText(glui, "");
 	description->disable();
-	description->set_w(220);
-	description->set_h(40);
+	description->set_w(420);
+	description->set_h(40);*/
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Go:Term List");
 	gotermList = new GLUI_List(glui, true, 2, control_cb);
 	gotermList->set_w(220);
-	goDescription = new GLUI_EditText(glui, "");
+	goDescription = new GLUI_EditText(glui, "Description");
 	goDescription->disable();
-	goDescription->set_w(220);
-	goDescription->set_h(40);
+	goDescription->set_w(420);
+	goDescription->set_h(80);
+	goDescription->set_alignment(GLUI_ALIGN_LEFT);
 
+
+	//Search GLUI
+	
+	new GLUI_Separator(searchglui);
+	new GLUI_StaticText(searchglui, "Search Term");
+	searchBox = new GLUI_EditText(searchglui, "");
+	searchButton = new GLUI_Button(searchglui, "Search", 3, control_cb);
+	searchBox->set_w(420);
+	searchBox->set_h(40);
 	glui->set_main_gfx_window(persp_win);
 
 	/* We register the idle callback with GLUI, *not* with GLUT */
