@@ -4,9 +4,10 @@
 #include "Gl\glui.h"
 
 #else
+//#include <GL/glui.h>
 #include <GL/glew.h>
 #endif
-
+#include <GL/glui.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include <GL/wglew.h>
@@ -18,7 +19,7 @@
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
-#  include <GL\freeglut.h>
+#  include <GL/freeglut.h>
 #endif
 #include "alignment.h"
 #include "graph.h"
@@ -531,7 +532,7 @@ void PerspDisplay() {
 			glScalef(0.25, 0.25, 0.25);
 			std::string tmp = lookupName(graphSelected, nodeSelected).c_str();
 			char name[256]; strncpy(name, tmp.c_str(), tmp.size());
-			printw(0 + 0.5, 0 + 0.5, 0 +0 .5, name, font_style);
+			printw(0 + 0.5, 0 + 0.5, 0 +0.5, name, font_style);
 			glPopMatrix();
 		}
 	}

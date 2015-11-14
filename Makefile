@@ -1,9 +1,9 @@
 CC=g++
 NVCC=nvcc
 SRC = G3NA
-INC=/usr/local/Cellar/glui/2.36/include -I /usr/local/Cellar/glew/1.11.0/include/
-GLUILIB=-L /usr/local/Cellar/glui/2.36/lib 
-GLEWLIB=-L /usr/local/Cellar/glew/1.11.0/lib 
+INC=/home/benafsh/Downloads/glui-2.35/src/include -I /home/benafsh/NVIDIA_CUDA-7.5_Samples/common/inc
+GLUILIB=-L /home/benafsh/Downloads/glui-2.35/src/lib
+GLEWLIB=-L /home/benafsh/NVIDIA_CUDA-7.5_Samples/common/lib/linux/x86_64
 PLATFORM= $(shell uname -s)
 
 ifeq "$(PLATFORM)" "Darwin"
