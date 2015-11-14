@@ -998,7 +998,7 @@ void readOntFile(std::unordered_map<std::string, ontStruct> *);
 int main(int argc, char *argv[]) {
 
 
-	//readOntFile(&ontologyDB);
+	readOntFile(&ontologyDB);
 	// set up opengl window
 	glutInit(&argc, argv);
 	//glewInit();
