@@ -35,7 +35,7 @@ public:
     void readGraph(char *);
 	void cleanup();
 	void readOntology(char *, std::unordered_map<std::string, ontStruct> *);
-	void graph::UpdateOntologyInfo(std::string, std::string, std::unordered_map<std::string, ontStruct> *);
+	void UpdateOntologyInfo(std::string, std::string, std::unordered_map<std::string, ontStruct> *);
 	
 	
     graph extractGraph(int *);
@@ -56,6 +56,7 @@ public:
     float nr,ng,nb,na;
     //std::vector<std::string> nodeVec;
 	std::unordered_map<std::string,int> nodeListMap;
+	
 
     int centerx;
     int centery;

@@ -10,7 +10,7 @@
 
 
 void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *);
-void printw(float x, float y, float z, char* format, ...);
+
 
 
 #endif

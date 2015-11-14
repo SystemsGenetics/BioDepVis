@@ -252,7 +252,7 @@ if(id < rows){
 
     {
     graph2Pos[j*3+0] = 0.0f;
-    graph2Pos[j*3+1] += 5.0f;
+    graph2Pos[j*3+1] -= 5.0f;
     }
     }
 }

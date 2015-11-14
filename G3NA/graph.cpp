@@ -24,6 +24,7 @@ graph::graph(int iid, char *graphname, char *filename, char *filenamecluster, ch
 	id = iid;
 displayName = false;
 strncpy(name, graphname, strlen(graphname));
+name[strlen(graphname)] = '\0';
 addName(name, x, y, z, w, h);
 
 printf(" Reading %s Filename : %s\n",graphname, filename);
@@ -90,7 +91,6 @@ displayName = true;
 			// std::cout << "Not Found";
 			 std::pair<std::string, int> item(node2, ctr);
 			 nodeListMap.insert(item);
-			 
 			 ctr++;
 		 }
 		 else

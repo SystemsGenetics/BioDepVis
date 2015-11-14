@@ -36,7 +36,7 @@ float searchRadius = 40;
 GLUI *glui;
 GLUI *searchglui;
 GLUI_EditText*description;
-GLUI_EditText*goDescription;
+GLUI_TextBox*goDescription;
 GLUI_List *gotermList;
 GLUI_EditText *searchBox;
 GLUI_Button *searchButton;
@@ -46,8 +46,9 @@ int   segments = 8;
 
 
 
-GLvoid *font_style = GLUT_BITMAP_TIMES_ROMAN_24;
-
+GLvoid *font_style = GLUT_BITMAP_HELVETICA_10;
+GLvoid *font_style2 = GLUT_BITMAP_TIMES_ROMAN_24;
+void printw(float x, float y, float z, char* format, GLvoid *, ...);
 extern "C"
 cudaError_t runForceDirectedGPU(graph *g);
 extern "C"
@@ -145,43 +146,40 @@ void init() {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 	
-	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	GLfloat light_position[] = { 2.0, -200.0, 0.0, 0.0 };
+	GLfloat light_position2[] = { 0.0, 10, -5.0, 0.0 };
+	GLfloat light_position3[] = { 0.0, 10, -5.0, 0.0 };
+	float specref[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	// Light values and coordinates
+	float ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+	float diffuseLight[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	GLfloat light1_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-	GLfloat light1_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light1_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light1_position[] = { -2.0, 2.0, 1.0, 1.0 };
-	GLfloat spot_direction[] = { -1.0, -1.0, 0.0 };
 
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
-	glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
-	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.5);
-	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.5);
-	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.2);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 
-	glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 45.0);
-	glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
-	glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 2.0);
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
+
+
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position2);
+	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
+
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specref);
+	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 128);
+	glEnable(GL_COLOR_MATERIAL);
 
 
+	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 
-	GLfloat mat_amb[] = { 0.1, 0.5, 0.8, 1.0 };
-	glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,mat_amb);
-	
-//	glEnable(GL_LIGHT0);
-//	glEnable(GL_LIGHT1);
-//   glEnable(GL_LIGHTING);
-	
 	//glEnable(GL_BLEND);
 
 
@@ -280,7 +278,7 @@ void drawGraph(graph *g)
 	if (g->displayName == true)
 	{
 		
-		printw(g->centerx, g->centery + g->height / 2, g->centerz, g->name);
+		printw(g->centerx, g->centery + g->height / 2, g->centerz, g->name,font_style2);
 	}
 	 
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
@@ -315,7 +313,7 @@ void drawGraph(graph *g)
 
 
 	//Orig
-	glPointSize(4.0f);
+	glPointSize(2.0f);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
@@ -393,23 +391,40 @@ void drawAlignment(Alignment *align)
 
 	if (animate == true)
 	align->update();
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, align->vertices);
-	glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
-	glLineWidth(0.1);
-	glDrawArrays(GL_LINES, 0, align->edges);
-	glDisable(GL_BLEND);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
+	if (showalignment == true){
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glLineStipple(1, 0xAAAA);//  # [1]
+		glEnable(GL_LINE_STIPPLE);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
+		glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
+		glLineWidth(0.1);
+		glDrawArrays(GL_LINES, 0, align->edges);
+		glDisable(GL_BLEND);
+		glDisable(GL_LINE_STIPPLE);
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
 
 
 
 }
 
 
+std::string lookupName(int graphIndex, int nodeIndex)
+{
+	for (int i = 0; i < graphDatabase.at(graphIndex)->nodes; i++)
+	{
+		for (auto it = graphDatabase.at(graphIndex)->nodeListMap.begin(); it != graphDatabase.at(graphIndex)->nodeListMap.end(); ++it)
+		{
+			if (it->second == nodeIndex)
+				return it->first;
+		}
+
+	}
+
+}
 
 
 
@@ -419,7 +434,7 @@ int _vscprintf(const char *format, va_list argptr)
 	return(vsnprintf(0, 0, format, argptr));
 }
 
-void printw(float x, float y, float z, char* format, ...)
+void printw(float x, float y, float z, char* format, GLvoid *fontStylePrint, ...)
 {
 	va_list args;	//  Variable argument list
 	int len;		//	String length
@@ -446,8 +461,8 @@ void printw(float x, float y, float z, char* format, ...)
 	glRasterPos3f(x, y, z);
 
 	//  Draw the characters one by one
-	for (i = 0; text[i] != '\0'; i++)
-		glutBitmapCharacter(font_style, text[i]);
+	for (i = 0; text[i] != '\0' && i < strlen(text); i++)
+		glutBitmapCharacter(fontStylePrint, text[i]);
 
 	//  Free the allocated memory for the string
 	free(text);
@@ -466,6 +481,13 @@ void PerspDisplay() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+	for (int i = 0; i < alignmentDatabase.size(); i++)
+	{
+		Alignment *alignT = alignmentDatabase.at(i);
+		drawAlignment(alignT);
+
+	}
+
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
 		graph *graphT = graphDatabase.at(i);
@@ -473,12 +495,7 @@ void PerspDisplay() {
 		//printf("Drawing %s \n ", graphT->name);
 	}
 
-	for (int i = 0; i < alignmentDatabase.size(); i++)
-	{
-		Alignment *alignT = alignmentDatabase.at(i);
-		drawAlignment(alignT);
 
-	}
 	//Test();
 	/*
 	glEnable(GL_TEXTURE_2D);
@@ -508,7 +525,13 @@ void PerspDisplay() {
 			glLoadIdentity();
 			glPushMatrix();
 			glTranslatef(vx,vy,vz);
-			glutSolidSphere(1, 20, 20);
+
+			glutWireCube(1);
+			glColor4f(1.0, 1.0, 1.0,0.5);
+			glScalef(0.25, 0.25, 0.25);
+			std::string tmp = lookupName(graphSelected, nodeSelected).c_str();
+			char name[256]; strncpy(name, tmp.c_str(), tmp.size());
+			printw(0 + 0.5, 0 + 0.5, 0 +0 .5, name, font_style);
 			glPopMatrix();
 		}
 	}
@@ -526,7 +549,7 @@ void PerspDisplay() {
 			glLoadIdentity();
 			glPushMatrix();
 			glTranslatef(vx, vy, vz);
-			glutSolidSphere(1, 20, 20);
+			glutWireCube(3);
 			glPopMatrix();
 
 		}
@@ -539,14 +562,14 @@ void PerspDisplay() {
 		{
 			int nodeSelected = searchSelectedVector.at(i).nodeSelected;
 			int graphSelected = searchSelectedVector.at(i).graphSelected;
-			glColor3f(0.0, 1.0, 1.0);
+			glColor3f(1.0, 0.0, 0.0);
 			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
 			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
 			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
 			glLoadIdentity();
 			glPushMatrix();
 			glTranslatef(vx, vy, vz);
-			glutSolidSphere(1, 20, 20);
+			glutWireCube(3);
 			glPopMatrix();
 
 		}
@@ -580,11 +603,14 @@ void idle()
 
 	gpuDeviceSync();
 
-	for (int i = 0; i < graphDatabase.size(); i++)
-	{
-		graph *graphT = graphDatabase.at(i);
 
-		copyForceDirectedGPU(graphT);
+	if (gpuEnabled){
+		for (int i = 0; i < graphDatabase.size(); i++)
+		{
+			graph *graphT = graphDatabase.at(i);
+
+			copyForceDirectedGPU(graphT);
+		}
 	}
 
 	
@@ -665,19 +691,6 @@ float PointToLineDistance(const Vector3d &a, const Vector3d &b, const Vector3d &
 }
 
 
-std::string lookupName(int graphIndex, int nodeIndex)
-{
-	for (int i = 0; i < graphDatabase.at(graphIndex)->nodes; i++)
-	{
-		for (auto it = graphDatabase.at(graphIndex)->nodeListMap.begin(); it != graphDatabase.at(graphIndex)->nodeListMap.end(); ++it)
-		{
-			if (it->second == nodeIndex)
-				return it->first;
-		}
-
-	}
-
-}
 
 GLUI_List *selectList;
 int listBoxVal;
@@ -882,7 +895,21 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+	std::stringstream ss(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
+}
 
+
+std::vector<std::string> split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
+}
 
 
 void control_cb(int control)
@@ -895,7 +922,7 @@ void control_cb(int control)
 		GLUI_List_Item *item = selectList->get_item_ptr(id);
 	
 		printf("ID : %d = \n", id);
-		description->set_text(item->text);
+		description->set_text(item->text.c_str());
 		gotermList->delete_all();
 
 		std::vector <std::string> goList = graphDatabase.at(selectedVector[id].graphSelected)->goTerm[selectedVector[id].nodeSelected];
@@ -910,8 +937,9 @@ void control_cb(int control)
 		int id = gotermList->get_current_item();
 		GLUI_List_Item *item = gotermList->get_item_ptr(id);
 		std::string goname = item->text;
-
-		goDescription->set_text(ontologyDB.at(goname).name+ "\n"+ontologyDB.at(goname).def.c_str());
+		std::string setText = "Name : " + ontologyDB.at(goname).name + "\n" + ontologyDB.at(goname).def.c_str();
+		goDescription->set_text(setText.c_str());
+//		goDescription->set_text(ontologyDB.at(goname).name+ "\n"+ontologyDB.at(goname).def.c_str());
 		SelectedGoPtr = &(ontologyDB.at(goname).connectedNodes);
 	}
 	//Search Box
@@ -924,23 +952,41 @@ void control_cb(int control)
 		selectList->redraw();
 		gotermList->redraw();
 		std::string searchString = searchBox->get_text();
+		std::vector<std::string> searchList = split(searchString, '+');
+		
+		
+
 		printf("Done :\n");
 		searchSelectedVector.clear();
+		
+		
 		for (auto local_it = ontologyDB.begin(); local_it != ontologyDB.end(); ++local_it){
-			std::size_t found = local_it->second.def.find(searchString);
-			if (found != std::string::npos)
+			bool foundStatus = true;
+			for (int i = 0; i < searchList.size(); i++)
 			{
-				for (auto nodeIt = local_it->second.connectedNodes.begin(); nodeIt != local_it->second.connectedNodes.end(); ++nodeIt)
+				std::size_t found = local_it->second.def.find(searchList.at(i));
+				if (found == std::string::npos)
 				{
+					foundStatus = false;
+					break;
+				}
+					
+			}
+			
+			if (foundStatus == true)	{
+				for (auto nodeIt = local_it->second.connectedNodes.begin(); nodeIt != local_it->second.connectedNodes.end(); ++nodeIt){
 					nodeSelectedStruct tmp;
 					tmp.graphSelected = nodeIt->graphSelected; tmp.nodeSelected = nodeIt->nodeSelected;
 					searchSelectedVector.push_back(tmp);
 				}
-			//	break;
 			}
 		}
 		
 
+	}
+	if (control == 4)
+	{
+		searchSelectedVector.clear();
 	}
 
 
@@ -951,7 +997,7 @@ void readOntFile(std::unordered_map<std::string, ontStruct> *);
 int main(int argc, char *argv[]) {
 
 
-	readOntFile(&ontologyDB);
+	//readOntFile(&ontologyDB);
 	// set up opengl window
 	glutInit(&argc, argv);
 	//glewInit();
@@ -1017,19 +1063,20 @@ int main(int argc, char *argv[]) {
 	selectList->set_w(220);
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Description");
-	/*description = new GLUI_EditText(glui, "");
+	description = new GLUI_EditText(glui, "");
 	description->disable();
 	description->set_w(420);
-	description->set_h(40);*/
+	description->set_h(40);
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Go:Term List");
 	gotermList = new GLUI_List(glui, true, 2, control_cb);
 	gotermList->set_w(220);
-	goDescription = new GLUI_EditText(glui, "Description");
-	goDescription->disable();
+	goDescription = new GLUI_TextBox(glui, true);
+	goDescription->set_text("GO TERM DESCRIPTION");
+	//goDescription->disable();
 	goDescription->set_w(420);
 	goDescription->set_h(80);
-	goDescription->set_alignment(GLUI_ALIGN_LEFT);
+	
 
 
 	//Search GLUI
@@ -1038,10 +1085,12 @@ int main(int argc, char *argv[]) {
 	new GLUI_StaticText(searchglui, "Search Term");
 	searchBox = new GLUI_EditText(searchglui, "");
 	searchButton = new GLUI_Button(searchglui, "Search", 3, control_cb);
+	new GLUI_Button(searchglui, "Clear", 4, control_cb);
 	searchBox->set_w(420);
 	searchBox->set_h(40);
 	glui->set_main_gfx_window(persp_win);
-
+	
+	
 	/* We register the idle callback with GLUI, *not* with GLUT */
 	//GLUI_Master.set_glutIdleFunc( myGlutIdle );
 	GLUI_Master.set_glutIdleFunc(idle);

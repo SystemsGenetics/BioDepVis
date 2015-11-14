@@ -5,8 +5,8 @@
             "name": "Maize",
             "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "Ontology": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\Maize_info.txt",
-            "x": 0,
+            "Ontology": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\Maize_info2.txt",
+            "x": -300,
             "y": 0,
             "z": 0,
             "w": 200,
@@ -17,8 +17,8 @@
             "name": "Rice",
             "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R.tab",
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R.tab.cluster",
-            "Ontology":  "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\Rice_info.txt",
-            "x": -200,
+            "Ontology":  "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\Rice_info2.txt",
+            "x": 0,
             "y": 0,
             "z": 0,
             "w": 200,
@@ -30,7 +30,7 @@
         "alignment1": {
             "graphID1" : 1,
             "graphID2" : 2,
-            "filelocation" :  "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\MR.tab"
+            "filelocation" :  "E:\\Dropbox\\Temp\\magma0.5.output"
         }
     }
 }
