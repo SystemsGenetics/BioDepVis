@@ -5,7 +5,7 @@
             "name": "Maize",
             "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 0,
+            "x": -300,
             "y": 0,
             "z": 0,
             "w": 200,
@@ -16,9 +16,9 @@
             "name": "MaizeCons",
             "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\grow.M.tab.gna",
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.grow.cluster",
-            "x": 0,
-            "y": 0,
-            "z": 50,
+            "x": -300,
+            "y": -300,
+            "z": 0,
             "w": 200,
             "h": 200
         },
@@ -29,7 +29,7 @@
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R.tab.cluster",
             "x": 0,
             "y": 0,
-            "z": 150,
+            "z": 0,
             "w": 200,
             "h": 200
         },
@@ -39,8 +39,8 @@
             "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\grow.R.tab.GNA",
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R.grow.cluster",
             "x": 0,
-            "y": 0,
-            "z": 100,
+            "y": -300,
+            "z": 0,
             "w": 200,
             "h": 200
         }
@@ -48,9 +48,21 @@
     },
     "alignment": {
         "alignment1": {
-            "graphID1" : 2,
-            "graphID2" : 4,
-            "filelocation" :  "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\MR.tab"
+            "graphID1": 2,
+            "graphID2": 4,
+            "filelocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\MR.tab"
+        },
+        "alignment2": {
+            "graphID1": 1,
+            "graphID2": 2,
+            "filelocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M-M.gna"
+        },
+       "alignment3": {
+            "graphID1": 3,
+            "graphID2": 4,
+            "filelocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\R-R.gna"
         }
+
+
     }
 }

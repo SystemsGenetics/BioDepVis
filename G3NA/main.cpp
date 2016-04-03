@@ -32,7 +32,7 @@
 #elif (WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 #include "Gl/glui.h"
 #endif
-
+#include "lodepng.h"
 float searchRadius = 40;
 GLUI *glui;
 GLUI *searchglui;
@@ -72,8 +72,8 @@ std::vector <nodeSelectedStruct> searchSelectedVector;
 //  Number of frames per second
 float fps = 0;
 
-int WIDTH = 1900;
-int HEIGHT = 1000;
+int WIDTH = 1920;
+int HEIGHT = 1080;
 
 //Beg of my Dec
 
@@ -95,32 +95,87 @@ char *vertexsource, *fragmentsource;
 GLuint shaderprogram;   
 int persp_win;
 Camera *camera;
-unsigned int width_particle = 64, height_particle = 64;
+unsigned int width_particle=64, height_particle=64;
 unsigned char *data_particle;
 GLuint textures;
+
+
+std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width, unsigned *height)
+{
+	unsigned error;
+	//unsigned char* image;
+	std::vector<unsigned char> image;
+	//unsigned width, height;
+	GLuint texture;
+	unsigned iw, ih;
+	error = lodepng::decode(image, iw, ih, filename);
+	if (error)
+	{
+		printf("error %u: %s\n", error, lodepng_error_text(error));
+		getchar();
+		exit(0);
+	}
+	*width = iw;
+	*height = ih;
+	return image;
+}
+
 
 void loadTexture()
 {
 
-	data_particle = loadBMPRaw("simple2.bmp", width_particle, height_particle, false);
+	
+	//newcode
+	std::vector<unsigned char> data_image;
+	data_image = loadPNGSimple2("particle.png", &width_particle, &height_particle);
+
+	size_t u2 = 1; while (u2 < width_particle) u2 *= 2;
+	size_t v2 = 1; while (v2 < height_particle) v2 *= 2;
+	// Ratio for power of two version compared to actual version, to render the non power of two image with proper size.
+	double u3 = (double)width_particle / u2;
+	double v3 = (double)height_particle / v2;
+
+	// Make power of two version of the image.
+	std::vector<unsigned char> image2(u2 * v2 * 4);
+	for (size_t y = 0; y < height_particle; y++)
+		for (size_t x = 0; x < width_particle; x++)
+			for (size_t c = 0; c < 4; c++)
+			{
+				image2[4 * u2 * y + 4 * x + c] = data_image[4 * width_particle * y + 4 * x + c];
+			}
+
+
+	
+	//Old Code
+	//data_particle = loadBMPRaw("simple2.bmp", width_particle, height_particle, false);
+	glGenTextures(1, &textures);
+	glBindTexture(GL_TEXTURE_2D, textures);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
+
+
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, u2, v2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image2[0]);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_particle, height_particle, 0, GL_BGRA, GL_UNSIGNED_BYTE, &data_image[0]);
+	//glGenerateMipmap(GL_TEXTURE_2D);
 	
 	
+	/*
+
+	//Old Code
+	data_particle = loadBMPRaw("particle.bmp", width_particle, height_particle, false);
 	glGenTextures(1, &textures);
 	glBindTexture(GL_TEXTURE_2D, textures);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	
-
-
-	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_particle, height_particle, 0, GL_BGR, GL_UNSIGNED_BYTE, data_particle);
-	//glGenerateMipmap(GL_TEXTURE_2D);
-	
-	
-
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_particle, height_particle, 0, GL_BGRA, GL_UNSIGNED_BYTE, data_particle);
 	delete[] data_particle;
+
+	*/
 }
 
 
@@ -138,7 +193,8 @@ void init() {
 		Vector3d(0, 1, 0));
 
 	// grey background for window
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+	//glClearColor(0.15, 0.15, 0.15, 0.0);
+	glClearColor(1.0, 1.0, 1.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
 
@@ -275,7 +331,7 @@ void init() {
 
 void drawGraph(graph *g)
 {
-	glColor3f(1, 1, 1);
+	glColor3f(0, 0, 0);
 	if (g->displayName == true)
 	{
 		
@@ -288,24 +344,33 @@ void drawGraph(graph *g)
 
 
 	glEnable(GL_BLEND);
+	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-	//glDisable(GL_LIGHTING);
+	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_LIGHTING);
 	glLineWidth(0.001f);
 	glColor4f(g->er, g->eg, g->eb, g->ea);
 	glDrawElements(GL_LINES, g->edges * 2, GL_UNSIGNED_INT, g->verticeEdgeList);
+	glDepthMask(GL_TRUE);
 	//glEnable(GL_LIGHTING);
 	/*float val = (rand()%201)/200.0f * 360.0f;
 	float cr,cg,cb;
 	HSVtoRGB(&cr,&cg,&cb,val,0.5,0.5);
 	glColor3f(cr,cg,cb);*/
 
-	glColor4f(g->nr, g->ng, g->nb, g->na);
+ 	glColor4f(g->nr, g->ng, g->nb, g->na);
+	//glColor4f(0,0,0,0.5);
 	if (cluster == true){
 		glColorPointer(4, GL_FLOAT, 0, g->color);
 		glEnableClientState(GL_COLOR_ARRAY);
 	}
+
+
+
+
+	
+
 
 	glBindTexture(GL_TEXTURE_2D, textures);
 	glEnable(GL_TEXTURE_2D);
@@ -313,12 +378,25 @@ void drawGraph(graph *g)
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 
 
+
+
 	//Orig
-	glPointSize(2.0f);
+	//printf("Max Size = %d\n", maxSize);
+
+
+	float att[3] = { 0.0f, 1.0f, 0.0f };
+	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
+	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
+	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
+
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	glDepthMask(GL_FALSE);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
-	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_POINT_SPRITE);
@@ -339,7 +417,7 @@ void Test()
 	glEnable(GL_POINT_SPRITE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 	
-	glPointSize(10);
+	glPointSize(200);
 	glBegin(GL_POINTS);
 	for (int i = 0; i < 10; i++)
 	{
@@ -387,8 +465,11 @@ void runAlignmentLayout(Alignment * a)
 }
 
 
+
+
 void drawAlignment(Alignment *align)
 {
+	glDepthMask(GL_FALSE);
 
 	if (animate == true)
 	align->update();
@@ -400,7 +481,7 @@ void drawAlignment(Alignment *align)
 		glEnable(GL_LINE_STIPPLE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
-		glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
+		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
 		glLineWidth(0.1);
 		glDrawArrays(GL_LINES, 0, align->edges);
 		glDisable(GL_BLEND);
@@ -408,8 +489,59 @@ void drawAlignment(Alignment *align)
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
+	if (animate == false && showalignment == false)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		/*glLineStipple(1, 0xAAAA);//  # [1]
+		glEnable(GL_LINE_STIPPLE);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
+		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
+		glLineWidth(0.1);
+		glDrawArrays(GL_LINES, 0, align->edges);*/
+		float r = ((double)rand() / (RAND_MAX)), g = ((double)rand() / (RAND_MAX)), b = ((double)rand() / (RAND_MAX));
+
+		glColor4f(0.99,0.69,0.29, 0.6f);
+		//float cenerCtrPoint1[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, (align->g1->centerz + align->g2->centerz) / 10.0 - 150 };
+		//float cenerCtrPoint2[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, 9 * (align->g1->centerz + align->g2->centerz) / 10.0 - 150};
+
+		glEnable(GL_MAP1_VERTEX_3);
+		for (int k = 0; k < align->edges;  k++)
+		{
+			float x1 = align->vertices[k * 6 + 0];
+			float y1 = align->vertices[k * 6 + 1];
+			float z1 = align->vertices[k * 6 + 2];
+
+			float x2 = align->vertices[k * 6 + 3];
+			float y2 = align->vertices[k * 6 + 4];
+			float z2 = align->vertices[k * 6 + 5];
+			
+			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0, (y1 + y2) / 2.0, (z1 + z2) / 10.0 - 150 };
+			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0, (y1 + y2) / 2.0, 9 * (z1 + z2) / 10.0 - 150};
+
+			GLfloat ctrlPoints[4][3] = { { align->vertices[k * 6 + 0], align->vertices[k * 6 + 1], align->vertices[k * 6 + 2] }, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { align->vertices[k * 6 + 3], align->vertices[k * 6 + 4], align->vertices[k * 6 + 5] } };
+			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
+			
+			glLineWidth(0.1);
+			
+
+			glBegin(GL_LINE_STRIP);
+			for (int i = 0; i <= 100; i++)
+			{
+				GLfloat u = i / (GLfloat)100.0;
+				glEvalCoord1f(u);
+			}
+			glEnd();
+		}
 
 
+		glDisable(GL_BLEND);
+		glDisable(GL_MAP1_VERTEX_3);
+		
+
+	}
+	glDepthMask(GL_TRUE);
 }
 
 
@@ -992,6 +1124,7 @@ void control_cb(int control)
 
 
 }
+
 
 
 void readOntFile(std::unordered_map<std::string, ontStruct> *);

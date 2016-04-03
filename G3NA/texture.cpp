@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+#include "lodepng.h"
 
 
 #ifdef __APPLE__
@@ -19,6 +19,9 @@
 #else
 #  include <GL/freeglut.h>
 #endif
+
+
+
 
 GLuint LoadTexture( const char * filename )
 {

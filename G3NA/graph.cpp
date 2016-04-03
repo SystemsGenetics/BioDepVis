@@ -8,8 +8,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#define CLUSTERSIZE 360.0f
 
-#define NODEALPHA 1.0f
+#define NODEALPHA 0.8f
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
@@ -52,7 +53,7 @@ displayName = true;
  void graph::readGraph(char* filename)
  {
      er=1.0f;eg=1.0f;eb=1.0f;ea=1.0f;
-	 nr = 1.0f; ng = 1.0f; nb = 1.0f, na = NODEALPHA;
+	 nr = 0.0f; ng = 0.0f; nb = 0.0f, na = NODEALPHA;
      FILE *fp;
      fp = fopen(filename,"r");
      if(fp == NULL)
@@ -222,12 +223,12 @@ void graph::clusterization(char *filename)
     {
     int cluster = coinfo[i * INFOCOUNT + 4];
 
-    float hval = cluster/60.0f * 360.0f;
-    float sval = cluster/60.0f * 1.0f;sval= 0.8f;
-    float vval = cluster/60.0f * 1.0f;vval = 0.8f;
+	float hval = cluster / CLUSTERSIZE * 360.0f;
+	float sval = cluster / CLUSTERSIZE * 1.0f; sval = 0.8f;
+	float vval = cluster / CLUSTERSIZE * 1.0f; vval = 0.8f;
     float r,g,b;
     HSVtoRGB(&r,&g,&b,hval,sval,vval);
-    if(cluster < 60){
+    if(cluster < CLUSTERSIZE){
     color[i*4+0]=r;
     color[i*4+1]=g;
     color[i*4+2]=b;

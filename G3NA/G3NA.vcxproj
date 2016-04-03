@@ -78,6 +78,7 @@
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="jsoncpp.cpp" />
     <ClCompile Include="loader.cpp" />
+    <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="miscgl.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="graph.h" />
     <ClInclude Include="json\json-forwards.h" />
     <ClInclude Include="json\json.h" />
+    <ClInclude Include="lodepng.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="Utility.h" />
@@ -113,6 +115,7 @@
   <ItemGroup>
     <None Include="fragmentshader.frag" />
     <None Include="test.json" />
+    <None Include="testDual.json" />
     <None Include="testmultiple.json" />
     <None Include="testSingle.json" />
     <None Include="vertexshader.vert" />

@@ -1,11 +1,12 @@
 {
-    "graph": {
+  "graph": {
         "graph1": {
             "id": 1,
             "name": "Maize",
             "fileLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab",
             "clusterLocation": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\M.tab.cluster",
-            "x": 0,
+            "Ontology": "C:\\Users\\SmaugMe\\Documents\\Visual Studio 2013\\Projects\\G3NA\\Debug\\nvidiadata\\Maize_info2.txt",
+            "x": -250,
             "y": 0,
             "z": 0,
             "w": 200,
