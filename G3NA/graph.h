@@ -42,6 +42,8 @@ public:
     float *coords;
     float *coinfo; //dx,dy,dz,radius
     float *color;
+
+
     float *edgeMatrix;
 
     float *coords_d;
@@ -66,6 +68,8 @@ public:
     char name[256];
     bool displayName;
 	std::vector <std::string> *goTerm;
+
+
 
     void addName(char *,int,int,int,int,int);
 	graph(int, char *, char *, char *, char *, int, int, int, int, int, std::unordered_map<std::string, ontStruct> *);

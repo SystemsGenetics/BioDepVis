@@ -24,7 +24,7 @@ char* filereader()
 	char * array = new char[array_size]; // allocating an array of 1kb
 	int position = 0; //this will be used incremently to fill characters in the array 
 
-	ifstream fin("testDual.json"); //opening an input stream for file test.txt
+	ifstream fin("input.json"); //opening an input stream for file test.txt
 	/*checking whether file could be opened or not. If file does not exist or don't have read permissions, file
 	stream could not be opened.*/
 	if (fin.is_open())
@@ -80,19 +80,18 @@ void PrintJSONValue(const Json::Value &val)
 
 #define MAXCOLOR 255.0f
 
-#define EDGEALPHA 0.2f
+#define EDGEALPHA 0.10f
 float edgeColor[10][4] = { 
-	{ 0, 0, 0, EDGEALPHA },
-	//{ 166 / MAXCOLOR, 206 / MAXCOLOR, 227 / MAXCOLOR, EDGEALPHA },
-	{ 255 / MAXCOLOR, 127 / MAXCOLOR, 0 / MAXCOLOR, EDGEALPHA },
-	
-{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, EDGEALPHA },
+	//{ 1.0, 1.0, 1.0, EDGEALPHA },
+	{ 166 / MAXCOLOR, 206 / MAXCOLOR, 227 / MAXCOLOR, EDGEALPHA },
+	{ 126 / MAXCOLOR, 127 / MAXCOLOR, 200 / MAXCOLOR, EDGEALPHA },
+	{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, EDGEALPHA },	
 { 31 / MAXCOLOR, 120 / MAXCOLOR, 180 / MAXCOLOR, EDGEALPHA },
 { 178 / MAXCOLOR, 223 / MAXCOLOR, 138 / MAXCOLOR, EDGEALPHA },
-{ 51 / MAXCOLOR, 160 / MAXCOLOR, 44 / MAXCOLOR, EDGEALPHA },
-{ 251 / MAXCOLOR, 154 / MAXCOLOR, 153 / MAXCOLOR, EDGEALPHA },
-{ 227 / MAXCOLOR, 26 / MAXCOLOR, 28 / MAXCOLOR, EDGEALPHA },
-{ 253 / MAXCOLOR, 191 / MAXCOLOR, 111 / MAXCOLOR, EDGEALPHA },
+//{ 51 / MAXCOLOR, 160 / MAXCOLOR, 44 / MAXCOLOR, EDGEALPHA },
+//{ 251 / MAXCOLOR, 154 / MAXCOLOR, 153 / MAXCOLOR, EDGEALPHA },
+//{ 227 / MAXCOLOR, 26 / MAXCOLOR, 28 / MAXCOLOR, EDGEALPHA },
+//{ 253 / MAXCOLOR, 191 / MAXCOLOR, 111 / MAXCOLOR, EDGEALPHA },
 { 255 / MAXCOLOR, 127 / MAXCOLOR, 0 / MAXCOLOR, EDGEALPHA } };
 
 /*

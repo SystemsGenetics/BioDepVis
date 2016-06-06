@@ -10,7 +10,7 @@
 #include <string>
 #define CLUSTERSIZE 360.0f
 
-#define NODEALPHA 0.8f
+#define NODEALPHA 0.6f
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
 #else
@@ -202,6 +202,12 @@ void graph::clusterization(char *filename)
     //std::string n1,n2;
     FILE *fp2;
     fp2 = fopen(filename,"r");
+    if(fp2 == NULL)
+    {
+        printf("Cannot Open Filename :%s\n",filename);
+        //exit(0);
+        return;
+    }
     while(fscanf(fp2,"%s\t%s\n",n1,cluster) == 2)
     {
         std::string node1 = n1;
@@ -223,14 +229,14 @@ void graph::clusterization(char *filename)
     {
     int cluster = coinfo[i * INFOCOUNT + 4];
 
-	float hval = cluster / CLUSTERSIZE * 360.0f;
-	float sval = cluster / CLUSTERSIZE * 1.0f; sval = 0.8f;
-	float vval = cluster / CLUSTERSIZE * 1.0f; vval = 0.8f;
+	float hval = cluster /  360.0f * CLUSTERSIZE;
+	float sval = 1.0f- cluster / CLUSTERSIZE * 1.0f; sval = 0.8f;
+	float vval = 1.0f - cluster / CLUSTERSIZE * 1.0f; //vval = 0.8f;
     float r,g,b;
     HSVtoRGB(&r,&g,&b,hval,sval,vval);
     if(cluster < CLUSTERSIZE){
     color[i*4+0]=r;
-    color[i*4+1]=g;
+    color[i*4+1]=g ;
     color[i*4+2]=b;
     color[i*4+3]=NODEALPHA;
     }

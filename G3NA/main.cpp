@@ -72,8 +72,8 @@ std::vector <nodeSelectedStruct> searchSelectedVector;
 //  Number of frames per second
 float fps = 0;
 
-int WIDTH = 1920;
-int HEIGHT = 1080;
+int WIDTH = 800;
+int HEIGHT = 600;
 
 //Beg of my Dec
 
@@ -83,6 +83,8 @@ bool showalignment = false;
 bool showGrid = false;
 bool gpuEnabled = true;
 bool searchArea = false;
+bool roiMODE = false;
+bool backGraphMode = false;
 
 
 std::vector <nodeSelectedStruct> *SelectedGoPtr;
@@ -98,6 +100,20 @@ Camera *camera;
 unsigned int width_particle=64, height_particle=64;
 unsigned char *data_particle;
 GLuint textures;
+
+//ROI Pointers
+std::vector<float> colorROI;
+std::vector<int> verticeEdgeListROI;
+std::vector<float> coordsROI;
+//std::vector<int> selectedNodeROI;
+//std::vector<int> selectedGraphROI;
+std::vector<int> alignEdgesROI;
+std::vector<int> alignEdgesROI2;
+std::vector<int> alignEdgesROI3;
+
+float cx1,cy1,cz1,cx2,cy2,cz2;
+float cx12,cy12,cz12,cx22,cy22,cz22;
+float cx13,cy13,cz13,cx23,cy23,cz23;
 
 
 std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width, unsigned *height)
@@ -194,7 +210,9 @@ void init() {
 
 	// grey background for window
 	//glClearColor(0.15, 0.15, 0.15, 0.0);
+	//glClearColor(1.0, 1.0, 1.0, 0.0);
 	glClearColor(1.0, 1.0, 1.0, 0.0);
+//	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
 
@@ -331,12 +349,14 @@ void init() {
 
 void drawGraph(graph *g)
 {
-	glColor3f(0, 0, 0);
+	/*glColor3f(0.0, 0.0, 0.0);
 	if (g->displayName == true)
 	{
 		
-		printw(g->centerx, g->centery + g->height / 2, g->centerz, g->name,font_style2);
-	}
+		printw(g->centerx, g->centery + g->height / 2 - 40, g->centerz, g->name,font_style2);
+	}*/
+
+
 	 
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -358,6 +378,8 @@ void drawGraph(graph *g)
 	float cr,cg,cb;
 	HSVtoRGB(&cr,&cg,&cb,val,0.5,0.5);
 	glColor3f(cr,cg,cb);*/
+
+	
 
  	glColor4f(g->nr, g->ng, g->nb, g->na);
 	//glColor4f(0,0,0,0.5);
@@ -382,13 +404,15 @@ void drawGraph(graph *g)
 
 	//Orig
 	//printf("Max Size = %d\n", maxSize);
-
+	/*
 
 	float att[3] = { 0.0f, 1.0f, 0.0f };
 	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
 	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
 	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
+	*/
 
+	glPointSize(4.3f);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(GL_FALSE);
@@ -405,6 +429,7 @@ void drawGraph(graph *g)
 
 	//Orig
 	glDisable(GL_BLEND);
+			
 }
 
 void Test()
@@ -464,9 +489,14 @@ void runAlignmentLayout(Alignment * a)
 
 }
 
+#define MAXCOLOR 255.0f
+float edgeAlignmentColor[3][4] = { 
+	//{ 1.0, 1.0, 1.0, EDGEALPHA },
+	{ 189 / MAXCOLOR, 63 / MAXCOLOR, 243 / MAXCOLOR, 0.05f },
+	{ 226 / MAXCOLOR, 127 / MAXCOLOR, 202 / MAXCOLOR, 0.05f },
+	{ 226 / MAXCOLOR, 127 / MAXCOLOR, 202 / MAXCOLOR, 0.05f }};
 
-
-
+int countalignmentdraw= 0;
 void drawAlignment(Alignment *align)
 {
 	glDepthMask(GL_FALSE);
@@ -478,10 +508,15 @@ void drawAlignment(Alignment *align)
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glLineStipple(1, 0xAAAA);//  # [1]
-		glEnable(GL_LINE_STIPPLE);
+		//glEnable(GL_LINE_STIPPLE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
 		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
+		glColor4f(0.69,0.19,0.29, 0.005f);
+		glColor4f(edgeAlignmentColor[countalignmentdraw][0],edgeAlignmentColor[countalignmentdraw][1],edgeAlignmentColor[countalignmentdraw][2],edgeAlignmentColor[countalignmentdraw][3] );
+		countalignmentdraw++;
+		countalignmentdraw = (countalignmentdraw)%alignmentDatabase.size();
+		//printf("countalignmentdraw : %d\n",countalignmentdraw);
 		glLineWidth(0.1);
 		glDrawArrays(GL_LINES, 0, align->edges);
 		glDisable(GL_BLEND);
@@ -502,7 +537,7 @@ void drawAlignment(Alignment *align)
 		glDrawArrays(GL_LINES, 0, align->edges);*/
 		float r = ((double)rand() / (RAND_MAX)), g = ((double)rand() / (RAND_MAX)), b = ((double)rand() / (RAND_MAX));
 
-		glColor4f(0.99,0.69,0.29, 0.6f);
+		glColor4f(0.69,0.19,0.29, 0.005f);
 		//float cenerCtrPoint1[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, (align->g1->centerz + align->g2->centerz) / 10.0 - 150 };
 		//float cenerCtrPoint2[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, 9 * (align->g1->centerz + align->g2->centerz) / 10.0 - 150};
 
@@ -517,8 +552,8 @@ void drawAlignment(Alignment *align)
 			float y2 = align->vertices[k * 6 + 4];
 			float z2 = align->vertices[k * 6 + 5];
 			
-			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0, (y1 + y2) / 2.0, (z1 + z2) / 10.0 - 150 };
-			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0, (y1 + y2) / 2.0, 9 * (z1 + z2) / 10.0 - 150};
+			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, (z1 + z2) / 10.0f - 150.0f };
+			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, 9 * (z1 + z2) / 10.0f - 150.0f};
 
 			GLfloat ctrlPoints[4][3] = { { align->vertices[k * 6 + 0], align->vertices[k * 6 + 1], align->vertices[k * 6 + 2] }, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { align->vertices[k * 6 + 3], align->vertices[k * 6 + 4], align->vertices[k * 6 + 5] } };
 			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
@@ -527,9 +562,9 @@ void drawAlignment(Alignment *align)
 			
 
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i <= 100; i++)
+			for (int i = 0; i <= 20; i++)
 			{
-				GLfloat u = i / (GLfloat)100.0;
+				GLfloat u = i / (GLfloat)20.0;
 				glEvalCoord1f(u);
 			}
 			glEnd();
@@ -544,6 +579,203 @@ void drawAlignment(Alignment *align)
 	glDepthMask(GL_TRUE);
 }
 
+
+void drawAlignmentROI(Alignment *align,int index)
+{
+	glDepthMask(GL_FALSE);
+
+	if (animate == true)
+	align->update();
+
+	if (showalignment == true){
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glLineStipple(1, 0xAAAA);//  # [1]
+		//glEnable(GL_LINE_STIPPLE);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
+		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
+		glColor4f(0.69,0.19,0.29, 0.05f);
+		glColor4f(edgeAlignmentColor[countalignmentdraw][0],edgeAlignmentColor[countalignmentdraw][1],edgeAlignmentColor[countalignmentdraw][2],edgeAlignmentColor[countalignmentdraw][3] );
+		countalignmentdraw++;
+		countalignmentdraw = (countalignmentdraw)%alignmentDatabase.size();
+		//printf("countalignmentdraw : %d\n",countalignmentdraw);
+		glLineWidth(0.1);
+		glDrawArrays(GL_LINES, 0, align->edges);
+		glDisable(GL_BLEND);
+		glDisable(GL_LINE_STIPPLE);
+		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+
+	if (animate == false && showalignment == false)
+	{
+		glLoadIdentity();
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		/*glLineStipple(1, 0xAAAA);//  # [1]
+		glEnable(GL_LINE_STIPPLE);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
+		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
+		glLineWidth(0.1);
+		glDrawArrays(GL_LINES, 0, align->edges);*/
+		float r = ((double)rand() / (RAND_MAX)), g = ((double)rand() / (RAND_MAX)), b = ((double)rand() / (RAND_MAX));
+
+		glColor4f(0.14,0.24,0.7, 0.15f);
+		//float cenerCtrPoint1[3] = { (align->g1->centerx + align->2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, (align->g1->centerz + align->g2->centerz) / 10.0 - 150 };
+		//float cenerCtrPoint2[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, 9 * (align->g1->centerz + align->g2->centerz) / 10.0 - 150};
+		
+		glEnable(GL_MAP1_VERTEX_3);
+		//for (int k = 0; k < align->edges;  k++)
+		//printf("Total Alignment = %d\n",alignEdgesROI.size())
+		
+
+		if(index == 0){
+		for (int i = 0; i < alignEdgesROI.size();  i=i+2)
+		{
+
+
+			int node1g1 = alignEdgesROI.at(i);
+			int node1g2 = alignEdgesROI.at(i+1);
+			float x1 = align->g1->coords[node1g1 * 3 + 0];
+			float y1 = align->g1->coords[node1g1 * 3 + 1];
+			float z1 = align->g1->coords[node1g1 * 3 + 2];
+
+			float x2 = align->g2->coords[node1g2 * 3 + 0];
+			float y2 = align->g2->coords[node1g2 * 3 + 1];
+			float z2 = align->g2->coords[node1g2 * 3 + 2];
+			
+
+
+			//if((x1 > cx1 && x1 <  cx2 && y1 > cy1 && y1 <  cy2 && z1 > cz1 && z1 <  cz2 ) && (x2 > cx12 && x2 <  cx22 && y2 > cy12 && y2 <  cy22 && z2 > cz12 && z2 <  cz22 ))
+			{
+
+			//printf("---Drawing Alignment---\n");
+			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, (z1 + z2) / 10.0f - 150.0f };
+			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, 9 * (z1 + z2) / 10.0f - 150.0f};
+
+			GLfloat ctrlPoints[4][3] = { { x1,y1,z1}, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { x2,y2,z2 } };
+			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
+			
+			glLineWidth(0.5);
+			
+
+			glBegin(GL_LINE_STRIP);
+			for (int i = 0; i <= 20; i++)
+			{
+				GLfloat u = i / (GLfloat)20.0;
+				glEvalCoord1f(u);
+			}
+			glEnd();
+
+
+
+
+			
+			}
+		}
+		printf("Total Edges : %d\n",alignEdgesROI.size());
+		}
+
+				if(index == 1)
+		for (int i = 0; i < alignEdgesROI2.size();  i=i+2)
+		{
+
+
+			int node1g1 = alignEdgesROI2.at(i);
+			int node1g2 = alignEdgesROI2.at(i+1);
+			float x1 = align->g1->coords[node1g1 * 3 + 0];
+			float y1 = align->g1->coords[node1g1 * 3 + 1];
+			float z1 = align->g1->coords[node1g1 * 3 + 2];
+
+			float x2 = align->g2->coords[node1g2 * 3 + 0];
+			float y2 = align->g2->coords[node1g2 * 3 + 1];
+			float z2 = align->g2->coords[node1g2 * 3 + 2];
+			
+
+
+			//if((x1 > cx1 && x1 <  cx2 && y1 > cy1 && y1 <  cy2 && z1 > cz1 && z1 <  cz2 ) && (x2 > cx12 && x2 <  cx22 && y2 > cy12 && y2 <  cy22 && z2 > cz12 && z2 <  cz22 ))
+			{
+
+			//printf("---Drawing Alignment---\n");
+			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, (z1 + z2) / 10.0f - 150.0f };
+			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, 9 * (z1 + z2) / 10.0f - 150.0f};
+
+			GLfloat ctrlPoints[4][3] = { { x1,y1,z1}, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { x2,y2,z2 } };
+			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
+			
+			glLineWidth(0.5);
+			
+
+			glBegin(GL_LINE_STRIP);
+			for (int i = 0; i <= 20; i++)
+			{
+				GLfloat u = i / (GLfloat)20.0;
+				glEvalCoord1f(u);
+			}
+			glEnd();
+
+
+
+
+			
+			}
+		}
+
+
+			if(index == 2)
+		for (int i = 0; i < alignEdgesROI3.size();  i=i+2)
+		{
+
+
+			int node1g1 = alignEdgesROI3.at(i);
+			int node1g2 = alignEdgesROI3.at(i+1);
+			float x1 = align->g1->coords[node1g1 * 3 + 0];
+			float y1 = align->g1->coords[node1g1 * 3 + 1];
+			float z1 = align->g1->coords[node1g1 * 3 + 2];
+
+			float x2 = align->g2->coords[node1g2 * 3 + 0];
+			float y2 = align->g2->coords[node1g2 * 3 + 1];
+			float z2 = align->g2->coords[node1g2 * 3 + 2];
+			
+
+
+			//if((x1 > cx1 && x1 <  cx2 && y1 > cy1 && y1 <  cy2 && z1 > cz1 && z1 <  cz2 ) && (x2 > cx12 && x2 <  cx22 && y2 > cy12 && y2 <  cy22 && z2 > cz12 && z2 <  cz22 ))
+			{
+
+			//printf("---Drawing Alignment---\n");
+			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, (z1 + z2) / 10.0f - 150.0f };
+			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, 9 * (z1 + z2) / 10.0f - 150.0f};
+
+			GLfloat ctrlPoints[4][3] = { { x1,y1,z1}, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { x2,y2,z2 } };
+			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
+			
+			glLineWidth(0.5);
+			
+
+			glBegin(GL_LINE_STRIP);
+			for (int i = 0; i <= 20; i++)
+			{
+				GLfloat u = i / (GLfloat)20.0;
+				glEvalCoord1f(u);
+			}
+			glEnd();
+
+
+
+
+			
+			}
+		}
+
+
+		glDisable(GL_BLEND);
+		glDisable(GL_MAP1_VERTEX_3);
+		
+
+	}
+	glDepthMask(GL_TRUE);
+}
 
 std::string lookupName(int graphIndex, int nodeIndex)
 {
@@ -602,6 +834,226 @@ void printw(float x, float y, float z, char* format, GLvoid *fontStylePrint, ...
 }
 
 
+float xscale=30,yscale=20,zscale=5;
+float xscale2=12,yscale2=18,zscale2=5;
+float xscale3=30,yscale3=30,zscale3=5;
+int nodeSelected2=958,graphSelected2 = 0;
+int nodeSelected3=2603,graphSelected3 = 2;
+void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int zs)
+
+{
+//Draw Rect
+//printf("Draawing ROI");
+glEnable(GL_BLEND);
+glLoadIdentity();
+glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		glPushMatrix();
+		//int nodeSelected = selectedVector.at(i).nodeSelected;
+		//int graphSelected = selectedVector.at(i).graphSelected;
+		//printf("Draw Box : %d %d\n",graphSelected, nodeSelected);
+		float vx = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 0];
+		float vy = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 1];
+		float vz = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 2];	
+		//printf("Draw Box Coords: %d %d==>%f %f %f\n",graphSelectedIndex,nodeSelectedIndex,vx,vy,vz);
+		
+		glTranslatef(vx,vy,vz);
+		glScalef(xs,ys,zs);
+		glColor4f(253.0f/255.0f,212.0f/255.0f,42.0f/255.0,0.8f);
+		//glutSolidCube(1.0);
+		glLineWidth(2.5);
+		glutWireCube(1.0);
+
+		glPopMatrix();
+		glDisable(GL_BLEND);
+}
+
+void drawROIGraph()
+{
+ 
+	glVertexPointer(3, GL_FLOAT, 0, coordsROI.data());
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	/*
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_LIGHTING);
+	glLineWidth(0.001f);
+	//glColor4f(g->er, g->eg, g->eb, g->ea);
+	glColor4f(0.2,0.9,0.3,0.2);
+	//glDrawElements(GL_LINES, verticeEdgeListROI.size(), GL_UNSIGNED_INT, verticeEdgeListROI.data());
+	glDepthMask(GL_TRUE);
+	
+
+	*/
+
+ 	//glColor4f(g->nr, g->ng, g->nb, g->na);
+ 	glColor4f(0.2,0.3,0.5,0.5);
+	//glColor4f(0,0,0,0.5);
+	if (cluster == true){
+		glColorPointer(4, GL_FLOAT, 0, colorROI.data());
+		glEnableClientState(GL_COLOR_ARRAY);
+	}
+
+
+	glBindTexture(GL_TEXTURE_2D, textures);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+
+
+	//Orig
+	//printf("Max Size = %d\n", maxSize);
+	/*
+
+	float att[3] = { 0.0f, 1.0f, 0.0f };
+	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
+	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
+	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
+	*/
+
+	glPointSize(4.3f);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	glDepthMask(GL_FALSE);
+	glDrawArrays(GL_POINTS, 0, coordsROI.size()/3);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
+
+
+	//Orig
+	glDisable(GL_BLEND);
+
+
+
+
+}
+
+
+void drawGraphROIBack(graph *g)
+{
+	glColor3f(0.0, 0.0, 0.0);
+	if (g->displayName == true)
+	{
+		
+		printw(g->centerx, g->centery + g->height / 2 - 40, g->centerz, g->name,font_style2);
+	}
+
+
+	 
+	glVertexPointer(3, GL_FLOAT, 0, g->coords);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+
+
+	glEnable(GL_BLEND);
+	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_LIGHTING);
+	glLineWidth(0.001f);
+	glColor4f(g->er, g->eg, g->eb, 0.10);
+	glDrawElements(GL_LINES, g->edges * 2, GL_UNSIGNED_INT, g->verticeEdgeList);
+	glDepthMask(GL_TRUE);
+	//glEnable(GL_LIGHTING);
+	/*float val = (rand()%201)/200.0f * 360.0f;
+	float cr,cg,cb;
+	HSVtoRGB(&cr,&cg,&cb,val,0.5,0.5);
+	glColor3f(cr,cg,cb);*/
+
+	
+
+ 	glColor4f(g->nr, g->ng, g->nb, 0.1);
+	//glColor4f(0,0,0,0.5);
+	if (cluster == true){
+		glColorPointer(4, GL_FLOAT, 0, g->color);
+		glEnableClientState(GL_COLOR_ARRAY);
+	}
+	glColor4f(0.0,0.0,0.0,0.1);
+
+
+
+
+	
+
+
+	glBindTexture(GL_TEXTURE_2D, textures);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_POINT_SPRITE);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+
+
+
+
+	//Orig
+	//printf("Max Size = %d\n", maxSize);
+	/*
+
+	float att[3] = { 0.0f, 1.0f, 0.0f };
+	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
+	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
+	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
+	*/
+
+	glPointSize(4.3f);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	glDepthMask(GL_FALSE);
+	
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDrawArrays(GL_POINTS, 0, g->nodes);
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_TRUE);
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_POINT_SPRITE);
+	glDisable(GL_BLEND);
+
+
+	
+			
+}
+
+
+void drawPoints()
+{
+glLoadIdentity();
+glPushMatrix();
+glLoadIdentity();
+glColor3f(1.0,0.0,0.0);
+/*glTranslatef(cx1,cy1,cz1);
+glutSolidSphere(1.0,20,20);
+glTranslatef(cx2,cy1,cz1);
+glutSolidSphere(1.0,20,20);
+glTranslatef(cx1,cy2,cz1);
+glutSolidSphere(1.0,20,20);
+glTranslatef(cx2,cy2,cz1);
+glutSolidSphere(1.0,20,20);
+glTranslatef((cx2+cx1)/2,(cy1+cy2)/2,(cz1+cz2)/2);
+glutSolidSphere(1.0,20,20);
+*/
+
+glBegin(GL_LINE_LOOP);
+glVertex3f(cx1,cy1,cz1);
+glVertex3f(cx1,cy2,cz1);
+glVertex3f(cx2,cy2,cz1);
+glVertex3f(cx2,cy1,cz1);
+glEnd();
+glPopMatrix();
+
+printf("(%f %f %f), (%f %f %f)\n",cx1,cy1,cz1,cx2,cy2,cz2);
+
+}
 
 void PerspDisplay() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -609,23 +1061,67 @@ void PerspDisplay() {
 	// draw the camera created in perspective
 	camera->PerspectiveDisplay(WIDTH, HEIGHT);
 
-
-
+	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	for (int i = 0; i < alignmentDatabase.size(); i++)
+
+
+
+	if(roiMODE == false)
 	{
-		Alignment *alignT = alignmentDatabase.at(i);
-		drawAlignment(alignT);
+		for (int i = 0; i < alignmentDatabase.size(); i++)
+		{
+			Alignment *alignT = alignmentDatabase.at(i);
+			drawAlignment(alignT);
+			
+
+		}
+		
+		for (int i = 0; i < graphDatabase.size(); i++)
+		{
+			graph *graphT = graphDatabase.at(i);
+			drawGraph(graphT);
+			//printf("Drawing %s \n ", graphT->name);
+		}
+
 
 	}
 
-	for (int i = 0; i < graphDatabase.size(); i++)
+	else
 	{
-		graph *graphT = graphDatabase.at(i);
-		drawGraph(graphT);
-		//printf("Drawing %s \n ", graphT->name);
+		
+		if(selectedVector.size() == 0)
+			return;
+		int nodeSelected = selectedVector.at(0).nodeSelected;
+		int graphSelected = selectedVector.at(0).graphSelected;
+		//drawPoints();
+		
+		drawROIBox(graphSelected,nodeSelected,xscale,yscale,zscale);
+		drawROIBox(graphSelected2,nodeSelected2,xscale2,yscale2,zscale2);
+		if(alignmentDatabase.size() > 1)
+		drawROIBox(graphSelected3,nodeSelected3,xscale3,yscale3,zscale3);
+
+		
+		glLoadIdentity();
+		for (int i = 0; i < alignmentDatabase.size(); i++)
+		{
+		Alignment *alignT = alignmentDatabase.at(i);
+		drawAlignmentROI(alignT,i);
+		
+		
+		if(backGraphMode)
+		for (int i = 0; i < graphDatabase.size(); i++)
+		{
+			graph *graphT = graphDatabase.at(i);
+			drawGraphROIBack(graphT);
+			//printf("Drawing %s \n ", graphT->name);
+		}
+		
+
+		drawROIGraph();
+
+		}
 	}
 
 
@@ -651,7 +1147,7 @@ void PerspDisplay() {
 		for (int i = 0; i < selectedVector.size(); i++){
 			int nodeSelected = selectedVector.at(i).nodeSelected;
 			int graphSelected = selectedVector.at(i).graphSelected;
-			glColor3f(1.0, 1.0, 0.0);
+			glColor4f(0.0, 0.0, 0.0,1.0);
 			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
 			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
 			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
@@ -660,11 +1156,11 @@ void PerspDisplay() {
 			glTranslatef(vx,vy,vz);
 
 			glutWireCube(1);
-			glColor4f(1.0, 1.0, 1.0,0.5);
-			glScalef(0.25, 0.25, 0.25);
+			glColor4f(0.0, 0.0, 0.0,1.0);
+			glScalef(0.90, 0.90, 0.90);
 			std::string tmp = lookupName(graphSelected, nodeSelected).c_str();
 			char name[256]; strncpy(name, tmp.c_str(), tmp.size());
-			printw(0 + 0.5, 0 + 0.5, 0 +0.5, name, font_style);
+			printw(0 + 0.0, 0 - 1.0, 0 +0.0, name, font_style);
 			glPopMatrix();
 		}
 	}
@@ -675,7 +1171,7 @@ void PerspDisplay() {
 		{
 			int nodeSelected = SelectedGoPtr->at(i).nodeSelected;
 			int graphSelected = SelectedGoPtr->at(i).graphSelected;
-			glColor3f(1.0, 0.0, 1.0);
+			glColor4f(1.0, 0.0, 1.0,0.5);
 			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
 			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
 			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
@@ -695,12 +1191,13 @@ void PerspDisplay() {
 		{
 			int nodeSelected = searchSelectedVector.at(i).nodeSelected;
 			int graphSelected = searchSelectedVector.at(i).graphSelected;
-			glColor3f(1.0, 0.0, 0.0);
+			
 			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
 			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
 			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
 			glLoadIdentity();
 			glPushMatrix();
+			glColor4f(1.0, 0.0, 0.0,0.02);
 			glTranslatef(vx, vy, vz);
 			glutWireCube(3);
 			glPopMatrix();
@@ -708,6 +1205,8 @@ void PerspDisplay() {
 		}
 
 	}
+
+
 	glutSwapBuffers();
 }
 
@@ -831,6 +1330,49 @@ std::string text = "Hello World!";
 int   obj = 0;
 int counter = 0;
 
+
+void AddNodeToROI(int node, graph *tmpg)
+{
+	float nx = tmpg->coords[node * 3 + 0];
+	float ny = tmpg->coords[node * 3 + 1];
+	float nz = tmpg->coords[node * 3 + 2];
+		
+	//if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2 )
+		{
+			int index = coordsROI.size()/3;
+			coordsROI.push_back(nx);coordsROI.push_back(ny);coordsROI.push_back(nz);
+			colorROI.push_back(tmpg->color[node*4+0]);
+			colorROI.push_back(tmpg->color[node*4+1]);
+			colorROI.push_back(tmpg->color[node*4+2]);
+			colorROI.push_back(tmpg->color[node*4+3]+0.3);
+			//selectedNodeROI.push_back(j);selectedGraphROI.push_back(i);
+		}
+}
+
+bool validROI(int node, graph *tmpg)
+{
+	float nx = tmpg->coords[node * 3 + 0];
+	float ny = tmpg->coords[node * 3 + 1];
+	float nz = tmpg->coords[node * 3 + 2];
+		
+	if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2 )
+		{
+			return true;
+		}
+	if(nx > cx12 && nx <  cx22 && ny > cy12 && ny <  cy22 && nz > cz12 && nz <  cz22 )
+	{
+		return true;
+	}
+
+	if(alignmentDatabase.size() > 1 && nx > cx13 && nx <  cx23 && ny > cy13 && ny <  cy23 && nz > cz13 && nz <  cz23 )
+	{
+		return true;
+	}
+		return false;
+	
+	
+}
+
 void GetPickRay(int mouseX, int mouseY)
 {
 	Vector3d m_start;
@@ -896,8 +1438,144 @@ void GetPickRay(int mouseX, int mouseY)
 		
 		printf("Search Length : %d Less than %f \n----\n",selectedVector.size(),min);
 	}
-//	printf("graphSelected = %d %d\n", graphSelected, nodeSelected);
 
+
+
+
+//ROI Load
+int nodeSelected = selectedVector.at(0).nodeSelected;
+int graphSelected = selectedVector.at(0).graphSelected;
+
+if(graphSelected == 0)
+	nodeSelected2 = nodeSelected;
+
+if(graphSelected == 2)
+	nodeSelected3 = nodeSelected;
+
+printf("Node Selected : %d at %f %f %f\n",nodeSelected, graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0],
+	graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1], graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2]);
+
+
+cx1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] - (xscale/2) ;
+cy1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] - (yscale/2) ;
+cz1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] - (zscale/2) ;	
+
+cx2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] + (xscale/2) ;
+cy2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] + (yscale/2) ;
+cz2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] + (zscale/2) ;
+
+
+
+
+cx12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] - (xscale2/2) ;
+cy12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] - (yscale2/2) ;
+cz12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] - (zscale2/2) ;	
+
+cx22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] + (xscale2/2) ;
+cy22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] + (yscale2/2) ;
+cz22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] + (zscale2/2) ;
+
+if(alignmentDatabase.size() > 1){
+cx13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] - (xscale3/2) ;
+cy13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] - (yscale3/2) ;
+cz13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] - (zscale3/2) ;	
+
+cx23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] + (xscale3/2) ;
+cy23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] + (yscale3/2) ;
+cz23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] + (zscale3/2) ;
+}
+
+//std::vector<float> colorROI;
+//std::vector<int> verticeEdgeListROI;
+//std::vector<float> coordsROI;
+
+
+coordsROI.clear();
+colorROI.clear();
+verticeEdgeListROI.clear();
+alignEdgesROI.clear();
+alignEdgesROI2.clear();
+alignEdgesROI3.clear();
+//selectedNodeROI.clear();
+//selectedGraphROI.clear();
+
+for (int i = 0; i < alignmentDatabase.size(); i++)
+{
+	Alignment *align = alignmentDatabase.at(i);
+	for (int k = 0; k < align->edges;  k++)
+	{
+		int node_g1 = align->g1_vertices.at(k);
+		int node_g2 = align->g2_vertices.at(k);
+		//printf("%d - %d\n",node_g1,node_g2);
+		if(validROI(node_g1,align->g1) && validROI(node_g2,align->g2))
+		{
+			AddNodeToROI(node_g1,align->g1);
+			AddNodeToROI(node_g2,align->g2);
+			if(i == 0){
+			alignEdgesROI.push_back(node_g1);alignEdgesROI.push_back(node_g2);
+			}
+			if(i == 1)
+			{
+			alignEdgesROI2.push_back(node_g1);alignEdgesROI2.push_back(node_g2);
+			}
+			if(i == 2)
+			{
+			alignEdgesROI3.push_back(node_g1);alignEdgesROI3.push_back(node_g2);
+			}
+
+		}
+	}
+}
+
+
+
+/*for (int i = 0; i < graphDatabase.size(); i++)
+{
+	for (int j = 0; j < graphDatabase.at(i)->nodes; j++)
+	{
+		float nx = graphDatabase.at(i)->coords[j * 3 + 0];
+		float ny = graphDatabase.at(i)->coords[j * 3 + 1];
+		float nz = graphDatabase.at(i)->coords[j * 3 + 2];
+		
+		if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2 )
+		{
+			int index = coordsROI.size()/3;
+			coordsROI.push_back(nx);coordsROI.push_back(ny);coordsROI.push_back(nz);
+			colorROI.push_back(graphDatabase.at(i)->color[j*4+0]);
+			colorROI.push_back(graphDatabase.at(i)->color[j*4+1]);
+			colorROI.push_back(graphDatabase.at(i)->color[j*4+2]);
+			colorROI.push_back(graphDatabase.at(i)->color[j*4+3]);
+			selectedNodeROI.push_back(j);selectedGraphROI.push_back(i);
+			for(int k = 0; k < graphDatabase.at(i)->nodes; k++ )
+			{
+					if(graphDatabase.at(i)->edgeMatrix[j * graphDatabase.at(i)->nodes + k] == 1 )
+						{
+
+							float nx1 = graphDatabase.at(i)->coords[k * 3 + 0];
+							float ny1 = graphDatabase.at(i)->coords[k * 3 + 1];
+							float nz1 = graphDatabase.at(i)->coords[k * 3 + 2];
+							coordsROI.push_back(nx1);coordsROI.push_back(ny1);coordsROI.push_back(nz1);
+							colorROI.push_back(graphDatabase.at(i)->color[k*4+0]);
+							colorROI.push_back(graphDatabase.at(i)->color[k*4+1]);
+							colorROI.push_back(graphDatabase.at(i)->color[k*4+2]);
+							colorROI.push_back(graphDatabase.at(i)->color[k*4+3]);
+							selectedNodeROI.push_back(k);selectedGraphROI.push_back(i);
+							int newindex = coordsROI.size()/3;
+							verticeEdgeListROI.push_back(index);verticeEdgeListROI.push_back(newindex);
+
+						}
+			}
+
+	
+
+
+
+		}
+
+	}
+}*/
+
+printf("Found : Coordinates %d Edges %d\n",coordsROI.size(),verticeEdgeListROI.size());
 }
 
 
@@ -1012,13 +1690,51 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 		searchArea = !searchArea;
 		break;
 
+	case 'p':
+		yscale+=2;
+		break;
+	case '[':
+		xscale+=2;
+		break;
+
+
+	case 'P':
+		yscale-=2;
+		break;
+	case '{':
+		xscale-=2;
+		break;
+
+
+
+	case '.':
+		yscale2+=2;
+		break;
+	case '/':
+		xscale2+=2;
+		break;
+
+
+	case '>':
+		yscale2-=2;
+		break;
+	case '?':
+		xscale2-=2;
+		break;
+
+
 	case '+':
 		searchRadius=+10;		
 		break;
 	case '-':
 		searchRadius=-10;
 		break;
-
+	case 'x':
+		roiMODE=!roiMODE;
+		break;
+	case 'X':
+		backGraphMode=!backGraphMode;
+		break;
 	case 27:		// esc
 		//glDeleteProgram(shaderprogram);
 		cleanup();
@@ -1127,7 +1843,7 @@ void control_cb(int control)
 
 
 
-void readOntFile(std::unordered_map<std::string, ontStruct> *);
+//void readOntFile(std::unordered_map<std::string, ontStruct> *);
 int main(int argc, char *argv[]) {
 
 
@@ -1188,7 +1904,7 @@ int main(int argc, char *argv[]) {
 
 	
 	glui = GLUI_Master.create_glui("GUI", GLUI_SUBWINDOW_RIGHT, 0, 0); /* name, flags,x, and y */
-	searchglui = GLUI_Master.create_glui("Search Windowh", GLUI_SUBWINDOW_TOP, 1800, 0); /* name, flags,x, and y */
+	searchglui = GLUI_Master.create_glui("Search Window", GLUI_SUBWINDOW_TOP, 1800, 0); /* name, flags,x, and y */
 	
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Selected Results");

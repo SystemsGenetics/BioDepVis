@@ -11,7 +11,7 @@
 
 
 void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *);
-
+void readOntFile(std::unordered_map<std::string, ontStruct> *array);
 
 
 #endif

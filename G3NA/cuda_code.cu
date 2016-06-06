@@ -290,8 +290,8 @@ if(id < rows){
 extern "C"
 cudaError_t runAlignmentForceGPU(Alignment *algn)
 {
-printf("running alignment kernel\n");
-printf("Running Normal Kernel\n");
+//printf("running alignment kernel\n");
+//printf("Running Normal Kernel\n");
 forceAlignKernel2d<<<(int)( algn->rows/256)+1,256>>>(algn->rows,algn->cols,algn->g1->coords_d,algn->g2->coords_d,algn->edgeAlignMatrix_d);
 return cudaGetLastError();
 }

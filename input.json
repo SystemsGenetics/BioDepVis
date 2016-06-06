@@ -1,0 +1,39 @@
+{
+    "graph": {
+        "graph1": {
+            "id": 1,
+            "name": "Maize",
+            "fileLocation": "../data/M.tab",
+            "clusterLocation": "../data/M.tab.cluster",
+            "Ontology" : "../data/Maize_info.txt",
+            "x": -100,
+            "y": 0,
+            "z": 0,
+            "w": 200,
+            "h": 200
+        },
+     
+        "graph2": {
+            "id": 2,
+            "name": "Rice",
+            "fileLocation": "../data/R.tab",
+            "clusterLocation": "../data/R.tab.cluster",
+            "Ontology" : "../data/Rice_info.txt",
+            "x": 100,
+            "y": 0,
+            "z": 0,
+            "w": 200,
+            "h": 200
+        }
+ 
+
+    },
+    "alignment": {
+        "alignment1": {
+            "graphID1": 1,
+            "graphID2": 2,
+            "filelocation": "../data/magma0.5.output"
+        }
+       
+    }
+}
