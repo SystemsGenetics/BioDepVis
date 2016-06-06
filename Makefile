@@ -1,9 +1,9 @@
 CC=g++
 NVCC=nvcc
 SRC = G3NA
-INC=/home/benafsh/Downloads/glui-2.35/src/include -I /home/benafsh/NVIDIA_CUDA-7.5_Samples/common/inc
-GLUILIB=-L /home/benafsh/Downloads/glui-2.35/src/lib
-GLEWLIB=-L /home/benafsh/NVIDIA_CUDA-7.5_Samples/common/lib/linux/x86_64
+INC=-I ./glui-2.35/src/include 
+GLUILIB=-L ./glui-2.35/src/lib
+#GLEWLIB=-L /home/benafsh/NVIDIA_CUDA-7.5_Samples/common/lib/linux/x86_64
 PLATFORM= $(shell uname -s)
 
 ifeq "$(PLATFORM)" "Darwin"
@@ -11,14 +11,15 @@ ifeq "$(PLATFORM)" "Darwin"
 endif
 
 ifeq "$(PLATFORM)" "Linux"
-	LIB=-lGL -lGLU -lglut -lGLEW -lglui
+	LIB=-lGL -lGLU -lglut $(GLUILIB) -lglui
 endif
 
-all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o
-	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o $(LIB) $(GLUILIB) $(GLEWLIB) -lGLEW -lglui -o G3NAV.exe
+
+all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o
+	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o $(LIB) -o G3NAV.exe
 
 main.o:	$(SRC)/main.cpp
-	$(NVCC) -c -std=c++11 $(SRC)/main.cpp -I $(INC)
+	$(NVCC) -c -std=c++11 $(SRC)/main.cpp $(INC)
 
 Camera.o: $(SRC)/Camera.cpp
 	$(NVCC) -c $(SRC)/Camera.cpp
@@ -52,6 +53,12 @@ texture.o: $(SRC)/texture.cpp
 
 parse.o: $(SRC)/parse.cpp
 	$(NVCC) -c -std=c++11 $(SRC)/parse.cpp
+
+lodepng.o : $(SRC)/lodepng.cpp
+	$(NVCC) -c -std=c++11 $(SRC)/lodepng.cpp
+
+Ont.o : $(SRC)/Ont.cpp
+	$(NVCC) -c -std=c++11 $(SRC)/Ont.cpp
 clean:
 	rm -rf *.o
 	rm -rf G3NAV.exe

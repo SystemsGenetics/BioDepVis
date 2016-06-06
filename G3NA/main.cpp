@@ -4,8 +4,8 @@
 #include "Gl\glui.h"
 
 #else
-//#include <GL/glui.h>
-#include <GL/glew.h>
+#include <GL/glui.h>
+//#include <GL/glew.h>
 #endif
 #include <GL/glui.h>
 
@@ -1871,10 +1871,10 @@ int main(int argc, char *argv[]) {
 
 
 
-
+	#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 	// initialize necessary OpenGL extensions
 	glewInit();
-
+	
 	if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5"))
 	{
 		fprintf(stderr, "The following required OpenGL extensions missing:\n\tGL_VERSION_2_0\n\tGL_VERSION_1_5\n");
@@ -1887,7 +1887,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_SUCCESS);
 	}
 	
-
+	#endif
 	// initialize the camera and such
 	init();
 	
