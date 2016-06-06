@@ -17,6 +17,7 @@ endif
 
 all: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o
 	$(NVCC)  main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o $(LIB) -o G3NAV.exe
+	rm *.o
 
 main.o:	$(SRC)/main.cpp
 	$(NVCC) -c -std=c++11 $(SRC)/main.cpp $(INC)
