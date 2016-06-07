@@ -1,5 +1,39 @@
 # BioDep-Vis
 
+Requirement: 
+CUDA:5.0 or greater
+gcc 4.8 or greater
+
+#First Time Usage
+In order to install glui, please run ./firsttime.sh after downloading the source code. This installs GLUI-2.35.
+
+#Compilation
+To Compile the code go in to the folder and type make. To compile and create execuatable
+
+#Running
+
+In order to run the code, type ./G3NAV.exe. This reads an input.json file. We have provided a sample input.json. 
+The input.json consist of two components, graphs and alignments. Graph components require tab seperated file as input and an index assigned to these graphs. While the Alignment component requires graph id as the input along with tab seperated alignment graph as output. When providing the graphs please provide coordinates of these graphs in 3d space.
+
+Optionally you can provide a cluster file tab seperated with <nodename><tab><clusterid>. You can also provide an ontology file<see data/Maize_info.txt for sample>.
+
+        "graph1": {
+            "id": 1,
+            "name": "Maize",
+            "fileLocation": "./data/M.tab",
+            "clusterLocation": "./data/M.tab.cluster",
+            "Ontology" : "./data/Maize_info.txt",
+            "x": -100,
+            "y": 0,
+            "z": 0,
+            "w": 200,
+            "h": 200
+        },
+
+
+
+
+
 #Visualizing Using VNC
 
 1. Download Putty  and TurboVNC
