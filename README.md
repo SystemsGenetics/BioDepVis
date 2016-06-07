@@ -17,6 +17,7 @@ The input.json consist of two components, graphs and alignments. Graph component
 
 Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see data/Maize_info.txt for sample).
 
+Graph Id Example
         "graph1": {
             "id": 1,
             "name": "Maize",
@@ -29,9 +30,29 @@ Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clu
             "w": 200,
             "h": 200
         },
+        "graph2": {
+            "id": 2,
+            "name": "Rice",
+            "fileLocation": "./data/R.tab",
+            "clusterLocation": "./data/R.tab.cluster",
+            "Ontology" : "./data/Rice_info.txt",
+            "x": 100,
+            "y": 0,
+            "z": 0,
+            "w": 200,
+            "h": 200
+        }
 
 
 
+Alignment Id Example
+
+    "alignment": {
+        "alignment1": {
+            "graphID1": 1,
+            "graphID2": 2,
+            "filelocation": "./data/alignment.output"
+        }
 
 
 #Visualizing Using VNC
