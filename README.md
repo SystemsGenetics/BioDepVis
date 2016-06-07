@@ -15,7 +15,7 @@ To Compile the code go in to the folder and type make. To compile and create exe
 In order to run the code, type ./G3NAV.exe. This reads an input.json file. We have provided a sample input.json. 
 The input.json consist of two components, graphs and alignments. Graph components require tab seperated file as input and an index assigned to these graphs. While the Alignment component requires graph id as the input along with tab seperated alignment graph as output. When providing the graphs please provide coordinates of these graphs in 3d space.
 
-Optionally you can provide a cluster file tab seperated with <nodename><tab><clusterid>. You can also provide an ontology file<see data/Maize_info.txt for sample>.
+Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see data/Maize_info.txt for sample).
 
         "graph1": {
             "id": 1,
