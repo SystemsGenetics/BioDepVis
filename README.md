@@ -4,6 +4,10 @@ Requirement:
 CUDA:5.0 or greater
 gcc 4.8 or greater
 
+Palmetto Usage
+module load gcc/4.8.1
+module load cuda-toolkit/7.5.18
+
 #First Time Usage
 In order to install glui, please run ./firsttime.sh after downloading the source code. This installs GLUI-2.35.
 
