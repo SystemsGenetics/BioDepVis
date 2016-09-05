@@ -95,4 +95,5 @@ TigerVNC: http://sourceforge.net/projects/turbovnc/?source=typ_redirect
 //For Linux Please replace step 6 to step 10 with following
 ssh -L <sourceport> node<nodenumber>.palmetto.clemson.edu:<590<portno>> username@user.palmetto.clemson.edu      [ssh -L 10000:node0263.palmetto.clemson.edu:5901  ksapra@user.palmetto.clemson.edu]
 
+15. To run it please use vglrun ./G3NAV.exe 
 
