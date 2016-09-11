@@ -9,7 +9,13 @@ Step 4  :When done use 'source deactivate'
 
 
 #Run:
-Step 1: First insert 'source activate biodepviz'
-Step 2: cd ConfigGenerator
-Step 3: To run use 'python server.py'
-Step 4: When done use 'source deactivate'
+
+Step 0 : Log into plametto with -X server 
+Windows: https://wiki.utdallas.edu/wiki/display/FAQ/X11+Forwarding+using+Xming+and+PuTTY
+Mac or Linux : ssh -X username@user.palmetto.clemson.edu 
+
+Step 1: qsub -X -I -l select=1:ncpus=8:mem=16gb:ngpus=1:gpu_model=k40,walltime=2:30:00
+Step 2: First insert 'source activate biodepviz'
+Step 3: cd ConfigGenerator
+Step 4: To run use 'python server.py'
+Step 5: When done use 'source deactivate'
