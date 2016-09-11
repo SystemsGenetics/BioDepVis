@@ -1,0 +1,15 @@
+Configure Generator Install and Run Insturction
+
+#Installation ( One - Time )
+Step 1: Log into  Palmetto
+Step 2: Use command 'module load anaconda/4.0.0' to load up anaconda
+Step 3: Use the following command 'conda create --name biodepviz pyqt'
+Step 4: Type 'y'
+Step 4  :When done use 'source deactivate'
+
+
+#Run:
+Step 1: First insert 'source activate biodepviz'
+Step 2: cd ConfigGenerator
+Step 3: To run use 'python server.py'
+Step 4: When done use 'source deactivate'
