@@ -70,6 +70,7 @@ TigerVNC: http://sourceforge.net/projects/turbovnc/?source=typ_redirect
 3. open interactive session to node with GPU -> qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
 
 4. Launch VNC on the node -> /opt/TurboVNC/bin/vncserver  -geometry 1920x1080
+
 4.a If you launching for firstime you may have to set a vnc password, which you provide as anything you want
 
 5. Look for "TurboVNC: node<nodenumber:portno>"  [(node0263:1)]
