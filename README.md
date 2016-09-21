@@ -98,3 +98,32 @@ ssh -L <sourceport> node<nodenumber>.palmetto.clemson.edu:<590<portno>> username
 
 15. To run it please use vglrun ./G3NAV.exe 
 
+#Control Keys for G3NAV
+
+Space - Force Directed Layout
+
+Q - Zoom Out
+
+W - Rotate on y axis
+
+E - Zoom In
+
+R - Reset View
+
+U,A,J - Pan Down View
+
+O - Pan Down View (slow)
+
+I - Pan Left View
+
+S,K - Pan Right View
+
+D - Rotate on X axis and zoom out
+
+L - Pan Up View
+
+X - Show only selected nodes
+
+V - change Edge Design (curved to 2D)
+
+, - Show node type
