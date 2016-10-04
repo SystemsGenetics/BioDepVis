@@ -28,3 +28,12 @@ Stpe 1 : source activate 'biodepviz'
 Step 2 : conda install pyqt=4.11.4
 Step 3 : type 'y'
 Step 4 : try running again using 'python server.py'
+
+
+
+#Usage Documentation.
+A user interface is implemented for the ease of loading and visualizing. 
+The 'Add New Network' window allows the user to load a network (and ontology) file along with specifying the x, y, and z coordinate position for the network on the display window. 
+Multiple networks can be added and viewed in the central window. Networks can also be deleted when selected in the 'Networks Added' window and using 'Remove Selected' button. 
+In the 'Aligned Networks' window, the drop down selections can be used to select the networks in order to load and visualize their alignments. A bit score file for the purpose of calculating alignment can also be read into BioDep-Vis. 
+The Alignment folder provides the path to the location of the alignments networks, where as Json Folder points to the directory where the json file for the configuration is written. 
