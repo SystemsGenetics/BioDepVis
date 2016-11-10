@@ -19,7 +19,7 @@ To Compile the code go in to the folder and type 'make'. To compile and create e
 In order to run the code, type 'vglrun ./G3NAV.exe'. This reads an input.json file. We have provided a sample input.json. 
 The input.json consists of two components, graphs and alignments. Graph components require tab seperated file as input and an index assigned to these graphs. While the Alignment component requires graph id as the input along with tab seperated alignment graph as output. When providing the graphs please provide coordinates of these graphs in 3d space.
 
-Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see data/Maize_info.txt for sample).
+Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see data/Maize_info.txt for sample). These files must be processed by the Configuraton Generator (provided in the BioDep-Vis exacutable folder).
 
 Graph Id Example
 
