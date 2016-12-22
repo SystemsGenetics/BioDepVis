@@ -1,4 +1,6 @@
 # BioDep-Vis
+Watch our video demo showcasing some of the features at 
+https://clemson.app.box.com/v/BioDepVis
 
 Requirement: 
 CUDA:5.0 or greater
