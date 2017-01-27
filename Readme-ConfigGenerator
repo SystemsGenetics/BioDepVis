@@ -2,7 +2,7 @@ Configure Generator Install and Run Insturction
 
 #Installation ( One - Time )
 Step 1: Log into  Palmetto
-Step 2: Use command 'module load anaconda/4.0.0' and 'module load python/2.7.6' to load up anaconda and python 
+Step 2: Use command 'module load anaconda/4.2.0' and 'module load python/2.7.6' to load up anaconda and python 
 Step 3: Use the following command 'conda create --name biodepviz pyqt'
 Step 4: Type 'y'
 Step 5: When done use 'source deactivate'
@@ -29,7 +29,7 @@ Step 5: When done use 'source deactivate'
 
 #Error Debugging 
 IF you get the error Regarding Pyqt4 not found Please do the following
-Step 0: module load anaconda/4.0.0
+Step 0: module load anaconda/4.2.0
 Stpe 1 : source activate 'biodepviz'
 Step 2 : conda install pyqt=4.11.4
 Step 3 : type 'y'
