@@ -13,13 +13,13 @@ module load gcc/4.8.1 cuda-toolkit/7.5.18
 ```
 
 ## First Time Usage
-In order to install glui, please run './firsttime.sh' after downloading the source code. This installs GLUI-2.35.
+In order to install glui, please run `./firsttime.sh` after downloading the source code. This installs GLUI-2.35.
 
 ## Compilation
-To Compile the code go in to the folder and type 'make'. To compile and create execuatable.
+To Compile the code go in to the folder and type `make`. To compile and create execuatable.
 
 ## Running
-In order to run the code, type 'vglrun ./G3NAV.exe'. This reads an input.json file. We have provided a sample input.json. 
+In order to run the code, type `vglrun ./G3NAV.exe`. This reads an input.json file. We have provided a sample input.json. 
 The input.json consists of two components, graphs and alignments. Graph components require tab seperated file as input and an index assigned to these graphs. While the Alignment component requires graph id as the input along with tab seperated alignment graph as output. When providing the graphs please provide coordinates of these graphs in 3d space.
 
 Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see `data/Maize_info.txt` for sample). These files must be processed by the Configuraton Generator (provided in the BioDep-Vis exacutable folder).
@@ -88,7 +88,7 @@ qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
 
 If you launching for firstime you may have to set a vnc password, which you provide as anything you want
 
-5. Look for "TurboVNC: node<nodenumber:portno>". For example 'node0263:1'
+5. Look for "TurboVNC: node<nodenumber:portno>". For example `node0263:1`
 
 6. Launch Another Session of Putty. Go to SSH -> Tunnelling on the left side of the startup window.
 
@@ -96,13 +96,13 @@ If you launching for firstime you may have to set a vnc password, which you prov
 
 8. Add Destination node<nodenumber>.palmetto.clemson.edu<590<portno>. [node0263.palmetto.clemson.edu:5901]
 
-9. Click 'Add'
+9. Click `Add`
 
-10. Go back to 'Logging' and Log into Palmetto to activate this forwarding using Step 2
+10. Go back to `Logging` and Log into Palmetto to activate this forwarding using Step 2
 
 11. Open TigerVNC
 
-12. Connect to 'localhost:<source port>, with the soruce port you mentioned above'  [localhost:10000]
+12. Connect to `localhost:<source port>`, with the source port you mentioned above  [localhost:10000]
 
 13. Done
 
