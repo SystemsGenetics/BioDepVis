@@ -1,25 +1,30 @@
 # BioDep-Vis
-Watch our video demo showcasing some of the features at 
-https://clemson.app.box.com/v/BioDepVis
 
-## Requirements
+Watch our video demo showcasing some of the features at https://clemson.app.box.com/v/BioDepVis
+
+## Dependencies
+
+You should have the following packages installed on your system:
 - CUDA 5.0 or greater
 - gcc 4.8 or greater
 
-## Palmetto Usage
-
+On Palmetto, these packages are available as modules:
 ```
-module load gcc/4.8.1 cuda-toolkit/7.5.18
+module load cuda-toolkit/7.5.18 gcc/4.8.1
 ```
 
-## First Time Usage
-In order to install glui, please run `./firsttime.sh` after downloading the source code. This installs GLUI-2.35.
+Run `install-libglui.sh` to download and extract GLUI.
 
-## Compilation
-To Compile the code go in to the folder and type `make`. To compile and create execuatable.
+## Usage
 
-## Running
-In order to run the code, type `vglrun ./G3NAV`. This reads an input.json file. We have provided a sample input.json.
+To build and run the executable:
+```
+make
+
+vglrun ./G3NAV
+```
+
+The program reads an input.json file. We have provided a sample input.json.
 
 The input.json consists of two components, graphs and alignments. Graph components require tab seperated file as input and an index assigned to these graphs. While the Alignment component requires graph id as the input along with tab seperated alignment graph as output. When providing the graphs please provide coordinates of these graphs in 3d space.
 
@@ -100,6 +105,24 @@ To disconnect:
 # example:
 /opt/TurboVNC/bin/vncserver -kill :1
 ```
+## Record VNC Session
+
+Install `vnc2flv`:
+```
+wget https://pypi.python.org/packages/1e/8e/40c71faa24e19dab555eeb25d6c07efbc503e98b0344f0b4c3131f59947f/vnc2flv-20100207.tar.gz
+tar xvf vnc2flv-20100207.tar.gz
+
+cd vnc2flv-20100207
+python setup.py install --user
+```
+
+Start the VNC server at <port> (e.g. 5901), then start recording:
+```
+cd tools
+python flvrec.py localhost <port>
+```
+
+To stop recording, enter `Ctrl-C` and an FLV file will be saved.
 
 ## Control Keys for G3NAV
 
