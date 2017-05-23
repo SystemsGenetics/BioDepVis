@@ -1045,7 +1045,10 @@ void Matrix::svd(Matrix &U, Vector &W, Matrix &V) const
 			}
 			
 			if(its == 30)
-				abort("no convergence in 30 svdcmp iterations");
+			{
+				char abort_msg[] = "no convergence in 30 svdcmp iterations";
+				abort(abort_msg);
+			}
 			
 			x = W[l];
 			nm = k - 1;

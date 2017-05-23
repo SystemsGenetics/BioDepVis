@@ -17,14 +17,14 @@
 
 using namespace std;
 
-char* filereader()
+char* filereader(char *f_in)
 {
 
 	int array_size = 65536; // define the size of character array
 	char * array = new char[array_size]; // allocating an array of 1kb
 	int position = 0; //this will be used incremently to fill characters in the array 
 
-	ifstream fin("input.json"); //opening an input stream for file test.txt
+	ifstream fin(f_in); //opening an input stream for file test.txt
 	/*checking whether file could be opened or not. If file does not exist or don't have read permissions, file
 	stream could not be opened.*/
 	if (fin.is_open())
@@ -106,11 +106,11 @@ float edgeColor[10][4] = { {179 / MAXCOLOR, 88 / MAXCOLOR, 6 / MAXCOLOR, EDGEALP
 {128 / MAXCOLOR, 115 / MAXCOLOR, 172 / MAXCOLOR, EDGEALPHA}
  };*/
 
-void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr)
+void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr, char *f_in)
 {
 	Json::Reader reader;
 	Json::Value root;
-	char *fileinfo = filereader();
+	char *fileinfo = filereader(f_in);
 	bool parseStatus = reader.parse(fileinfo, root);
 	if (parseStatus == true)
 		printf("Parsed Successful");

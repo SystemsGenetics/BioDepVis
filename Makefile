@@ -1,5 +1,5 @@
 CXX  = g++
-NVCC = nvcc
+NVCC = nvcc -Wno-deprecated-gpu-targets
 
 GLUIDIR = glui-2.37
 SRC     = G3NA

@@ -218,7 +218,7 @@ float max(float a, float b)
 		return b;
 	
 }*/
-#define M_PI 3.14
+
 #define ONE_DEG_IN_RAD (2.0 * M_PI ) / 360;
 void Camera::PerspectiveDisplay(int W, int H) {
 

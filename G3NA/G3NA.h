@@ -4,14 +4,10 @@
 #include "alignment.h"
 #include "util.h"
 #include <unordered_map>
-#include  <cstdarg>
-#include<vector>
+#include <cstdarg>
+#include <vector>
 
-
-
-
-void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *);
-void readOntFile(std::unordered_map<std::string, ontStruct> *array);
-
+void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *, char *f_in);
+void readOntFile(std::unordered_map<std::string, ontStruct> *array, char *ont_input);
 
 #endif

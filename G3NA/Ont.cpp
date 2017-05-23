@@ -1,16 +1,16 @@
-#include<unordered_map>
-#include<iostream>
-#include<sstream>
-#include<fstream>
-#include<cstdlib>
-#include<vector>
-#include<string>
+#include <unordered_map>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+#include <string>
 #include <time.h>
 #include "G3NA.h"
 
 
 
- void readOntFile(std::unordered_map<std::string, ontStruct> *array)
+ void readOntFile(std::unordered_map<std::string, ontStruct> *array, char *ont_input)
 {
 	
 	std::string line, word;
@@ -21,7 +21,7 @@
 	double sec;
 
 	t1 = time(NULL);
-	std::ifstream my1("ont_data.txt");
+	std::ifstream my1(ont_input);
 	if (my1.is_open())
 	{
 		while (std::getline(my1, line))
