@@ -66,58 +66,40 @@ Alignment Id Example
 }
 ```
 
-## Visualizing Using VNC
+## Stream from Palmetto using VNC
 
-1. Download Putty and TurboVNC
-Putty : http://the.earth.li/~sgtatham/putty/latest/x86/putty.exe
-TigerVNC: http://sourceforge.net/projects/turbovnc/?source=typ_redirect
-
-2. Create a connection to palmetto:
+Login to a GPU node on Palmetto and launch a VNC server:
 ```
 ssh -X <username>@user.palmetto.clemson.edu
-```
-
-3. open interactive session to node with GPU:
-```
 qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
+
+/opt/TurboVNC/bin/vncserver -geometry 1920x1080
 ```
 
-4. Launch VNC on the node:
+When you launch a VNC server for the first time you may be asked to set a password, which can be whatever you want. Look for `TurboVNC: <node>:<port>`. For example: `node0263:1`.
+
+Login to another Palmetto session with tunnelling:
 ```
-/opt/TurboVNC/bin/vncserver  -geometry 1920x1080
-```
-
-If you launching for firstime you may have to set a vnc password, which you provide as anything you want
-
-5. Look for "TurboVNC: node<nodenumber:portno>". For example `node0263:1`
-
-6. Launch Another Session of Putty. Go to SSH -> Tunnelling on the left side of the startup window.
-
-7. Add A source Port as any number > 10000
-
-8. Add Destination node<nodenumber>.palmetto.clemson.edu<590<portno>. [node0263.palmetto.clemson.edu:5901]
-
-9. Click `Add`
-
-10. Go back to `Logging` and Log into Palmetto to activate this forwarding using Step 2
-
-11. Open TigerVNC
-
-12. Connect to `localhost:<source port>`, with the source port you mentioned above  [localhost:10000]
-
-13. Done
-
-14. To disconnect, please use `/opt/TurboVNC/bin/vncserver  -kill :<portno>` [`/opt/TurboVNC/bin/vncserver -kill :1`]
-
-```
-# For Linux Please replace step 6 to step 10 with following
-ssh -L <sourceport> node<nodenumber>.palmetto.clemson.edu:<590<portno>> <username>@user.palmetto.clemson.edu
+ssh -L 10000:<node>.palmetto.clemson.edu:<5900 + port> <username>@user.palmetto.clemson.edu
 
 # example:
 ssh -L 10000:node0263.palmetto.clemson.edu:5901 ksapra@user.palmetto.clemson.edu
 ```
 
-15. To run it please use `vglrun ./G3NAV.exe`
+Install a VNC client on your machine, such as `Vinagre` on Ubuntu. Connect to `localhost:10000`.
+
+To run the visualizer on the GPU node:
+```
+vglrun ./G3NAV
+```
+
+To disconnect:
+```
+/opt/TurboVNC/bin/vncserver -kill :<port>
+
+# example:
+/opt/TurboVNC/bin/vncserver -kill :1
+```
 
 ## Control Keys for G3NAV
 

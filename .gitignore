@@ -3,4 +3,5 @@ glui-2.37
 
 # build files, executables
 *.o
+*.pyc
 G3NAV
