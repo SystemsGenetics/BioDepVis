@@ -34,6 +34,12 @@
 #endif
 #include "lodepng.h"
 
+#include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 float searchRadius = 40;
 GLUI *glui;
 GLUI *searchglui;
@@ -1694,16 +1700,71 @@ void control_cb(int control)
 }
 
 
+typedef enum {
+	OPTION_ONTFILE,
+	OPTION_JSONFILE,
+	OPTION_HELP,
+	OPTION_UNKNOWN = '?'
+} option_t;
+
+typedef struct {
+	char *ont_file;
+	char *json_file;
+} optarg_t;
+
+
+void print_usage()
+{
+	fprintf(stderr,
+		"Usage: ./G3NAV [options]\n"
+		"\n"
+		"Options:\n"
+		"  --ont_file   FILE    [REQUIRED] specify the ontology text file\n"
+		"  --json_file  FILE    [REQUIRED] specify the json file containing graphs and alignments\n"
+		"  --help       list help options\n"
+	);
+}
+
 //void readOntFile(std::unordered_map<std::string, ontStruct> *);
 int main(int argc, char **argv) {
 
-	if (argc != 3)
-	{
-		fprintf(stderr, "\nYou must include the ontology input file and the json input file!\n\n");
-		exit(EXIT_SUCCESS);
+	optarg_t args = {
+		NULL,
+		NULL
+	};
+
+	struct option long_options[] = {
+		{ "ont_file", required_argument, 0, OPTION_ONTFILE },
+		{ "json_file", required_argument, 0, OPTION_JSONFILE },
+		{ "help", no_argument, 0, OPTION_HELP },
+		{ 0, 0, 0, 0 }
+	};
+
+	int opt;
+	while ( (opt = getopt_long_only(argc, argv, "", long_options, NULL)) != -1 ) {
+		switch ( opt ) {
+		case OPTION_ONTFILE:
+			args.ont_file = optarg;
+			break;
+		case OPTION_JSONFILE:
+			args.json_file = optarg;
+			break;
+		case OPTION_HELP:
+			print_usage();
+			exit(1);
+		case OPTION_UNKNOWN:
+			print_usage();
+			exit(1);
+		}
 	}
 
-	readOntFile(&ontologyDB, argv[1]);
+	// validate arguments
+	if ( !args.ont_file || !args.json_file ) {
+		print_usage();
+		exit(1);
+	}
+
+	readOntFile(&ontologyDB, args.ont_file);
 	// set up opengl window
 	glutInit(&argc, argv);
 	//glewInit();
@@ -1739,8 +1800,8 @@ int main(int argc, char **argv) {
 	}
 	
 	#endif
-	// initialize the camera and such
-	init(argv[2]);
+	// initialize the camera and such, pass in the json file to be read
+	init(args.json_file);
 	
 	// set up opengl callback functions
 	glutDisplayFunc(PerspDisplay);
