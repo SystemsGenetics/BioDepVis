@@ -21,7 +21,7 @@ To build and run the executable:
 ```
 make
 
-vglrun ./G3NAV
+vglrun ./G3NAV --ont_file FILE --json_file FILE
 ```
 
 The program reads an input.json file. We have provided a sample input.json.
@@ -95,7 +95,7 @@ Install a VNC client on your machine, such as `Vinagre` on Ubuntu. Connect to `l
 
 To run the visualizer on the GPU node:
 ```
-vglrun ./G3NAV
+vglrun ./G3NAV --ont_file FILE --json_file FILE
 ```
 
 To disconnect:
