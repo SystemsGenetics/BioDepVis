@@ -2,21 +2,140 @@
 #define _UTIL_H_
 #include <vector>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <GL/glui.h>
+#include <cuda_runtime.h>
+
+#include "alignment.h"
+#include "graph.h"
+#include "Matrix.h"
+#include "G3NA.h"
+#include "lodepng.h"
+#include "Camera.h"
+
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include <GL/glew.h>
+#include "Gl\glui.h"
+#else
+#include <GL/glui.h>
+//#include <GL/glew.h>
+#endif
+
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include <GL/wglew.h>
+#endif
+
+#ifdef __APPLE__
+#  include <GLUT/glut.h>
+#else
+#  include <GL/freeglut.h>
+#endif
+
+#ifdef __APPLE__
+#include <GL/glui.h>
+#elif (WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#include "Gl/glui.h"
+#endif
+
+#define GLEW_STATIC
+#define MAXCOLOR 255.0f
+#define SHIFT 15
+
+extern GLUI *glui;
+extern GLUI *searchglui;
+extern GLUI_EditText *description;
+extern GLUI_TextBox *goDescription;
+extern GLUI_List *gotermList;
+extern GLUI_EditText *searchBox;
+extern GLUI_Button *searchButton;
+extern GLUI_List *selectList;
+
+extern std::unordered_map<std::string, ontStruct> ontologyDB;
+
+extern int persp_win;
+
+extern int WIDTH;
+extern int HEIGHT;
+
+// void printw(float x, float y, float z, char* format, GLvoid *, ...);
+extern "C"
+cudaError_t runForceDirectedGPU(graph *g);
+extern "C"
+cudaError_t runAlignmentForceGPU(Alignment *);
+extern "C"
+cudaError_t copyForceDirectedGPU(graph *g);
+extern "C"
+cudaError_t gpuDeviceSync();
+
+
+// function prototypes
 char* filetobuf(char *file);
 unsigned char * loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight, bool flipY = true);
+std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width, unsigned *height);
+void loadTexture();
+void init(char * f_in);
+void drawGraph(graph *g);
+void Test();
+void runForceDirected(graph *g);
+void runAlignmentLayout(Alignment * a);
+void drawAlignment(Alignment *align);
+void drawAlignmentROI(Alignment *align,int index);
+std::string lookupName(int graphIndex, int nodeIndex);
+int _vscprintf(const char *format, va_list argptr);
+void printw(float x, float y, float z, char* format, GLvoid *fontStylePrint, ...);
+void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int zs);
+void drawROIGraph();
+void drawGraphROIBack(graph *g);
+void drawPoints();
+void PerspDisplay();
+void idle();
+void cleanup();
+Vector3d ClosestPoint(const Vector3d A, const Vector3d B, const Vector3d P, double *t);
+bool RayTest( const Vector3d start, const Vector3d end, Vector3d center, Vector3d *pt, double *t, double epsilon);
+bool RayTestPoints(const Vector3d &start, const Vector3d &end, unsigned int *id, double *t, double epsilon);
+float PointToLineDistance(const Vector3d &a, const Vector3d &b, const Vector3d &point);
+void AddNodeToROI(int node, graph *tmpg);
+bool validROI(int node, graph *tmpg);
+void GetPickRay(int mouseX, int mouseY);
+void mouseEventHandler(int button, int state, int x, int y);
+void motionEventHandler(int x, int y);
+void keyboardEventHandler(unsigned char key, int x, int y);
+std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems);
+std::vector<std::string> split(const std::string &s, char delim);
+void control_cb(int control);
 
-struct nodeSelectedStruct
-{
-	int nodeSelected;
-	int graphSelected;
-};
 
 
-struct ontStruct{
-	std::string id;
-	std::string name;
-	std::string def;
-	int index;
-	std::vector<nodeSelectedStruct> connectedNodes;
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #endif

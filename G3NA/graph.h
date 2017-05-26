@@ -12,8 +12,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unordered_map>
-#include "util.h"
+// #include "util.h"
 
+struct nodeSelectedStruct
+{
+    int nodeSelected;
+    int graphSelected;
+};
+
+struct ontStruct{
+    std::string id;
+    std::string name;
+    std::string def;
+    int index;
+    std::vector<nodeSelectedStruct> connectedNodes;
+};
 
 //#define STACKVIEW 1
 #define INFOCOUNT 5

@@ -2,7 +2,7 @@
 #define _G3NA_H
 #include "graph.h"
 #include "alignment.h"
-#include "util.h"
+// #include "util.h"
 #include <unordered_map>
 #include <cstdarg>
 #include <vector>

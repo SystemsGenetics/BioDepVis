@@ -27,7 +27,7 @@ all: G3NAV
 %.o: $(SRC)/%.cu
 	$(NVCC) -c $(GLUIINC) -std=c++11 -o $@ $<
 
-G3NAV: main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o
+G3NAV: util.o main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o 
 	$(NVCC) -o G3NAV $^ $(LIBS)
 
 clean:
