@@ -44,6 +44,7 @@
 #define MAXCOLOR 255.0f
 #define SHIFT 15
 
+// global variables for GLUT objects
 extern GLUI *glui;
 extern GLUI *searchglui;
 extern GLUI_EditText *description;
@@ -52,7 +53,26 @@ extern GLUI_List *gotermList;
 extern GLUI_EditText *searchBox;
 extern GLUI_Button *searchButton;
 extern GLUI_List *selectList;
+extern Camera *camera;
 
+// global variables that are modified during events
+extern bool animate;
+extern bool cluster;
+extern bool showalignment;
+extern bool showGrid;
+extern bool gpuEnabled;
+extern bool searchArea;
+extern bool roiMODE;
+extern bool backGraphMode;
+extern float yscale, yscale2;
+extern float xscale, xscale2;
+extern float searchRadius;
+extern std::vector <nodeSelectedStruct> selectedVector;
+extern std::vector <nodeSelectedStruct> searchSelectedVector;
+extern std::vector <nodeSelectedStruct> *SelectedGoPtr;
+extern std::vector <graph*> graphDatabase;
+
+// ontolgoy database used in several files
 extern std::unordered_map<std::string, ontStruct> ontologyDB;
 
 extern int persp_win;
@@ -100,42 +120,5 @@ float PointToLineDistance(const Vector3d &a, const Vector3d &b, const Vector3d &
 void AddNodeToROI(int node, graph *tmpg);
 bool validROI(int node, graph *tmpg);
 void GetPickRay(int mouseX, int mouseY);
-void mouseEventHandler(int button, int state, int x, int y);
-void motionEventHandler(int x, int y);
-void keyboardEventHandler(unsigned char key, int x, int y);
-std::vector<std::string>& split(const std::string &s, char delim, std::vector<std::string> &elems);
-std::vector<std::string> split(const std::string &s, char delim);
-void control_cb(int control);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif

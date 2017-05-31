@@ -1,4 +1,5 @@
 #include "util.h"
+#include "events.h"
 #include <getopt.h>
 
 typedef enum {
@@ -86,7 +87,7 @@ int main(int argc, char **argv) {
 	// create the main window that shows the graphs and alignments
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(WIDTH, HEIGHT);
-	glutInitWindowPosition(50, 50);
+	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - WIDTH) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2);
 	persp_win = glutCreateWindow("G3NAV");
 
 	#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
@@ -106,7 +107,7 @@ int main(int argc, char **argv) {
 	}
 	
 	#endif
-	
+
 	// initialize the camera and such, pass in the json file to be read
 	init(args.json_file);
 	
