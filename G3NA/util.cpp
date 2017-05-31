@@ -20,7 +20,7 @@ std::unordered_map<std::string, ontStruct> ontologyDB;
 
 int persp_win;
 
-int WIDTH = 800;
+int WIDTH = 1000;
 int HEIGHT = 600;
 
 float searchRadius = 40;

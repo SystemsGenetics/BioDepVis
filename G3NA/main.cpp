@@ -87,7 +87,10 @@ int main(int argc, char **argv) {
 	// create the main window that shows the graphs and alignments
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(WIDTH, HEIGHT);
+
+	// start the window in the middle of the screen
 	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - WIDTH) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2);
+	
 	persp_win = glutCreateWindow("G3NAV");
 
 	#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
@@ -119,8 +122,8 @@ int main(int argc, char **argv) {
 	glutIdleFunc(idle);
 
 	// MainGLUI
-	glui = GLUI_Master.create_glui("GUI", GLUI_SUBWINDOW_RIGHT, 0, 0); /* name, flags,x, and y */
-	searchglui = GLUI_Master.create_glui("Search Window", GLUI_SUBWINDOW_TOP, 1800, 0); /* name, flags,x, and y */
+	glui = GLUI_Master.create_glui("Ontology Lookup Window", GLUI_SUBWINDOW_RIGHT, (glutGet(GLUT_SCREEN_WIDTH) - (WIDTH*2)) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2); /* name, flags,x, and y */
+	searchglui = GLUI_Master.create_glui("Search Window", GLUI_SUBWINDOW_TOP, (glutGet(GLUT_SCREEN_WIDTH) + WIDTH) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2); /* name, flags,x, and y */
 	
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Selected Results");
