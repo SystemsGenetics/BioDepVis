@@ -66,9 +66,12 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
+	// read the ontology file
 	readOntFile(&ontologyDB, args.ont_file);
+	
 	// set up opengl window
 	glutInit(&argc, argv);
+	
 	//glewInit();
 	/*
 	if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
@@ -80,6 +83,7 @@ int main(int argc, char **argv) {
 	}
 	*/
 
+	// create the main window that shows the graphs and alignments
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutInitWindowSize(WIDTH, HEIGHT);
 	glutInitWindowPosition(50, 50);
@@ -102,6 +106,7 @@ int main(int argc, char **argv) {
 	}
 	
 	#endif
+	
 	// initialize the camera and such, pass in the json file to be read
 	init(args.json_file);
 	

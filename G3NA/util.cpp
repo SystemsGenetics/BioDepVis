@@ -1225,32 +1225,39 @@ void GetPickRay(int mouseX, int mouseY)
 {
 	Vector3d m_start;
 	Vector3d m_end;
+
 	double matModelView[16], matProjection[16];
 	int viewport[4];
+
 	glLoadIdentity();
 	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView);
 	glGetDoublev(GL_PROJECTION_MATRIX, matProjection);
 	glGetIntegerv(GL_VIEWPORT, viewport);
+
 	double winX = (double)mouseX;
 	double winY = viewport[3] - (double)mouseY;
+
 	gluUnProject(winX, winY, 0.0, matModelView, matProjection,
 		viewport, &m_start.x, &m_start.y, &m_start.z);
 	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
 		viewport, &m_end.x, &m_end.y, &m_end.z);
-	double t;
-	
+
+	double t;	
 	float w;
 	//int graphSelected = -1;
 	//int nodeSelected = -1;
 	
 	float min = 5.0f;
+
 	if (searchArea != true)
 		min = searchRadius;
 		//RayTestPoints(m_start, m_end, 0, &t, 0.0001f);
+
 	selectedVector.clear();
 	selectList->delete_all();
 	gotermList->delete_all();
 	SelectedGoPtr = NULL;
+
 	for (int i = 0; i < graphDatabase.size(); i++)
 	{
 		for (int j = 0; j < graphDatabase.at(i)->nodes; j++)
@@ -1260,69 +1267,74 @@ void GetPickRay(int mouseX, int mouseY)
 			if (d < min)
 				{
 					nodeSelectedStruct tmp;
-				printf("Valid %d = %f\n", j, d);
-				tmp.nodeSelected = j;
-				tmp.graphSelected = i;
+					printf("Valid %d = %f\n", j, d);
+					tmp.nodeSelected = j;
+					tmp.graphSelected = i;
 				
-				if (searchArea != true)
-				{
-					min = d;
-					selectedVector.clear();
-					selectList->delete_all();
-					
-				}
-						selectedVector.push_back(tmp);
-						
-						char tmpc[256]; 
-						std::string nodename = lookupName(tmp.graphSelected, tmp.nodeSelected);
-						sprintf(tmpc, "%s",nodename.c_str());
-						selectList->add_item(selectedVector.size()-1, tmpc);
+					if (searchArea != true)
+					{
+						min = d;
+						selectedVector.clear();
+						selectList->delete_all();			
+					}
 
+					selectedVector.push_back(tmp);
+					
+					char tmpc[256]; 
+					std::string nodename = lookupName(tmp.graphSelected, tmp.nodeSelected);
+					sprintf(tmpc, "%s",nodename.c_str());
+					selectList->add_item(selectedVector.size()-1, tmpc);
 				}
 			}
+
 		selectList->update_size();
 		selectList->update_and_draw_text();
 		
 		printf("Search Length : %d Less than %f \n----\n", (int)selectedVector.size(), min);
 	}
 
-	//ROI Load
-	int nodeSelected = selectedVector.at(0).nodeSelected;
-	int graphSelected = selectedVector.at(0).graphSelected;
+	if (selectedVector.size() > 0)
+	{
+		//ROI Load
+		int nodeSelected = selectedVector.at(0).nodeSelected;
+		int graphSelected = selectedVector.at(0).graphSelected;
 
-	if(graphSelected == 0)
-		nodeSelected2 = nodeSelected;
+		if(graphSelected == 0)
+			nodeSelected2 = nodeSelected;
 
-	if(graphSelected == 2)
-		nodeSelected3 = nodeSelected;
+		if(graphSelected == 2)
+			nodeSelected3 = nodeSelected;
 
-	printf("Node Selected : %d at %f %f %f\n",nodeSelected, graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0],
-		graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1], graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2]);
+		printf("Node Selected : %d at %f %f %f\n",nodeSelected, graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0],
+			graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1], graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2]);
 
-	cx1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] - (xscale/2) ;
-	cy1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] - (yscale/2) ;
-	cz1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] - (zscale/2) ;	
+		cx1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] - (xscale/2) ;
+		cy1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] - (yscale/2) ;
+		cz1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] - (zscale/2) ;	
 
-	cx2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] + (xscale/2) ;
-	cy2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] + (yscale/2) ;
-	cz2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] + (zscale/2) ;
+		cx2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] + (xscale/2) ;
+		cy2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] + (yscale/2) ;
+		cz2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] + (zscale/2) ;
 
-	cx12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] - (xscale2/2) ;
-	cy12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] - (yscale2/2) ;
-	cz12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] - (zscale2/2) ;	
+		cx12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] - (xscale2/2) ;
+		cy12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] - (yscale2/2) ;
+		cz12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] - (zscale2/2) ;	
 
-	cx22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] + (xscale2/2) ;
-	cy22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] + (yscale2/2) ;
-	cz22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] + (zscale2/2) ;
+		cx22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] + (xscale2/2) ;
+		cy22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] + (yscale2/2) ;
+		cz22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] + (zscale2/2) ;
+	}
 
-	if(alignmentDatabase.size() > 1){
-	cx13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] - (xscale3/2) ;
-	cy13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] - (yscale3/2) ;
-	cz13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] - (zscale3/2) ;	
 
-	cx23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] + (xscale3/2) ;
-	cy23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] + (yscale3/2) ;
-	cz23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] + (zscale3/2) ;
+	if(alignmentDatabase.size() > 1)
+	{
+		cx13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] - (xscale3/2) ;
+		cy13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] - (yscale3/2) ;
+		cz13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] - (zscale3/2) ;	
+
+		cx23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] + (xscale3/2) ;
+		cy23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] + (yscale3/2) ;
+		cz23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] + (zscale3/2) ;
 	}
 
 	//std::vector<float> colorROI;
@@ -1420,7 +1432,7 @@ void mouseEventHandler(int button, int state, int x, int y)
 	// let the camera handle some specific mouse events (similar to maya)
 	camera->HandleMouseEvent(button, state, x, y);
 	
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
 		GetPickRay(x, y);
 	}
