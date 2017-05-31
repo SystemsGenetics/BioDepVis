@@ -24,11 +24,11 @@ make
 vglrun ./G3NAV --ont_file FILE --json_file FILE
 ```
 
-The program reads an input.json file. We have provided a sample input.json.
+The program reads a json file and ontology file as input. We have provided both a sample json and ontology file for testing.
 
-The input.json consists of two components, graphs and alignments. Graph components require tab seperated file as input and an index assigned to these graphs. While the Alignment component requires graph id as the input along with tab seperated alignment graph as output. When providing the graphs please provide coordinates of these graphs in 3d space.
+The json file must consist of two data types, graphs and alignments. The graph component requires tab seperated files as input and an assigned index for each graph. The alignment component requires a graph id as the input along with tab seperated alignment graph as output. When providing the graphs, the file must also contain coordinates for the graphs in 3d space.
 
-Optionally you can provide a cluster file tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see `data/Maize_info.txt` for sample). These files must be processed by the Configuraton Generator (provided in the BioDep-Vis exacutable folder).
+Optionally, you can provide a cluster file that is tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see `data/Maize_info.txt` for sample). These files must be processed by the configuraton generator (provided in the BioDep-Vis exacutable folder).
 
 Graph Id Example
 
