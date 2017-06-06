@@ -58,10 +58,10 @@ void forceDirectedLayout(float *nodePos,float *nodePosD,int nodes, float *matrix
         }
   //      nodePos[i*3+2] += d_z;
 
-        if(isnan(d_x)){
+        if(std::isnan(d_x)){
             d_x = 0.001;//printf("NAN");
         }
-        if(isnan(d_y)){
+        if(std::isnan(d_y)){
             d_y = 0.001;//printf("NAN");
         }
         nodePos[i*3+1] += d_y;
