@@ -2,7 +2,7 @@ CXX  = g++
 NVCC = nvcc -Wno-deprecated-gpu-targets
 
 GLUIDIR = glui-2.37
-SRC     = G3NA
+SRC     = src
 
 GLUIINC = -I $(GLUIDIR)/include
 GLUILIB = -L $(GLUIDIR)/lib
