@@ -21,90 +21,68 @@ To build and run the executable:
 ```
 make
 
-vglrun ./G3NAV --ont_file FILE --json_file FILE
+./G3NAV --ont_file ont_data.txt --json_file input.json
 ```
 
 The program reads a json file and ontology file as input. We have provided both a sample json and ontology file for testing.
 
 The json file must consist of two data types, graphs and alignments. The graph component requires tab seperated files as input and an assigned index for each graph. The alignment component requires a graph id as the input along with tab seperated alignment graph as output. When providing the graphs, the file must also contain coordinates for the graphs in 3d space.
 
-Optionally, you can provide a cluster file that is tab seperated with (nodename)(tab)(clusterid). You can also provide an ontology file (see `data/Maize_info.txt` for sample). These files must be processed by the configuraton generator (provided in the BioDep-Vis exacutable folder).
+Optionally, you can provide a cluster file and an ontology file. See `data/M.tab.cluster` and `data/Maize_info.txt` for examples.
 
-Graph Id Example
+## Stream from a remote machine
 
+Install [VirtualGL](https://virtualgl.org/) and [TurboVNC](https://turbovnc.org/) on the remote machine. You will also need to install TurboVNC or an equivalent VNC client on your local machine.
+
+Login to the remote machine through SSH and start a VNC server:
 ```
-"graph1": {
-    "id": 1,
-    "name": "Maize",
-    "fileLocation": "./data/M.tab",
-    "clusterLocation": "./data/M.tab.cluster",
-    "Ontology" : "./data/Maize_info.txt",
-    "x": -100,
-    "y": 0,
-    "z": 0,
-    "w": 200,
-    "h": 200
-},
-"graph2": {
-    "id": 2,
-    "name": "Rice",
-    "fileLocation": "./data/R.tab",
-    "clusterLocation": "./data/R.tab.cluster",
-    "Ontology" : "./data/Rice_info.txt",
-    "x": 100,
-    "y": 0,
-    "z": 0,
-    "w": 200,
-    "h": 200
-}
+/opt/TurboVNC/bin/vncserver -geometry 1920x1080
 ```
 
-Alignment Id Example
-
+Start a VNC client on your local machine and connect to the remote VNC server at `<hostname>:1`. For the TurboVNC client:
 ```
-"alignment": {
-    "alignment1": {
-        "graphID1": 1,
-        "graphID2": 2,
-        "filelocation": "./data/alignment.output"
-    }
-}
+/opt/TurboVNC/bin/vncviewer
 ```
 
-## Stream from Palmetto using VNC
-
-Login to a GPU node on Palmetto and launch a VNC server:
+Start BioDep-Vis on the remote machine:
 ```
-ssh -X <username>@user.palmetto.clemson.edu
+vglrun -c proxy ./G3NAV --ont_file FILE --json_file FILE
+```
+
+To stop the VNC server:
+```
+/opt/TurboVNC/bin/vncserver -kill :1
+```
+
+## Stream from Palmetto
+
+Palmetto should already have VirtualGL and TurboVNC installed. However, because compute nodes cannot be accessed directly via SSH but only through the login node, you must tunnel the VNC server through the login node on a second SSH session.
+
+Login to a GPU node on Palmetto and start a VNC server:
+```
+ssh -X <username>@login.palmetto.clemson.edu
 qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
 
 /opt/TurboVNC/bin/vncserver -geometry 1920x1080
 ```
 
-When you launch a VNC server for the first time you may be asked to set a password, which can be whatever you want. Look for `TurboVNC: <node>:<port>`. For example: `node0263:1`.
+Look for `TurboVNC: <node>:<port>` in the output. For example: `node0263:1`.
 
 Login to another Palmetto session with tunnelling:
 ```
-ssh -L 10000:<node>.palmetto.clemson.edu:<5900 + port> <username>@user.palmetto.clemson.edu
+ssh -L 10000:<node>.palmetto.clemson.edu:<5900 + port> <username>@login.palmetto.clemson.edu
 
 # example:
-ssh -L 10000:node0263.palmetto.clemson.edu:5901 ksapra@user.palmetto.clemson.edu
+ssh -L 10000:node0263.palmetto.clemson.edu:5901 ksapra@login.palmetto.clemson.edu
 ```
 
-Install a VNC client on your machine, such as `Vinagre` on Ubuntu. Connect to `localhost:10000`.
+Start a VNC client on your local machine and connect to `localhost:10000`.
 
-To run the visualizer on the GPU node:
+Start BioDep-Vis on the GPU node:
 ```
-vglrun ./G3NAV --ont_file FILE --json_file FILE
+vglrun -c proxy ./G3NAV --ont_file FILE --json_file FILE
 ```
 
-To disconnect:
-```
-/opt/TurboVNC/bin/vncserver -kill :<port>
-
-# example:
-/opt/TurboVNC/bin/vncserver -kill :1
-```
 ## Record VNC Session
 
 Install `vnc2flv`:
