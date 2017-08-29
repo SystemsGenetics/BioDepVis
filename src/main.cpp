@@ -19,7 +19,7 @@ typedef struct {
 void print_usage()
 {
 	fprintf(stderr,
-		"Usage: ./G3NAV [options]\n"
+		"Usage: ./biodep-vis [options]\n"
 		"\n"
 		"Options:\n"
 		"  --ont_file   FILE    [REQUIRED] specify the ontology text file\n"

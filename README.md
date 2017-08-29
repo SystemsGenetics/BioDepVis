@@ -21,7 +21,7 @@ To build and run the executable:
 ```
 make
 
-./G3NAV --ont_file ont_data.txt --json_file input.json
+./biodep-vis --ont_file ont_data.txt --json_file input.json
 ```
 
 The program reads a json file and ontology file as input. We have provided both a sample json and ontology file for testing.
@@ -46,7 +46,7 @@ Start a VNC client on your local machine and connect to the remote VNC server at
 
 Start BioDep-Vis on the remote machine:
 ```
-vglrun -c proxy ./G3NAV --ont_file FILE --json_file FILE
+vglrun -c proxy ./biodep-vis --ont_file FILE --json_file FILE
 ```
 
 To stop the VNC server:
@@ -80,7 +80,7 @@ Start a VNC client on your local machine and connect to `localhost:10000`.
 
 Start BioDep-Vis on the GPU node:
 ```
-vglrun -c proxy ./G3NAV --ont_file FILE --json_file FILE
+vglrun -c proxy ./biodep-vis --ont_file FILE --json_file FILE
 ```
 
 ## Record VNC Session
@@ -102,7 +102,7 @@ python flvrec.py localhost <port>
 
 To stop recording, enter `Ctrl-C` and an FLV file will be saved.
 
-## Control Keys for G3NAV
+## Keyboard Commands
 
 Space - Force Directed Layout
 

@@ -17,8 +17,26 @@ ifeq "$(PLATFORM)" "Linux"
 	LIBS = -lGL -lGLU -lglut $(GLUILIB) -lglui
 endif
 
+BINS = biodep-vis
+OBJS = \
+	alignment.o \
+	Camera.o \
+	cuda_code.o \
+	events.o \
+	graph.o \
+	jsoncpp.o \
+	lodepng.o \
+	main.o \
+	Matrix.o \
+	miscgl.o \
+	Ont.o \
+	parse.o \
+	texture.o \
+	util.o \
+	Utility.o \
+	Vector.o
 
-all: G3NAV
+all: $(BINS)
 	rm *.o
 
 %.o: $(SRC)/%.cpp
@@ -27,8 +45,8 @@ all: G3NAV
 %.o: $(SRC)/%.cu
 	$(NVCC) -c $(GLUIINC) -std=c++11 -o $@ $<
 
-G3NAV: util.o events.o main.o Camera.o Vector.o Utility.o Matrix.o graph.o alignment.o jsoncpp.o cuda_code.o miscgl.o texture.o parse.o lodepng.o Ont.o 
-	$(NVCC) -o G3NAV $^ $(LIBS)
+biodep-vis: $(OBJS)
+	$(NVCC) -o $@ $^ $(LIBS)
 
 clean:
-	rm -rf *.o G3NAV
+	rm -rf *.o $(BINS)
