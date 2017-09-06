@@ -1,6 +1,14 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <QFile>
 #include <getopt.h>
+#include "graph.h"
+#include "alignment.h"
+
+
+std::vector <Graph> graphDatabase;
+std::vector <Alignment> alignmentDatabase;
+std::unordered_map<std::string, ontStruct> ontologyDB;
 
 typedef enum {
     OPTION_ONTFILE,
@@ -25,6 +33,55 @@ void print_usage()
         "  --json_file  FILE    [REQUIRED] specify the json file containing graphs and alignments\n"
         "  --help       list help options\n"
     );
+}
+
+void parser(const std::string& filename, std::vector <Graph>& gd, std::vector <Alignment>& ad, std::unordered_map<std::string, ontStruct>& ontologyDatabasePtr)
+{
+
+    QFile file(QString(filename));
+    QByteArray data = file.readAll();
+    QJsonObject object = QJsonDocument::fromJson(data).object();
+
+    // read nodes
+    QJsonObject nodes = object["graph"].toObject();
+
+    for ( const QString& key : nodes.keys() ) {
+        QJsonObject jsonNode = nodes[key].toObject();
+
+        node_t node = {
+            jsonNode["id"].toInt(),
+            jsonNode["name"].toString(),
+            jsonNode["taxid"].toInt(),
+            jsonNode["fileLocation"].toString(),
+            jsonNode["clusterLocation"].toString(),
+            jsonNode["Ontology"].toString(),
+            jsonNode["x"].toInt(),
+            jsonNode["y"].toInt(),
+            jsonNode["z"].toInt(),
+            jsonNode["w"].toInt(),
+            jsonNode["h"].toInt()
+        };
+        Graph g(node.id, node.name, node.filename, node.filenamecluster,node.ontFile,node.x,node.y,node.z,node.w,node.h,ontologyDatabasePtr);
+        gd.push_back(g);
+   }
+
+    //read edges
+    QJsonObject edges = object["alignment"].toObject();
+
+    for(const QString& key : edges.keys()){
+        QJsonObject jsonEdge = edges[key].toObject();
+
+        edge_t edge ={
+            jsonEdge["graphID1"].toInt(),
+            jsonEdge["graphID2"].toInt(),
+            jsonEdge["filelocation"].toString()//fix format
+        };
+
+        Alignment a(edge.graphID1,edge.graphID2,edge.filelocation);
+        ad.push_back(a);
+
+    }
+
 }
 
 int main(int argc, char *argv[])
@@ -71,6 +128,8 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    parser(args.json_file, graphDatabase, alignmentDatabase, ontologyDB);
+
     // read the ontology file
     //readOntFile(&ontologyDB, args.ont_file);
 
@@ -82,3 +141,5 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
+
+
