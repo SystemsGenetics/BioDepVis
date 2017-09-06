@@ -94,12 +94,67 @@
         VisualizationGroup->setLayout(VisualizationLayout);
 
         //Legend
-
-        QGroupBox *LegendGroup = new QGroupBox("Controls");
-
+        QGroupBox *LegendGroup = new QGroupBox("Controls");     
         QVBoxLayout *LegendLayout = new QVBoxLayout;
+
+        QStringList controlHeaders {
+           "Key",
+            "Action"
+        };
+
+        QTableWidget * controlTable = new QTableWidget(21,2);
+        controlTable->setHorizontalHeaderLabels(controlHeaders);
+        controlTable->horizontalHeader()->setStretchLastSection(true);
+        controlTable->verticalHeader()->setVisible(false);
+
+        //Control Commands
+        controlTable->setItem(0, 0, new QTableWidgetItem("Space"));
+        controlTable->setItem(0, 1, new QTableWidgetItem("FDL"));
+
+        controlTable->setItem(1, 0, new QTableWidgetItem("Q"));
+        controlTable->setItem(1, 1, new QTableWidgetItem("Zoom Out"));
+
+        controlTable->setItem(2, 0, new QTableWidgetItem("W"));
+        controlTable->setItem(2, 1, new QTableWidgetItem("Rotate on y axis"));
+
+        controlTable->setItem(3, 0, new QTableWidgetItem("E"));
+        controlTable->setItem(3, 1, new QTableWidgetItem("Zoom In"));
+
+        controlTable->setItem(4, 0, new QTableWidgetItem("R"));
+        controlTable->setItem(4, 1, new QTableWidgetItem("Reset View"));
+
+        controlTable->setItem(5, 0, new QTableWidgetItem("U,A,J"));
+        controlTable->setItem(5, 1, new QTableWidgetItem("Pan Down View"));
+
+        controlTable->setItem(6, 0, new QTableWidgetItem("O"));
+        controlTable->setItem(6, 1, new QTableWidgetItem("Pan Down View (slow)"));
+
+        controlTable->setItem(7, 0, new QTableWidgetItem("I"));
+        controlTable->setItem(7, 1, new QTableWidgetItem("Pan Left View"));
+
+        controlTable->setItem(8, 0, new QTableWidgetItem("S,K"));
+        controlTable->setItem(8, 1, new QTableWidgetItem("Pan Right View"));
+
+        controlTable->setItem(9, 0, new QTableWidgetItem("D"));
+        controlTable->setItem(9, 1, new QTableWidgetItem("Rotate on X axis and zoom out"));
+
+        controlTable->setItem(10, 0, new QTableWidgetItem("L"));
+        controlTable->setItem(10, 1, new QTableWidgetItem(" Pan Up View"));
+
+        controlTable->setItem(11, 0, new QTableWidgetItem("X"));
+        controlTable->setItem(11, 1, new QTableWidgetItem("Show only selected nodes"));
+
+        controlTable->setItem(12, 0, new QTableWidgetItem("V"));
+        controlTable->setItem(12, 1, new QTableWidgetItem("Change Edge Design (curved to 2D)"));
+
+        controlTable->setItem(13, 0, new QTableWidgetItem(","));
+        controlTable->setItem(13, 1, new QTableWidgetItem("Show node type"));
+
+        LegendLayout->addWidget(controlTable,0,0);
         LegendGroup->setLayout(LegendLayout);
 
+
+        //Add Groups to Layout
         layout->setColumnStretch(0, 1);
         layout->setColumnStretch(1, 2);
         layout->setColumnStretch(2, 2);
