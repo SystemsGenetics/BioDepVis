@@ -1,10 +1,7 @@
 #include "alignment.h"
-#include "graph.h"
-#include <stdio.h>
-#include <stdlib.h>
 
-
-Alignment::Alignment(char *filename,graph *graph1,graph *graph2)
+Alignment::Alignment(const QString& filename, int id1, int id2)
 {
-
+	this->_id1 = id1;
+	this->_id2 = id2;
 }

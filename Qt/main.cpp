@@ -1,14 +1,7 @@
-#include "mainwindow.h"
-#include <QApplication>
-#include <QFile>
 #include <getopt.h>
-#include "graph.h"
-#include "alignment.h"
-
-
-std::vector <Graph> graphDatabase;
-std::vector <Alignment> alignmentDatabase;
-std::unordered_map<std::string, ontStruct> ontologyDB;
+#include <QApplication>
+#include "database.h"
+#include "mainwindow.h"
 
 typedef enum {
     OPTION_ONTFILE,
@@ -17,12 +10,14 @@ typedef enum {
     OPTION_UNKNOWN = '?'
 } option_t;
 
-
 typedef struct {
-    char *ont_file;
-    char *json_file;
+    const char *ont_file;
+    const char *json_file;
 } optarg_t;
 
+/**
+ * Print command-line usage.
+ */
 void print_usage()
 {
     fprintf(stderr,
@@ -35,60 +30,12 @@ void print_usage()
     );
 }
 
-void parser(const std::string& filename, std::vector <Graph>& gd, std::vector <Alignment>& ad, std::unordered_map<std::string, ontStruct>& ontologyDatabasePtr)
-{
-
-    QFile file(QString(filename));
-    QByteArray data = file.readAll();
-    QJsonObject object = QJsonDocument::fromJson(data).object();
-
-    // read nodes
-    QJsonObject nodes = object["graph"].toObject();
-
-    for ( const QString& key : nodes.keys() ) {
-        QJsonObject jsonNode = nodes[key].toObject();
-
-        node_t node = {
-            jsonNode["id"].toInt(),
-            jsonNode["name"].toString(),
-            jsonNode["taxid"].toInt(),
-            jsonNode["fileLocation"].toString(),
-            jsonNode["clusterLocation"].toString(),
-            jsonNode["Ontology"].toString(),
-            jsonNode["x"].toInt(),
-            jsonNode["y"].toInt(),
-            jsonNode["z"].toInt(),
-            jsonNode["w"].toInt(),
-            jsonNode["h"].toInt()
-        };
-        Graph g(node.id, node.name, node.filename, node.filenamecluster,node.ontFile,node.x,node.y,node.z,node.w,node.h,ontologyDatabasePtr);
-        gd.push_back(g);
-   }
-
-    //read edges
-    QJsonObject edges = object["alignment"].toObject();
-
-    for(const QString& key : edges.keys()){
-        QJsonObject jsonEdge = edges[key].toObject();
-
-        edge_t edge ={
-            jsonEdge["graphID1"].toInt(),
-            jsonEdge["graphID2"].toInt(),
-            jsonEdge["filelocation"].toString()//fix format
-        };
-
-        Alignment a(edge.graphID1,edge.graphID2,edge.filelocation);
-        ad.push_back(a);
-
-    }
-
-}
-
 int main(int argc, char *argv[])
 {
+    // parse command-line arguments
     optarg_t args = {
-        NULL,
-        NULL
+        "ont_data.txt",
+        "input.json"
     };
 
     struct option long_options[] = {
@@ -115,12 +62,6 @@ int main(int argc, char *argv[])
             exit(1);
         }
     }
-    if(args.ont_file == NULL){
-        args.ont_file = "ont_data.txt";
-    }
-    if(args.json_file == NULL){
-        args.json_file = "input.json";
-    }
 
     // validate arguments
     if ( !args.ont_file || !args.json_file ) {
@@ -128,11 +69,13 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    parser(args.json_file, graphDatabase, alignmentDatabase, ontologyDB);
+    // load data
+    Database db;
 
-    // read the ontology file
-    //readOntFile(&ontologyDB, args.ont_file);
+    db.load_alignments(args.json_file);
+    db.load_ontology(args.ont_file);
 
+    // start application
     QApplication a(argc, argv);
 
     MainWindow w;
@@ -141,5 +84,3 @@ int main(int argc, char *argv[])
 
     return a.exec();
 }
-
-

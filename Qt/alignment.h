@@ -1,14 +1,17 @@
 #ifndef ALIGNMENT_H
 #define ALIGNMENT_H
+
 #include "graph.h"
 
 class Alignment
 {
-public:
+private:
+    int _id1;
+    int _id2;
 
-    Alignment(char *,Graph*,Graph*);
+public:
+    Alignment(const QString& filename, int id1, int id2);
 
 };
 
 #endif // ALIGNMENT_H
-
