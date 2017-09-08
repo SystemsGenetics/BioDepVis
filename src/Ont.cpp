@@ -12,7 +12,7 @@
 
  void readOntFile(std::unordered_map<std::string, ontStruct> *array, char *ont_input)
 {
-	
+
 	std::string line, word;
 	ontStruct *a = new ontStruct();
 	int count = 0;
@@ -83,7 +83,7 @@
 	std::cout << sec << std::endl;
 
 	//Test to print values for file ont_data1.txt
-	//Do not print values for ont_data.txt
+	//Do not print values for go-basic.obo
 	/*for(int i = 0; i < 3; i++)
 	{
 	std::cout << "ID: " << array[i].id << std::endl;

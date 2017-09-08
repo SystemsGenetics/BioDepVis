@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 {
     // parse command-line arguments
     optarg_t args = {
-        "ont_data.txt",
+        "go-basic.obo",
         "input.json"
     };
 

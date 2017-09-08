@@ -21,7 +21,7 @@ To build and run the executable:
 ```
 make
 
-./biodep-vis --ont_file ont_data.txt --json_file input.json
+./biodep-vis --ont_file go-basic.obo --json_file input.json
 ```
 
 The program reads a json file and ontology file as input. We have provided both a sample json and ontology file for testing.
