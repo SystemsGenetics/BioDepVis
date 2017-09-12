@@ -168,9 +168,13 @@ void MainWindow::createGUI()
 
 bool MainWindow::search()
 {
+    // TODO: stub
+
     return true;
 }
 bool MainWindow::clear()
 {
+    // TODO: stub
+
     return true;
 }

@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
 {
     // parse command-line arguments
     optarg_t args = {
-        "go-basic.obo",
-        "input.json"
+        "../go-basic.obo",
+        "../input.json"
     };
 
     struct option long_options[] = {

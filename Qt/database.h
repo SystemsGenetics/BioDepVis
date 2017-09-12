@@ -6,6 +6,7 @@
 #include <vector>
 #include "alignment.h"
 #include "graph.h"
+#include <QHash>
 
 typedef struct {
     int nodeSelected;
@@ -13,9 +14,9 @@ typedef struct {
 } nodeSelectedStruct;
 
 typedef struct {
-    std::string id;
-    std::string name;
-    std::string def;
+    QString id;
+    QString name;
+    QString def;
     int index;
     std::vector<nodeSelectedStruct> connectedNodes;
 } ont_term_t;
@@ -24,7 +25,7 @@ class Database {
 private:
     std::vector<Graph> _graphs;
     std::vector<Alignment> _alignments;
-    std::unordered_map<std::string, ont_term_t> _ontology;
+    QHash<QString, ont_term_t> _ontology;
 
 public:
     Database() {};

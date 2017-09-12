@@ -1,7 +1,10 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QTextStream>
 #include "database.h"
+#include <QDebug>
+
 
 /**
  * Load graph and alignment data from a configuration file.
@@ -66,7 +69,45 @@ bool Database::load_alignments(const QString& filename)
  */
 bool Database::load_ontology(const QString& filename)
 {
-	// TODO: stub
+
+
+    QString line;
+    QFile file(filename);
+    QTextStream in(&file);
+
+    if (!file.open(QIODevice::ReadOnly) ) {
+
+        return false;
+    }
+    qDebug("Test1");
+
+    ont_term_t ont;
+
+    while(!in.atEnd()){
+
+        line = in.readLine();
+        QStringList list = line.split(" ");
+
+        if(list[0] == "id:"){
+            ont.id = list[1];
+        }
+        if(list[0] == "name:"){
+            list.removeFirst();
+            ont.name = list.join(" ");
+        }
+        if(list[0] == "def:"){
+            list.removeFirst();
+            ont.def = list.join(" ");
+            _ontology[ont.id] = ont;
+        }
+    }
+
+    qDebug("Test2");
+
+    for( ont_term_t& term : _ontology){
+        qDebug("Test3");
+        //qDebug() << term.id << term.name << term.def << "\n";
+    }
 
     return false;
 }
