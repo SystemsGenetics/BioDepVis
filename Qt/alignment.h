@@ -6,11 +6,14 @@
 class Alignment
 {
 private:
-    int _id1;
-    int _id2;
+    Graph* graph1;
+    Graph* graph2;
+    //std::vector<int> graph1_vertices;
+    //std::vector<int> graph2_vertices;
 
 public:
-    Alignment(const QString& filename, int id1, int id2);
+    Alignment(const QString& filename, Graph* graph1, Graph* graph2);
+    bool load_alignment(const QString& filename);
 
 };
 

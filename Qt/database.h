@@ -4,9 +4,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "alignment.h"
-#include "graph.h"
 #include <QHash>
+#include "alignment.h"
+
 
 typedef struct {
     int nodeSelected;
@@ -22,15 +22,15 @@ typedef struct {
 } ont_term_t;
 
 class Database {
-private:
-    std::vector<Graph> _graphs;
+public:
+    QHash<int,Graph*> _graphs;
     std::vector<Alignment> _alignments;
     QHash<QString, ont_term_t> _ontology;
 
 public:
-    Database() {};
+    Database(){};
 
-    bool load_alignments(const QString& filename);
+    bool load_config(const QString& filename);
     bool load_ontology(const QString& filename);
 };
 

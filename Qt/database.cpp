@@ -6,13 +6,15 @@
 #include <QDebug>
 
 
+
 /**
  * Load graph and alignment data from a configuration file.
  *
  * @param filename
  */
-bool Database::load_alignments(const QString& filename)
+bool Database::load_config(const QString& filename)
 {
+
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -28,7 +30,7 @@ bool Database::load_alignments(const QString& filename)
     for ( const QString& key : nodes.keys() ) {
         QJsonObject jsonNode = nodes[key].toObject();
 
-        Graph g(
+        Graph *g = new Graph(
             jsonNode["id"].toInt(),
             jsonNode["name"].toString(),
             jsonNode["fileLocation"].toString(),
@@ -41,7 +43,7 @@ bool Database::load_alignments(const QString& filename)
             jsonNode["h"].toInt()
         );
 
-        this->_graphs.push_back(g);
+        this->_graphs.insert(g->id(), g);
    }
 
     // read alignments
@@ -49,11 +51,18 @@ bool Database::load_alignments(const QString& filename)
 
     for ( const QString& key : edges.keys() ) {
         QJsonObject jsonEdge = edges[key].toObject();
+        //read id1 and id2
+        int id1 = jsonEdge["graphID1"].toInt();
+        int id2 = jsonEdge["graphID2"].toInt();
+        //search graphs for ids
+
+        Graph* g1 = _graphs.value(id1);
+        Graph* g2 = _graphs.value(id2);
+        //pass into alignment
 
         Alignment a(
 			jsonEdge["filelocation"].toString(),
-			jsonEdge["graphID1"].toInt(),
-			jsonEdge["graphID2"].toInt()
+            g1,g2
         );
 
         this->_alignments.push_back(a);
@@ -69,8 +78,6 @@ bool Database::load_alignments(const QString& filename)
  */
 bool Database::load_ontology(const QString& filename)
 {
-
-
     QString line;
     QFile file(filename);
     QTextStream in(&file);
@@ -79,8 +86,6 @@ bool Database::load_ontology(const QString& filename)
 
         return false;
     }
-    qDebug("Test1");
-
     ont_term_t ont;
 
     while(!in.atEnd()){
@@ -102,11 +107,9 @@ bool Database::load_ontology(const QString& filename)
         }
     }
 
-    qDebug("Test2");
-
     for( ont_term_t& term : _ontology){
-        qDebug("Test3");
-        //qDebug() << term.id << term.name << term.def << "\n";
+
+        qDebug() << term.id << term.name << term.def << "\n";
     }
 
     return false;

@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     // load data
     Database db;
 
-    db.load_alignments(args.json_file);
+    db.load_config(args.json_file);
     db.load_ontology(args.ont_file);
 
     // start application

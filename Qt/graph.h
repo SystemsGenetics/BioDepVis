@@ -2,12 +2,22 @@
 #define GRAPH_H
 
 #include <QString>
+#include <QVector>
+
 
 class Graph
 {
-private:
-    int _id;
+public:
+
     QString _name;
+    int _id;
+    int nodes;
+    int edges;
+    float *edgeMatrix;
+    QVector<QString> nodeListMap;
+    std::vector <std::string> *goTerm;
+
+
 
 public:
     Graph(
@@ -20,6 +30,9 @@ public:
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
+    bool load_datafile(const QString& filename);
+   // bool load_clusterfile(const QFile& file);
+   // bool load_ontologyfile(const QFile& file);
 };
 
 #endif // GRAPH
