@@ -127,7 +127,7 @@ bool Graph::load_ontologyfile(const QString& filename){
          goTermList = lineContents[9].split(",");
 
          int nodeIndex = nodeListMap.indexOf(name);
-         //goTerm.assign(nodeIndex, goTermList);
+         goTerm.replace(nodeIndex, goTermList);
      }
 
 }

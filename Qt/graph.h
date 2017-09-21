@@ -24,7 +24,7 @@ public:
     int edges;
     float *edgeMatrix;
     QVector<QString> nodeListMap;
-    std::vector<std::vector<std::string>> goTerm;
+    QVector<QStringList> goTerm;
     QVector<coord_t> coinfo;
 
 public:
