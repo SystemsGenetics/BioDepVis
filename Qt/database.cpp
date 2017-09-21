@@ -5,8 +5,6 @@
 #include "database.h"
 #include <QDebug>
 
-
-
 /**
  * Load graph and alignment data from a configuration file.
  *
@@ -14,7 +12,6 @@
  */
 bool Database::load_config(const QString& filename)
 {
-
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -51,17 +48,17 @@ bool Database::load_config(const QString& filename)
 
     for ( const QString& key : edges.keys() ) {
         QJsonObject jsonEdge = edges[key].toObject();
-        //read id1 and id2
+
         int id1 = jsonEdge["graphID1"].toInt();
         int id2 = jsonEdge["graphID2"].toInt();
-        //search graphs for ids
 
+        // search graphs for ids
         Graph* g1 = _graphs.value(id1);
         Graph* g2 = _graphs.value(id2);
-        //pass into alignment
 
+        // construct alignment
         Alignment a(
-			jsonEdge["filelocation"].toString(),
+            jsonEdge["filelocation"].toString(),
             g1,g2
         );
 
@@ -78,32 +75,31 @@ bool Database::load_config(const QString& filename)
  */
 bool Database::load_ontology(const QString& filename)
 {
-    QString line;
     QFile file(filename);
-    QTextStream in(&file);
 
-    if (!file.open(QIODevice::ReadOnly) ) {
-
+    if ( !file.open(QIODevice::ReadOnly) ) {
         return false;
     }
-    ont_term_t ont;
 
-    while(!in.atEnd()){
+    QTextStream in(&file);
 
-        line = in.readLine();
+    while ( !in.atEnd() ) {
+        QString line = in.readLine();
         QStringList list = line.split(" ");
 
-        if(list[0] == "id:"){
+        ont_term_t ont;
+        if ( list[0] == "id:" ) {
             ont.id = list[1];
         }
-        if(list[0] == "name:"){
+        else if ( list[0] == "name:" ) {
             list.removeFirst();
             ont.name = list.join(" ");
         }
-        if(list[0] == "def:"){
+        else if ( list[0] == "def:" ) {
             list.removeFirst();
             ont.def = list.join(" ");
-            _ontology[ont.id] = ont;
+
+            this->_ontology[ont.id] = ont;
         }
     }
 

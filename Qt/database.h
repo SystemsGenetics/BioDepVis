@@ -7,7 +7,6 @@
 #include <QHash>
 #include "alignment.h"
 
-
 typedef struct {
     int nodeSelected;
     int graphSelected;
@@ -22,8 +21,8 @@ typedef struct {
 } ont_term_t;
 
 class Database {
-public:
-    QHash<int,Graph*> _graphs;
+private:
+    QHash<int, Graph *> _graphs;
     std::vector<Alignment> _alignments;
     QHash<QString, ont_term_t> _ontology;
 

@@ -19,8 +19,7 @@ typedef struct {
 
 class Graph
 {
-public:
-
+private:
     QString _name;
     int _id;
     int nodes;

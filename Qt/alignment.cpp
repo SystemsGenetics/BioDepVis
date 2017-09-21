@@ -10,8 +10,8 @@ Alignment::Alignment(const QString& filename, Graph* graph1, Graph* graph2)
     load_alignment(filename);
 }
 
-bool Alignment::load_alignment(const QString& filename){
-
+bool Alignment::load_alignment(const QString& filename)
+{
     QFile file(filename);
     QTextStream in(&file);
     QString node1;
@@ -22,15 +22,15 @@ bool Alignment::load_alignment(const QString& filename){
         return false;
     }
 
-     while(!in.atEnd()){
-         line = in.readLine();
-         QStringList list = line.split("\t");
-         node1 = list[0];
-         node2 = list[1];
+    while(!in.atEnd()){
+        line = in.readLine();
+        QStringList list = line.split("\t");
+        node1 = list[0];
+        node2 = list[1];
 
-         //Todo:
-         //check in nodeListMap
-     }
+        //Todo:
+        //check in nodeListMap
+    }
 
     return true;
 }
