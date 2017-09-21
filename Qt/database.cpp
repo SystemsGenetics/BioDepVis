@@ -1,9 +1,9 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QDebug>
 #include <QTextStream>
 #include "database.h"
-#include <QDebug>
 
 /**
  * Load graph and alignment data from a configuration file.
@@ -22,44 +22,40 @@ bool Database::load_config(const QString& filename)
     QJsonObject object = QJsonDocument::fromJson(data).object();
 
     // read graphs
-    QJsonObject nodes = object["graph"].toObject();
+    QJsonObject graphs = object["graph"].toObject();
 
-    for ( const QString& key : nodes.keys() ) {
-        QJsonObject jsonNode = nodes[key].toObject();
+    for ( const QString& key : graphs.keys() ) {
+        QJsonObject obj = graphs[key].toObject();
 
         Graph *g = new Graph(
-            jsonNode["id"].toInt(),
-            jsonNode["name"].toString(),
-            jsonNode["fileLocation"].toString(),
-            jsonNode["clusterLocation"].toString(),
-            jsonNode["Ontology"].toString(),
-            jsonNode["x"].toInt(),
-            jsonNode["y"].toInt(),
-            jsonNode["z"].toInt(),
-            jsonNode["w"].toInt(),
-            jsonNode["h"].toInt()
+            obj["id"].toInt(),
+            obj["name"].toString(),
+            obj["fileLocation"].toString(),
+            obj["clusterLocation"].toString(),
+            obj["Ontology"].toString(),
+            obj["x"].toInt(),
+            obj["y"].toInt(),
+            obj["z"].toInt(),
+            obj["w"].toInt(),
+            obj["h"].toInt()
         );
 
         this->_graphs.insert(g->id(), g);
    }
 
     // read alignments
-    QJsonObject edges = object["alignment"].toObject();
+    QJsonObject alignments = object["alignment"].toObject();
 
-    for ( const QString& key : edges.keys() ) {
-        QJsonObject jsonEdge = edges[key].toObject();
+    for ( const QString& key : alignments.keys() ) {
+        QJsonObject obj = alignments[key].toObject();
 
-        int id1 = jsonEdge["graphID1"].toInt();
-        int id2 = jsonEdge["graphID2"].toInt();
+        int id1 = obj["graphID1"].toInt();
+        int id2 = obj["graphID2"].toInt();
 
-        // search graphs for ids
-        Graph* g1 = _graphs.value(id1);
-        Graph* g2 = _graphs.value(id2);
-
-        // construct alignment
         Alignment a(
-            jsonEdge["filelocation"].toString(),
-            g1,g2
+            obj["filelocation"].toString(),
+            this->_graphs[id1],
+            this->_graphs[id2]
         );
 
         this->_alignments.push_back(a);
@@ -84,8 +80,7 @@ bool Database::load_ontology(const QString& filename)
     QTextStream in(&file);
 
     while ( !in.atEnd() ) {
-        QString line = in.readLine();
-        QStringList list = line.split(" ");
+        QStringList list = in.readLine().split(" ");
 
         ont_term_t ont;
         if ( list[0] == "id:" ) {
@@ -105,14 +100,14 @@ bool Database::load_ontology(const QString& filename)
 
     // populate ontology terms with connected nodes
     for ( Graph *g : this->_graphs.values() ) {
-        QVector<node_t> nodes = g->node_list();
+        QVector<node_t> nodes = g->nodes();
 
         for ( int i = 0; i < nodes.size(); i++ ) {
             for ( const QString& term : nodes[i].go_terms ) {
                 ont_term_t& ont = this->_ontology[term];
 
-                ont.connectedNodes.push_back(nodeSelectedStruct {
-                    i, g->id() - 1
+                ont.connected_nodes.push_back(node_ref_t {
+                    g->id() - 1, i
                 });
             }
         }

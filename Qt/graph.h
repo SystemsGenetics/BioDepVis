@@ -9,24 +9,23 @@ typedef struct {
     float dy;
     float dz;
     float radius;
-    int clusterId;
-} coord_t;
+} coinfo_t;
 
 typedef struct {
     QString name;
+    int cluster_id;
     QStringList go_terms;
+    coinfo_t coinfo;
 } node_t;
 
 class Graph
 {
 private:
-    QString _name;
     int _id;
-    int nodes;
-    int edges;
-    float *edgeMatrix;
-    QVector<node_t> nodeList;
-    QVector<coord_t> coinfo;
+    QString _name;
+    QVector<node_t> _nodes;
+    float *_edge_matrix;
+    int _num_edges;
 
 public:
     Graph(
@@ -36,10 +35,11 @@ public:
         const QString& ontfile,
         int x, int y, int z, int w, int h
     );
+    Graph() {};
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
-    const QVector<node_t>& node_list() const { return this->nodeList; }
+    const QVector<node_t>& nodes() const { return this->_nodes; }
 
     bool load_datafile(const QString& filename);
     bool load_clusterfile(const QString& filename);

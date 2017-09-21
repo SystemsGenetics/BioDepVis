@@ -3,33 +3,30 @@
 #include <QFile>
 #include <QTextStream>
 
-Alignment::Alignment(const QString& filename, Graph* graph1, Graph* graph2)
+Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
 {
-    this->graph1 = graph1;
-    this->graph2 = graph2;
+    this->_graph1 = graph1;
+    this->_graph2 = graph2;
+
     load_alignment(filename);
 }
 
 bool Alignment::load_alignment(const QString& filename)
 {
     QFile file(filename);
-    QTextStream in(&file);
-    QString node1;
-    QString node2;
-    QString line;
 
     if ( !file.open(QIODevice::ReadOnly) ) {
         return false;
     }
 
-    while(!in.atEnd()){
-        line = in.readLine();
-        QStringList list = line.split("\t");
-        node1 = list[0];
-        node2 = list[1];
+    QTextStream in(&file);
 
-        //Todo:
-        //check in nodeListMap
+    while ( !in.atEnd() ) {
+        QStringList list = in.readLine().split("\t");
+        QString node1 = list[0];
+        QString node2 = list[1];
+
+        // TODO
     }
 
     return true;
@@ -37,5 +34,5 @@ bool Alignment::load_alignment(const QString& filename)
 
 void Alignment::print() const
 {
-    qDebug() << graph1->id() << graph2->id();
+    qDebug() << this->_graph1->id() << this->_graph2->id();
 }
