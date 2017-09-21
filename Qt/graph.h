@@ -4,7 +4,6 @@
 #include <QString>
 #include <QVector>
 
-
 typedef struct {
     float dx;
     float dy;
@@ -13,6 +12,10 @@ typedef struct {
     int clusterId;
 } coord_t;
 
+typedef struct {
+    QString name;
+    QStringList go_terms;
+} node_t;
 
 class Graph
 {
@@ -23,8 +26,7 @@ public:
     int nodes;
     int edges;
     float *edgeMatrix;
-    QVector<QString> nodeListMap;
-    QVector<QStringList> goTerm;
+    QVector<node_t> nodeList;
     QVector<coord_t> coinfo;
 
 public:
@@ -38,9 +40,13 @@ public:
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
+    const QVector<node_t>& node_list() const { return this->nodeList; }
+
     bool load_datafile(const QString& filename);
     bool load_clusterfile(const QString& filename);
     bool load_ontologyfile(const QString& filename);
+
+    void print() const;
 };
 
 #endif // GRAPH

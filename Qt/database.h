@@ -32,6 +32,8 @@ public:
 
     bool load_config(const QString& filename);
     bool load_ontology(const QString& filename);
+
+    void print() const;
 };
 
 #endif

@@ -107,10 +107,41 @@ bool Database::load_ontology(const QString& filename)
         }
     }
 
-    for( ont_term_t& term : _ontology){
+    // populate ontology terms with connected nodes
+    for ( Graph *g : this->_graphs.values() ) {
+        QVector<node_t> nodes = g->node_list();
 
-        qDebug() << term.id << term.name << term.def << "\n";
+        for ( int i = 0; i < nodes.size(); i++ ) {
+            for ( const QString& term : nodes[i].go_terms ) {
+                ont_term_t& ont = this->_ontology[term];
+
+                ont.connectedNodes.push_back(nodeSelectedStruct {
+                    i, g->id() - 1
+                });
+            }
+        }
     }
 
-    return false;
+    return true;
+}
+
+void Database::print() const
+{
+    qDebug() << "Ontology terms:\n";
+    for ( const ont_term_t& term : this->_ontology.values() ) {
+        qDebug() << term.id << term.name;
+        qDebug() << "";
+    }
+
+    qDebug() << "Graphs:\n";
+    for ( Graph *g : this->_graphs.values() ) {
+        g->print();
+        qDebug() << "";
+    }
+
+    qDebug() << "Alignments:\n";
+    for ( const Alignment& a : this->_alignments ) {
+        a.print();
+        qDebug() << "";
+    }
 }

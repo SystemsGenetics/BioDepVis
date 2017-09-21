@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <QDebug>
 #include <QFile>
 #include<QTextStream>
 
@@ -12,6 +13,8 @@ Graph::Graph(
 	this->_id = id;
 	this->_name = name;
 
+	load_datafile(datafile);
+
     //initialize the coord info struct for clusterization
     coinfo.reserve(nodes);
     for(int i = 0; i < nodes;i++)
@@ -22,10 +25,25 @@ Graph::Graph(
         coinfo.push_back(c);
     }
 
-    load_datafile(datafile);
     load_clusterfile(clusterfile);
+	load_ontologyfile(ontfile);
+}
 
+/**
+ * Search a list of nodes by name.
+ *
+ * @param nodes
+ * @param name
+ */
+int find_index(const QVector<node_t>& nodes, const QString& name)
+{
+	for ( int i = 0; i < nodes.size(); i++ ) {
+		if ( nodes[i].name == name ) {
+			return i;
+		}
+	}
 
+	return -1;
 }
 
 bool Graph::load_datafile(const QString& filename){
@@ -33,7 +51,6 @@ bool Graph::load_datafile(const QString& filename){
     QFile file(filename);
     QTextStream in(&file);
     QString line;
-    in.readLine();//for fist line
     QString node1;
     QString node2;
 
@@ -54,27 +71,31 @@ bool Graph::load_datafile(const QString& filename){
          node1 = p.first;
          node2 = p.second;
 
-         bool found = nodeListMap.contains(node1);
-         if (!found){
-             nodeListMap.push_back(node1);
+         if ( find_index(nodeList, node1) == -1 ) {
+			 node_t n;
+			 n.name = node1;
+
+             nodeList.push_back(n);
          }
 
-        bool found2 = nodeListMap.contains(node2);
-         if (!found2){
-            nodeListMap.push_back(node2);
+         if ( find_index(nodeList, node2) == -1 ) {
+			 node_t n;
+			 n.name = node2;
+
+            nodeList.push_back(n);
          }
 
     }
-    nodes = nodeListMap.size();
-    goTerm.reserve(nodes);
+    nodes = nodeList.size();
     edgeMatrix = new float[nodes * nodes];
     edges=0;
 
     for(std::pair<QString,QString> p : nodePairs){
 
         node1 = p.first;
-        int i = nodeListMap.indexOf(node1);
-        int j = nodeListMap.indexOf(node2);
+		node2 = p.second;
+        int i = find_index(nodeList, node1);
+        int j = find_index(nodeList, node2);
 
         edgeMatrix[i*nodes + j]=1;
         edgeMatrix[j*nodes + i]=1;
@@ -102,7 +123,7 @@ bool Graph::load_clusterfile(const QString& filename){
         node = list[0];
         clusterId =list[1].toInt();
 
-        int nodeIndex = nodeListMap.indexOf(node);
+        int nodeIndex = find_index(nodeList, node);
         coinfo[nodeIndex].clusterId = clusterId;
     }
 
@@ -126,11 +147,23 @@ bool Graph::load_ontologyfile(const QString& filename){
          name = lineContents[1];
          goTermList = lineContents[9].split(",");
 
-         int nodeIndex = nodeListMap.indexOf(name);
-         goTerm.replace(nodeIndex, goTermList);
+        int nodeIndex = find_index(nodeList, name);
+
+		if ( nodeIndex != -1 ) {
+			nodeList[nodeIndex].go_terms = goTermList;
+		}
      }
 
 }
 
+void Graph::print() const
+{
+	qDebug() << this->_id << this->_name;
 
-
+	for ( int i = 0; i < this->nodeList.size(); i++ ) {
+		qDebug()
+			<< this->nodeList[i].name
+			<< this->coinfo[i].clusterId
+			<< this->nodeList[i].go_terms.join(' ');
+	}
+}

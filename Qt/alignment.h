@@ -15,6 +15,7 @@ public:
     Alignment(const QString& filename, Graph* graph1, Graph* graph2);
     bool load_alignment(const QString& filename);
 
+    void print() const;
 };
 
 #endif // ALIGNMENT_H

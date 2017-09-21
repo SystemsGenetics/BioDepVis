@@ -1,4 +1,5 @@
 #include "alignment.h"
+#include <QDebug>
 #include <QFile>
 #include <QTextStream>
 
@@ -32,4 +33,9 @@ bool Alignment::load_alignment(const QString& filename){
      }
 
     return true;
+}
+
+void Alignment::print() const
+{
+    qDebug() << graph1->id() << graph2->id();
 }
