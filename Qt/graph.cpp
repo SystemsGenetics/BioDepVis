@@ -11,7 +11,21 @@ Graph::Graph(
 {
 	this->_id = id;
 	this->_name = name;
+
+    //initialize the coord info struct for clusterization
+    coinfo.reserve(nodes);
+    for(int i = 0; i < nodes;i++)
+    {
+        coord_t c = {
+            0,0,0,1,0
+        };
+        coinfo.push_back(c);
+    }
+
     load_datafile(datafile);
+    load_clusterfile(clusterfile);
+
+
 }
 
 bool Graph::load_datafile(const QString& filename){
@@ -52,27 +66,15 @@ bool Graph::load_datafile(const QString& filename){
 
     }
     nodes = nodeListMap.size();
-    goTerm = new std::vector<std::string>[nodes];
+    goTerm.reserve(nodes);
     edgeMatrix = new float[nodes * nodes];
     edges=0;
 
     for(std::pair<QString,QString> p : nodePairs){
 
         node1 = p.first;
-        int i = 0;
-        int j = 0;
-
-        for(int i = 0;i<nodes;i++){
-            if(nodeListMap[i] == node1 ){
-                break;
-            }
-        }
-
-        for(int j = 0;j<nodes;j++){
-            if(nodeListMap[j] == node1 ){
-                break;
-            }
-        }
+        int i = nodeListMap.indexOf(node1);
+        int j = nodeListMap.indexOf(node2);
 
         edgeMatrix[i*nodes + j]=1;
         edgeMatrix[j*nodes + i]=1;
@@ -81,6 +83,52 @@ bool Graph::load_datafile(const QString& filename){
 
     }
 
+}
+bool Graph::load_clusterfile(const QString& filename){
+
+    QFile file(filename);
+    QTextStream in(&file);
+    QString line;
+    QString node;//gene?
+    int clusterId;
+
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        return false;
+    }
+
+    while(!in.atEnd()){
+        line = in.readLine();
+        QStringList list = line.split("\t");
+        node = list[0];
+        clusterId =list[1].toInt();
+
+        int nodeIndex = nodeListMap.indexOf(node);
+        coinfo[nodeIndex].clusterId = clusterId;
+    }
+
+}
+
+bool Graph::load_ontologyfile(const QString& filename){
+    QFile file(filename);
+    QTextStream in(&file);
+    QString line;
+    QString name;
+    QStringList goTermList;
+
+
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        return false;
+    }
+
+     while(!in.atEnd()){
+         line = in.readLine();
+         QStringList lineContents = line.split("\t");
+         name = lineContents[1];
+         goTermList = lineContents[9].split(",");
+
+         int nodeIndex = nodeListMap.indexOf(name);
+         //goTerm.assign(nodeIndex, goTermList);
+     }
 
 }
 

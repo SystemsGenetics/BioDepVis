@@ -5,6 +5,15 @@
 #include <QVector>
 
 
+typedef struct {
+    float dx;
+    float dy;
+    float dz;
+    float radius;
+    int clusterId;
+} coord_t;
+
+
 class Graph
 {
 public:
@@ -15,9 +24,8 @@ public:
     int edges;
     float *edgeMatrix;
     QVector<QString> nodeListMap;
-    std::vector <std::string> *goTerm;
-
-
+    std::vector<std::vector<std::string>> goTerm;
+    QVector<coord_t> coinfo;
 
 public:
     Graph(
@@ -31,8 +39,8 @@ public:
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
     bool load_datafile(const QString& filename);
-   // bool load_clusterfile(const QFile& file);
-   // bool load_ontologyfile(const QFile& file);
+    bool load_clusterfile(const QString& filename);
+    bool load_ontologyfile(const QString& filename);
 };
 
 #endif // GRAPH

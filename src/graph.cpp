@@ -329,21 +329,11 @@ void graph::UpdateOntologyInfo(std::string name, std::string golistString, std::
 		goList.push_back(term);
 	}
 
-	/*while (ss >> term)
-	{
-		goList.push_back(term);
-
-		if (ss.peek() == ',')
-			ss.ignore();
-	}*/
-
-	
-	
 	std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
 
 	if (found == nodeListMap.end())
 	{
-		return;
+		return;//should return error
 	}
 	
 	for (int i = 0; i < goList.size(); i++)
@@ -398,14 +388,5 @@ void graph::readOntology(char *filename, std::unordered_map<std::string, ontStru
 
 	}
 }
-
-
-
-/*std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
-
-if (found != nodeListMap.end())
-{
-	UpdateOntologyInfo(name, goterm);
-}*/
 
 
