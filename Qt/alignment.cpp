@@ -67,7 +67,21 @@ bool Alignment::load_edges(const QString& filename)
         this->_edge_matrix[i * this->_cols + j] = 1;
     }
 
+    // initialize vertices
+    this->_vertices = new edge_t[this->_edges.size()];
+
     return true;
+}
+
+void Alignment::update()
+{
+    for ( int k = 0; k < this->_edges.size(); k++ ) {
+        int i = this->_edges[k].first;
+        int j = this->_edges[k].second;
+
+        this->_vertices[k].v1 = this->_graph1->nodes()[i].coord;
+        this->_vertices[k].v2 = this->_graph2->nodes()[j].coord;
+    }
 }
 
 void Alignment::print() const

@@ -4,6 +4,11 @@
 #include <QPair>
 #include "graph.h"
 
+typedef struct {
+    vec3_t v1;
+    vec3_t v2;
+} edge_t;
+
 class Alignment
 {
 private:
@@ -14,6 +19,7 @@ private:
     int _rows;
     int _cols;
     float *_edge_matrix;
+    edge_t *_vertices;
 
 public:
     Alignment(const QString& filename, Graph *graph1, Graph *graph2);
@@ -21,6 +27,7 @@ public:
     ~Alignment();
 
     bool load_edges(const QString& filename);
+    void update();
 
     void print() const;
 };
