@@ -20,7 +20,7 @@ public:
     Alignment();
     ~Alignment();
 
-    bool load_alignment(const QString& filename);
+    bool load_edges(const QString& filename);
 
     void print() const;
 };

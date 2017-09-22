@@ -14,7 +14,7 @@ Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
 
     memset(this->_edge_matrix, 0, this->_rows * this->_cols * sizeof(float));
 
-    load_alignment(filename);
+    load_edges(filename);
 }
 
 Alignment::Alignment()
@@ -26,11 +26,14 @@ Alignment::Alignment()
 
 Alignment::~Alignment()
 {
+    // TODO: causes segfault, need copy constructor?
     // delete[] this->_edge_matrix;
 }
 
-bool Alignment::load_alignment(const QString& filename)
+bool Alignment::load_edges(const QString& filename)
 {
+    qDebug() << "- loading edge list...";
+
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {

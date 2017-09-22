@@ -25,17 +25,26 @@ Graph::Graph(
     const QString& datafile,
     const QString& clusterfile,
     const QString& ontfile,
-    int x, int y, int z, int w, int h)
+    float x, float y, float z, int w, int h)
 {
     this->_id = id;
     this->_name = name;
+    this->_center = { x, y, z };
+    this->_width = w;
+    this->_height = h;
 
     load_clusterfile(clusterfile);
     load_edgefile(datafile);
     load_ontologyfile(ontfile);
 
-    // initialize node coordinates
+    // initialize node coords, coinfo
     for ( node_t& node : this->_nodes ) {
+        node.coord = {
+            x - w/2 + qrand() % w,
+            y - w/2 + qrand() % h,
+            z
+        };
+
         node.coinfo = { 0, 0, 0, 1 };
     }
 }
@@ -87,34 +96,38 @@ bool Graph::load_edgefile(const QString& filename)
         return false;
     }
 
-    // read node pairs from file
+    // load edges from file
     QTextStream in(&file);
-    QVector<QPair<QString, QString>> node_pairs;
 
     while ( !in.atEnd() ) {
         QStringList list = in.readLine().split("\t");
         QString node1 = list[0];
         QString node2 = list[1];
 
-        node_pairs.push_back({ node1, node2 });
-    }
-
-    // construct edge matrix
-    int n = this->_nodes.size();
-
-    this->_edge_matrix = new float[n * n];
-    this->_num_edges = 0;
-
-    for ( auto& p : node_pairs ) {
-        QString node1 = p.first;
-        QString node2 = p.second;
         int i = find_node(this->_nodes, node1);
         int j = find_node(this->_nodes, node2);
 
-        this->_edge_matrix[i * n + j] = 1;
-        this->_edge_matrix[j * n + i] = 1;
+        if ( i != -1 && j != -1 ) {
+            this->_edges.push_back({ i, j });
+        }
+        else {
+            qDebug() << "warning: could not find nodes " << node1 << node2;
+        }
+    }
 
-        this->_num_edges++;
+    // initialize edge matrix
+    int rows = this->_nodes.size();
+
+    this->_edge_matrix = new float[rows * rows];
+
+    memset(this->_edge_matrix, 0, rows * rows * sizeof(float));
+
+    for ( auto& edge : this->_edges ) {
+        int i = edge.first;
+        int j = edge.second;
+
+        this->_edge_matrix[i * rows + j] = 1;
+        this->_edge_matrix[j * rows + i] = 1;
     }
 
     return true;
