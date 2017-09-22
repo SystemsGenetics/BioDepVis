@@ -52,6 +52,8 @@ Graph::~Graph()
 
 bool Graph::load_datafile(const QString& filename)
 {
+    qDebug() << "- loading edge list...";
+
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -113,6 +115,8 @@ bool Graph::load_datafile(const QString& filename)
 
 bool Graph::load_clusterfile(const QString& filename)
 {
+    qDebug() << "- loading cluster file...";
+
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -135,6 +139,8 @@ bool Graph::load_clusterfile(const QString& filename)
 
 bool Graph::load_ontologyfile(const QString& filename)
 {
+    qDebug() << "- loading ontology file...";
+
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -162,10 +168,10 @@ void Graph::print() const
 {
     qDebug() << this->_id << this->_name;
 
-    for ( int i = 0; i < this->_nodes.size(); i++ ) {
-        qDebug()
-            << this->_nodes[i].name
-            << this->_nodes[i].cluster_id
-            << this->_nodes[i].go_terms.join(' ');
-    }
+    // for ( int i = 0; i < this->_nodes.size(); i++ ) {
+    //     qDebug()
+    //         << this->_nodes[i].name
+    //         << this->_nodes[i].cluster_id
+    //         << this->_nodes[i].go_terms.join(' ');
+    // }
 }

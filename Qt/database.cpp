@@ -42,6 +42,8 @@ bool Database::load_config(const QString& filename)
         );
 
         this->_graphs.insert(g->id(), g);
+
+        g->print();
     }
 
     qDebug() << "Loading alignments...";
@@ -61,6 +63,8 @@ bool Database::load_config(const QString& filename)
         );
 
         this->_alignments.push_back(a);
+
+        a.print();
     }
 
     return true;

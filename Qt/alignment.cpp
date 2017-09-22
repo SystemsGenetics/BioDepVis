@@ -70,9 +70,8 @@ bool Alignment::load_alignment(const QString& filename)
 void Alignment::print() const
 {
     qDebug() << this->_graph1->name() << this->_graph2->name();
-    qDebug() << "";
 
-    for ( auto& edge : this->_edges ) {
-        qDebug() << edge.first << edge.second;
-    }
+    // for ( auto& edge : this->_edges ) {
+    //     qDebug() << edge.first << edge.second;
+    // }
 }
