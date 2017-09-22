@@ -3,6 +3,23 @@
 #include <QFile>
 #include <QTextStream>
 
+/**
+ * Find a node by name.
+ *
+ * @param nodes
+ * @param name
+ */
+int find_node(const QVector<node_t>& nodes, const QString& name)
+{
+    for ( int i = 0; i < nodes.size(); i++ ) {
+        if ( nodes[i].name == name ) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 Graph::Graph(
     int id, const QString& name,
     const QString& datafile,
@@ -23,21 +40,14 @@ Graph::Graph(
     }
 }
 
-/**
- * Search a list of nodes by name.
- *
- * @param nodes
- * @param name
- */
-int find_index(const QVector<node_t>& nodes, const QString& name)
+Graph::Graph()
 {
-    for ( int i = 0; i < nodes.size(); i++ ) {
-        if ( nodes[i].name == name ) {
-            return i;
-        }
-    }
+    this->_edge_matrix = nullptr;
+}
 
-    return -1;
+Graph::~Graph()
+{
+    delete[] this->_edge_matrix;
 }
 
 bool Graph::load_datafile(const QString& filename)
@@ -65,14 +75,14 @@ bool Graph::load_datafile(const QString& filename)
         QString node1 = p.first;
         QString node2 = p.second;
 
-        if ( find_index(this->_nodes, node1) == -1 ) {
+        if ( find_node(this->_nodes, node1) == -1 ) {
             node_t n;
             n.name = node1;
 
             this->_nodes.push_back(n);
         }
 
-        if ( find_index(this->_nodes, node2) == -1 ) {
+        if ( find_node(this->_nodes, node2) == -1 ) {
             node_t n;
             n.name = node2;
 
@@ -89,8 +99,8 @@ bool Graph::load_datafile(const QString& filename)
     for ( auto& p : node_pairs ) {
         QString node1 = p.first;
         QString node2 = p.second;
-        int i = find_index(this->_nodes, node1);
-        int j = find_index(this->_nodes, node2);
+        int i = find_node(this->_nodes, node1);
+        int j = find_node(this->_nodes, node2);
 
         this->_edge_matrix[i * n + j] = 1;
         this->_edge_matrix[j * n + i] = 1;
@@ -116,7 +126,7 @@ bool Graph::load_clusterfile(const QString& filename)
         QString node = list[0];
         int cluster_id = list[1].toInt();
 
-        int nodeIndex = find_index(this->_nodes, node);
+        int nodeIndex = find_node(this->_nodes, node);
         this->_nodes[nodeIndex].cluster_id = cluster_id;
     }
 
@@ -138,7 +148,7 @@ bool Graph::load_ontologyfile(const QString& filename)
         QString name = fields[1];
         QStringList go_terms = fields[9].split(",");
 
-        int nodeIndex = find_index(this->_nodes, name);
+        int nodeIndex = find_node(this->_nodes, name);
 
         if ( nodeIndex != -1 ) {
             this->_nodes[nodeIndex].go_terms = go_terms;

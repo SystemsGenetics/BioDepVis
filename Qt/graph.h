@@ -18,6 +18,8 @@ typedef struct {
     coinfo_t coinfo;
 } node_t;
 
+int find_node(const QVector<node_t>& nodes, const QString& name);
+
 class Graph
 {
 private:
@@ -35,7 +37,8 @@ public:
         const QString& ontfile,
         int x, int y, int z, int w, int h
     );
-    Graph() {};
+    Graph();
+    ~Graph();
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }

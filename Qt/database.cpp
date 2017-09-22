@@ -1,7 +1,7 @@
+#include <QDebug>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QDebug>
 #include <QTextStream>
 #include "database.h"
 
@@ -21,7 +21,8 @@ bool Database::load_config(const QString& filename)
     QByteArray data = file.readAll();
     QJsonObject object = QJsonDocument::fromJson(data).object();
 
-    // read graphs
+    qDebug() << "Loading graphs...";
+
     QJsonObject graphs = object["graph"].toObject();
 
     for ( const QString& key : graphs.keys() ) {
@@ -41,9 +42,10 @@ bool Database::load_config(const QString& filename)
         );
 
         this->_graphs.insert(g->id(), g);
-   }
+    }
 
-    // read alignments
+    qDebug() << "Loading alignments...";
+
     QJsonObject alignments = object["alignment"].toObject();
 
     for ( const QString& key : alignments.keys() ) {
@@ -76,6 +78,8 @@ bool Database::load_ontology(const QString& filename)
     if ( !file.open(QIODevice::ReadOnly) ) {
         return false;
     }
+
+    qDebug() << "Loading ontology terms...";
 
     QTextStream in(&file);
 
@@ -118,12 +122,6 @@ bool Database::load_ontology(const QString& filename)
 
 void Database::print() const
 {
-    qDebug() << "Ontology terms:\n";
-    for ( const ont_term_t& term : this->_ontology.values() ) {
-        qDebug() << term.id << term.name;
-        qDebug() << "";
-    }
-
     qDebug() << "Graphs:\n";
     for ( Graph *g : this->_graphs.values() ) {
         g->print();
@@ -133,6 +131,12 @@ void Database::print() const
     qDebug() << "Alignments:\n";
     for ( const Alignment& a : this->_alignments ) {
         a.print();
+        qDebug() << "";
+    }
+
+    qDebug() << "Ontology terms:\n";
+    for ( const ont_term_t& term : this->_ontology.values() ) {
+        qDebug() << term.id << term.name;
         qDebug() << "";
     }
 }

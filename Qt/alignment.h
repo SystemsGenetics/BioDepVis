@@ -1,6 +1,7 @@
 #ifndef ALIGNMENT_H
 #define ALIGNMENT_H
 
+#include <QPair>
 #include "graph.h"
 
 class Alignment
@@ -8,12 +9,16 @@ class Alignment
 private:
     Graph *_graph1;
     Graph *_graph2;
-    //std::vector<int> graph1_vertices;
-    //std::vector<int> graph2_vertices;
+    QVector<QPair<int, int>> _edges;
+
+    int _rows;
+    int _cols;
+    float *_edge_matrix;
 
 public:
     Alignment(const QString& filename, Graph *graph1, Graph *graph2);
-    Alignment() {};
+    Alignment();
+    ~Alignment();
 
     bool load_alignment(const QString& filename);
 
