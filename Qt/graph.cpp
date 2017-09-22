@@ -59,14 +59,15 @@ Graph::~Graph()
     delete[] this->_edge_matrix;
 }
 
-bool Graph::load_clusterfile(const QString& filename)
+void Graph::load_clusterfile(const QString& filename)
 {
-    qDebug() << "- loading cluster file...";
+    qInfo() << "- loading cluster file...";
 
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
+        qWarning("warning: unable to open cluster file");
+        return;
     }
 
     QTextStream in(&file);
@@ -82,18 +83,17 @@ bool Graph::load_clusterfile(const QString& filename)
 
         this->_nodes.push_back(node);
     }
-
-    return true;
 }
 
-bool Graph::load_edgefile(const QString& filename)
+void Graph::load_edgefile(const QString& filename)
 {
-    qDebug() << "- loading edge list...";
+    qInfo() << "- loading edge list...";
 
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
+        qWarning("warning: unable to open edge file");
+        return;
     }
 
     // load edges from file
@@ -111,7 +111,7 @@ bool Graph::load_edgefile(const QString& filename)
             this->_edges.push_back({ i, j });
         }
         else {
-            qDebug() << "warning: could not find nodes " << node1 << node2;
+            qWarning() << "warning: could not find nodes " << node1 << node2;
         }
     }
 
@@ -129,18 +129,17 @@ bool Graph::load_edgefile(const QString& filename)
         this->_edge_matrix[i * rows + j] = 1;
         this->_edge_matrix[j * rows + i] = 1;
     }
-
-    return true;
 }
 
-bool Graph::load_ontologyfile(const QString& filename)
+void Graph::load_ontologyfile(const QString& filename)
 {
-    qDebug() << "- loading ontology file...";
+    qInfo() << "- loading ontology file...";
 
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
+        qWarning("warning: unable to open ontology file");
+        return;
     }
 
     QTextStream in(&file);
@@ -156,13 +155,11 @@ bool Graph::load_ontologyfile(const QString& filename)
             this->_nodes[nodeIndex].go_terms = go_terms;
         }
     }
-
-    return true;
 }
 
 void Graph::print() const
 {
-    qDebug() << this->_id << this->_name;
+    qInfo() << this->_id << this->_name;
 
     // for ( int i = 0; i < this->_nodes.size(); i++ ) {
     //     qDebug()

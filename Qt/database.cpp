@@ -10,18 +10,19 @@
  *
  * @param filename
  */
-bool Database::load_config(const QString& filename)
+void Database::load_config(const QString& filename)
 {
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
+        qWarning("warning: unable to open config file");
+        return;
     }
 
     QByteArray data = file.readAll();
     QJsonObject object = QJsonDocument::fromJson(data).object();
 
-    qDebug() << "Loading graphs...";
+    qInfo() << "Loading graphs...";
 
     QJsonObject graphs = object["graph"].toObject();
 
@@ -46,7 +47,7 @@ bool Database::load_config(const QString& filename)
         g->print();
     }
 
-    qDebug() << "Loading alignments...";
+    qInfo() << "Loading alignments...";
 
     QJsonObject alignments = object["alignment"].toObject();
 
@@ -66,8 +67,6 @@ bool Database::load_config(const QString& filename)
 
         a.print();
     }
-
-    return true;
 }
 
 /**
@@ -75,15 +74,16 @@ bool Database::load_config(const QString& filename)
  *
  * @param filename
  */
-bool Database::load_ontology(const QString& filename)
+void Database::load_ontology(const QString& filename)
 {
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
+        qWarning("warning: unable to open ontology file");
+        return;
     }
 
-    qDebug() << "Loading ontology terms...";
+    qInfo() << "Loading ontology terms...";
 
     QTextStream in(&file);
 
@@ -120,27 +120,25 @@ bool Database::load_ontology(const QString& filename)
             }
         }
     }
-
-    return true;
 }
 
 void Database::print() const
 {
-    qDebug() << "Graphs:\n";
+    qInfo() << "Graphs:\n";
     for ( Graph *g : this->_graphs.values() ) {
         g->print();
-        qDebug() << "";
+        qInfo() << "";
     }
 
-    qDebug() << "Alignments:\n";
+    qInfo() << "Alignments:\n";
     for ( const Alignment& a : this->_alignments ) {
         a.print();
-        qDebug() << "";
+        qInfo() << "";
     }
 
-    qDebug() << "Ontology terms:\n";
+    qInfo() << "Ontology terms:\n";
     for ( const ont_term_t& term : this->_ontology.values() ) {
-        qDebug() << term.id << term.name;
-        qDebug() << "";
+        qInfo() << term.id << term.name;
+        qInfo() << "";
     }
 }

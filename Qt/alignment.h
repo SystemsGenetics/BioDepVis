@@ -26,7 +26,7 @@ public:
     Alignment();
     ~Alignment();
 
-    bool load_edges(const QString& filename);
+    void load_edges(const QString& filename);
     void update();
 
     void print() const;

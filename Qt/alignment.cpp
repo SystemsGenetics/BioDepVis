@@ -22,22 +22,25 @@ Alignment::Alignment()
     this->_graph1 = nullptr;
     this->_graph2 = nullptr;
     this->_edge_matrix = nullptr;
+    this->_vertices = nullptr;
 }
 
 Alignment::~Alignment()
 {
     // TODO: causes segfault, need copy constructor?
     // delete[] this->_edge_matrix;
+    // delete[] this->_vertices;
 }
 
-bool Alignment::load_edges(const QString& filename)
+void Alignment::load_edges(const QString& filename)
 {
-    qDebug() << "- loading edge list...";
+    qInfo() << "- loading edge list...";
 
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
+        qWarning("warning: unable to open edge file");
+        return;
     }
 
     // load edges from file
@@ -55,7 +58,7 @@ bool Alignment::load_edges(const QString& filename)
             this->_edges.push_back({ i, j });
         }
         else {
-            qDebug() << "warning: could not find nodes " << node1 << node2;
+            qWarning() << "warning: could not find nodes " << node1 << node2;
         }
     }
 
@@ -69,8 +72,6 @@ bool Alignment::load_edges(const QString& filename)
 
     // initialize vertices
     this->_vertices = new edge_t[this->_edges.size()];
-
-    return true;
 }
 
 void Alignment::update()
@@ -86,7 +87,7 @@ void Alignment::update()
 
 void Alignment::print() const
 {
-    qDebug() << this->_graph1->name() << this->_graph2->name();
+    qInfo() << this->_graph1->name() << this->_graph2->name();
 
     // for ( auto& edge : this->_edges ) {
     //     qDebug() << edge.first << edge.second;

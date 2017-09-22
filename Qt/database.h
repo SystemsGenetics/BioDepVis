@@ -25,8 +25,8 @@ private:
 public:
     Database() {};
 
-    bool load_config(const QString& filename);
-    bool load_ontology(const QString& filename);
+    void load_config(const QString& filename);
+    void load_ontology(const QString& filename);
 
     void print() const;
 };
