@@ -44,8 +44,8 @@ public:
     const QString& name() const { return this->_name; }
     const QVector<node_t>& nodes() const { return this->_nodes; }
 
-    bool load_datafile(const QString& filename);
     bool load_clusterfile(const QString& filename);
+    bool load_edgefile(const QString& filename);
     bool load_ontologyfile(const QString& filename);
 
     void print() const;

@@ -30,8 +30,8 @@ Graph::Graph(
     this->_id = id;
     this->_name = name;
 
-    load_datafile(datafile);
     load_clusterfile(clusterfile);
+    load_edgefile(datafile);
     load_ontologyfile(ontfile);
 
     // initialize node coordinates
@@ -50,7 +50,34 @@ Graph::~Graph()
     delete[] this->_edge_matrix;
 }
 
-bool Graph::load_datafile(const QString& filename)
+bool Graph::load_clusterfile(const QString& filename)
+{
+    qDebug() << "- loading cluster file...";
+
+    QFile file(filename);
+
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        return false;
+    }
+
+    QTextStream in(&file);
+
+    while ( !in.atEnd() ) {
+        QStringList list = in.readLine().split("\t");
+        QString name = list[0];
+        int cluster_id = list[1].toInt();
+
+        node_t node;
+        node.name = name;
+        node.cluster_id = cluster_id;
+
+        this->_nodes.push_back(node);
+    }
+
+    return true;
+}
+
+bool Graph::load_edgefile(const QString& filename)
 {
     qDebug() << "- loading edge list...";
 
@@ -72,26 +99,6 @@ bool Graph::load_datafile(const QString& filename)
         node_pairs.push_back({ node1, node2 });
     }
 
-    // construct node list from pairs
-    for ( auto& p : node_pairs ) {
-        QString node1 = p.first;
-        QString node2 = p.second;
-
-        if ( find_node(this->_nodes, node1) == -1 ) {
-            node_t n;
-            n.name = node1;
-
-            this->_nodes.push_back(n);
-        }
-
-        if ( find_node(this->_nodes, node2) == -1 ) {
-            node_t n;
-            n.name = node2;
-
-            this->_nodes.push_back(n);
-        }
-    }
-
     // construct edge matrix
     int n = this->_nodes.size();
 
@@ -108,30 +115,6 @@ bool Graph::load_datafile(const QString& filename)
         this->_edge_matrix[j * n + i] = 1;
 
         this->_num_edges++;
-    }
-
-    return true;
-}
-
-bool Graph::load_clusterfile(const QString& filename)
-{
-    qDebug() << "- loading cluster file...";
-
-    QFile file(filename);
-
-    if ( !file.open(QIODevice::ReadOnly) ) {
-        return false;
-    }
-
-    QTextStream in(&file);
-
-    while ( !in.atEnd() ) {
-        QStringList list = in.readLine().split("\t");
-        QString node = list[0];
-        int cluster_id = list[1].toInt();
-
-        int nodeIndex = find_node(this->_nodes, node);
-        this->_nodes[nodeIndex].cluster_id = cluster_id;
     }
 
     return true;
