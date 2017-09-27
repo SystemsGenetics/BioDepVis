@@ -1,5 +1,6 @@
 #include <getopt.h>
 #include <QApplication>
+#include <QSurfaceFormat>
 #include "database.h"
 #include "mainwindow.h"
 
@@ -77,6 +78,13 @@ int main(int argc, char *argv[])
 
     // start application
     QApplication a(argc, argv);
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setVersion(3, 2);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
     w.resize(1280, 720);

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "visualizer.h"
 #include <QFile>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -90,7 +91,10 @@ void MainWindow::createGUI()
     //Visualization
     QGroupBox *VisualizationGroup = new QGroupBox;
 
+    VisualizerWidget *visualizer = new VisualizerWidget();
+
     QVBoxLayout *VisualizationLayout = new QVBoxLayout;
+    VisualizationLayout->addWidget(visualizer);
     VisualizationGroup->setLayout(VisualizationLayout);
 
     //Legend

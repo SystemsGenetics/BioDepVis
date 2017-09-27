@@ -30,13 +30,15 @@ SOURCES += \
     database.cpp \
     graph.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    visualizer.cpp
 
 HEADERS += \
     alignment.h \
     database.h \
     graph.h \
-    mainwindow.h
+    mainwindow.h \
+    visualizer.h
 
 FORMS += \
     mainwindow.ui
