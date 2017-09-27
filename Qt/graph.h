@@ -56,6 +56,7 @@ public:
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
     const QVector<node_t>& nodes() const { return this->_nodes; }
+    const QVector<QPair<int, int>>& edges() const { return this->_edges; }
 
     void load_clusterfile(const QString& filename);
     void load_edgefile(const QString& filename);
