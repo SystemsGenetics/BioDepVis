@@ -40,6 +40,11 @@ Alignment::~Alignment()
     delete[] this->_edge_matrix;
 }
 
+/**
+ * Load the algnment edge list from a file.
+ *
+ * @param filename
+ */
 void Alignment::load_edges(const QString& filename)
 {
     qInfo() << "- loading edges...";
@@ -61,15 +66,22 @@ void Alignment::load_edges(const QString& filename)
         int i = this->_graph1->find_node(node1);
         int j = this->_graph2->find_node(node2);
 
+        if ( i == -1 ) {
+            qWarning() << "warning: could not find node " << node1;
+        }
+        if ( j == -1 ) {
+            qWarning() << "warning: could not find node " << node2;
+        }
         if ( i != -1 && j != -1 ) {
             this->_edges.push_back({ i, j });
-        }
-        else {
-            qWarning() << "warning: could not find nodes " << node1 << node2;
         }
     }
 }
 
+/**
+ * Update the vertices of each alignment edge to
+ * the positions of the corresponding graph nodes.
+ */
 void Alignment::update()
 {
     for ( int k = 0; k < this->_edges.size(); k++ ) {

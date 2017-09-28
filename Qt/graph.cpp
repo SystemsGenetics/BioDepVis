@@ -130,6 +130,11 @@ int Graph::find_node(const QString& name)
     return -1;
 }
 
+/**
+ * Load the node list from a file.
+ *
+ * @param filename
+ */
 void Graph::load_nodes(const QString& filename)
 {
     qInfo() << "- loading nodes...";
@@ -156,6 +161,11 @@ void Graph::load_nodes(const QString& filename)
     }
 }
 
+/**
+ * Load the edge list from a file.
+ *
+ * @param filename
+ */
 void Graph::load_edges(const QString& filename)
 {
     qInfo() << "- loading edges...";
@@ -186,6 +196,11 @@ void Graph::load_edges(const QString& filename)
     }
 }
 
+/**
+ * Load the ontology terms list from a file.
+ *
+ * @param filename
+ */
 void Graph::load_ontology(const QString& filename)
 {
     qInfo() << "- loading ontology...";
