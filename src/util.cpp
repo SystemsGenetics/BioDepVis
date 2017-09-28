@@ -141,32 +141,13 @@ void loadTexture()
 				image2[4 * u2 * y + 4 * x + c] = data_image[4 * width_particle * y + 4 * x + c];
 			}
 
-	//Old Code
-	//data_particle = loadBMPRaw("simple2.bmp", width_particle, height_particle, false);
 	glGenTextures(1, &textures);
 	glBindTexture(GL_TEXTURE_2D, textures);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, u2, v2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image2[0]);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_particle, height_particle, 0, GL_BGRA, GL_UNSIGNED_BYTE, &data_image[0]);
-	//glGenerateMipmap(GL_TEXTURE_2D);
-	/*
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, u2, v2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image2);
 
-	//Old Code
-	data_particle = loadBMPRaw("particle.bmp", width_particle, height_particle, false);
-	glGenTextures(1, &textures);
-	glBindTexture(GL_TEXTURE_2D, textures);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_particle, height_particle, 0, GL_BGRA, GL_UNSIGNED_BYTE, data_particle);
-	delete[] data_particle;
-
-	*/
 }
 
 
@@ -304,12 +285,6 @@ void init(char * f_in)
 
 void drawGraph(graph *g)
 {
-	/*glColor3f(0.0, 0.0, 0.0);
-	if (g->displayName == true)
-	{
-		
-		printw(g->centerx, g->centery + g->height / 2 - 40, g->centerz, g->name,font_style2);
-	}*/
 
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -317,18 +292,12 @@ void drawGraph(graph *g)
 	glEnable(GL_BLEND);
 	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_LIGHTING);
 	glLineWidth(0.001f);
-	glColor4f(g->er, g->eg, g->eb, g->ea);
+	//glColor4f(g->er, g->eg, g->eb, g->ea);
 	glDrawElements(GL_LINES, g->edges * 2, GL_UNSIGNED_INT, g->verticeEdgeList);
 	glDepthMask(GL_TRUE);
-	//glEnable(GL_LIGHTING);
-	/*float val = (rand()%201)/200.0f * 360.0f;
-	float cr,cg,cb;
-	HSVtoRGB(&cr,&cg,&cb,val,0.5,0.5);
-	glColor3f(cr,cg,cb);*/
 
  	glColor4f(g->nr, g->ng, g->nb, g->na);
 	//glColor4f(0,0,0,0.5);
@@ -343,15 +312,6 @@ void drawGraph(graph *g)
 	glEnable(GL_POINT_SPRITE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 
-	//Orig
-	//printf("Max Size = %d\n", maxSize);
-	/*
-
-	float att[3] = { 0.0f, 1.0f, 0.0f };
-	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
-	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
-	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
-	*/
 
 	glPointSize(4.3f);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
