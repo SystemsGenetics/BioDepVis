@@ -1,11 +1,29 @@
 #include "visualizer.h"
 
+#define NORMALIZE(v) ((float)(v) / 255)
+
+const color_t GRAPH_EDGE_COLORS[] = {
+    { NORMALIZE(166), NORMALIZE(206), NORMALIZE(227), 0.10f },
+    { NORMALIZE(126), NORMALIZE(127), NORMALIZE(200), 0.10f },
+    { NORMALIZE(106), NORMALIZE(61),  NORMALIZE(154), 0.10f },
+    { NORMALIZE(31),  NORMALIZE(120), NORMALIZE(180), 0.10f },
+    { NORMALIZE(178), NORMALIZE(223), NORMALIZE(138), 0.10f },
+    { NORMALIZE(255), NORMALIZE(127), NORMALIZE(0),   0.10f }
+};
+
+const color_t ALIGN_EDGE_COLORS[] = {
+    { NORMALIZE(189), NORMALIZE(63),  NORMALIZE(243), 0.05f },
+    { NORMALIZE(226), NORMALIZE(127), NORMALIZE(202), 0.05f },
+    { NORMALIZE(226), NORMALIZE(127), NORMALIZE(202), 0.05f }
+};
+
 Visualizer::Visualizer(Database *db, QWidget *parent)
     : QOpenGLWidget(parent)
 {
     this->_db = db;
     this->_animate = false;
     this->_showalignment = false;
+    this->_showcluster = false;
 }
 
 void Visualizer::initializeGL()
@@ -16,7 +34,7 @@ void Visualizer::initializeGL()
     glShadeModel(GL_SMOOTH);
     glDepthRange(0.0, 1.0);
 
-    //load Texture()
+    // load texture image
     QImage image("particle.png");
 
     // scale each image dimension to next power of two
@@ -38,8 +56,8 @@ void Visualizer::initializeGL()
     glEnable(GL_NORMALIZE);
 
     // initialize lights
-    float light_position1[] = { 2.0, -200.0, 0.0, 0.0 };
-    float light_position2[] = { 0.0, 10, -5.0, 0.0 };
+    float light_position1[] = { 2.0f, -200.0f, 0.0f, 0.0f };
+    float light_position2[] = { 0.0f, 10.0f, -5.0f, 0.0f };
     float light_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
     float light_diffuse[] = { 0.7f, 0.7f, 0.7f, 1.0f };
     float light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -78,16 +96,20 @@ void Visualizer::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    for ( Alignment *a : _db->alignments() ) {
-        this->draw_alignment(*a);
+    for ( int i = 0; i < _db->graphs().size(); i++ ) {
+        Graph *g = _db->graphs().values()[i];
+
+        this->draw_graph(*g, GRAPH_EDGE_COLORS[i]);
     }
 
-    for ( Graph *g : _db->graphs() ) {
-        this->draw_graph(*g);
+    for ( int i = 0; i < _db->alignments().size(); i++ ) {
+        Alignment *a = _db->alignments()[i];
+
+        this->draw_alignment(*a, ALIGN_EDGE_COLORS[i]);
     }
 }
 
-void Visualizer::draw_graph(const Graph& g)
+void Visualizer::draw_graph(const Graph& g, const color_t& edge_color)
 {
     glVertexPointer(3, GL_FLOAT, 0, g.coords().data());
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -98,9 +120,16 @@ void Visualizer::draw_graph(const Graph& g)
     glDepthMask(GL_FALSE);
     glDisable(GL_LIGHTING);
     glLineWidth(0.001f);
-
+    glColor4f(edge_color.r, edge_color.g, edge_color.b, edge_color.a);
     glDrawElements(GL_LINES, g.edges().size() * sizeof(graph_edge_t), GL_UNSIGNED_INT, g.edges().data());
     glDepthMask(GL_TRUE);
+
+    glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+
+    if ( _showcluster ) {
+        glColorPointer(4, GL_FLOAT, 0, g.colors().data());
+        glEnableClientState(GL_COLOR_ARRAY);
+    }
 
     glBindTexture(GL_TEXTURE_2D, _textures);
     glEnable(GL_TEXTURE_2D);
@@ -123,7 +152,7 @@ void Visualizer::draw_graph(const Graph& g)
     glDisable(GL_BLEND);
 }
 
-void Visualizer::draw_alignment(Alignment& a)
+void Visualizer::draw_alignment(Alignment& a, const color_t& edge_color)
 {
     glDepthMask(GL_FALSE);
 
@@ -140,7 +169,7 @@ void Visualizer::draw_alignment(Alignment& a)
         glVertexPointer(3, GL_FLOAT, 0, a.vertices().data());
         glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
         glColor4f(0.69f, 0.19f, 0.29f, 0.005f);
-        // TODO: edgeAlignmentColor
+        glColor4f(edge_color.r, edge_color.g, edge_color.b, edge_color.a);
 
         glLineWidth(0.1);
         glDrawArrays(GL_LINES, 0, a.edges().size());

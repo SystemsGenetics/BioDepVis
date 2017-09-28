@@ -70,6 +70,7 @@ public:
 
     const QVector<vec3_t>& coords() const { return this->_coords; }
     const QVector<coinfo_t>& coinfo() const { return this->_coinfo; }
+    const QVector<color_t>& colors() const { return this->_colors; }
 
     int find_node(const QString& name);
 

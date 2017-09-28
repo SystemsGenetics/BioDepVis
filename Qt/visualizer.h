@@ -15,6 +15,7 @@ private:
     Database *_db;
     bool _animate;
     bool _showalignment;
+    bool _showcluster;
 
 public:
     Visualizer(Database *db, QWidget *parent=Q_NULLPTR);
@@ -24,8 +25,8 @@ private:
     void resizeGL(int w, int h);
     void paintGL();
 
-    void draw_graph(const Graph& g);
-    void draw_alignment(Alignment& a);
+    void draw_graph(const Graph& g, const color_t& edge_color);
+    void draw_alignment(Alignment& a, const color_t& edge_color);
 };
 
 #endif
