@@ -37,8 +37,7 @@ Alignment::Alignment()
 
 Alignment::~Alignment()
 {
-    // TODO: causes segfault, need copy constructor?
-    // delete[] this->_edge_matrix;
+    delete[] this->_edge_matrix;
 }
 
 void Alignment::load_edges(const QString& filename)
@@ -86,7 +85,7 @@ void Alignment::print() const
 {
     qInfo() << this->_graph1->name() << this->_graph2->name();
 
-    // for ( auto& edge : this->_edges ) {
-    //     qDebug() << edge.first << edge.second;
+    // for ( const graph_edge_t& edge : this->_edges ) {
+    //     qDebug() << edge.node1 << edge.node2;
     // }
 }

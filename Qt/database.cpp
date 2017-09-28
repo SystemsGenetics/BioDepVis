@@ -57,7 +57,7 @@ void Database::load_config(const QString& filename)
         int id1 = obj["graphID1"].toInt();
         int id2 = obj["graphID2"].toInt();
 
-        Alignment a(
+        Alignment *a = new Alignment(
             obj["filelocation"].toString(),
             this->_graphs[id1],
             this->_graphs[id2]
@@ -65,7 +65,7 @@ void Database::load_config(const QString& filename)
 
         this->_alignments.push_back(a);
 
-        a.print();
+        a->print();
     }
 }
 
@@ -131,8 +131,8 @@ void Database::print() const
     }
 
     qInfo() << "Alignments:\n";
-    for ( const Alignment& a : this->_alignments ) {
-        a.print();
+    for ( Alignment *a : this->_alignments ) {
+        a->print();
         qInfo() << "";
     }
 

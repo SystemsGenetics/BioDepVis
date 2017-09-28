@@ -78,8 +78,8 @@ void Visualizer::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    for ( Alignment& a : _db->alignments() ) {
-        this->draw_alignment(a);
+    for ( Alignment *a : _db->alignments() ) {
+        this->draw_alignment(*a);
     }
 
     for ( Graph *g : _db->graphs() ) {
