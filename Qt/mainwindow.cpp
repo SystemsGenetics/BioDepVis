@@ -81,7 +81,7 @@ MainWindow::MainWindow(Database *db)
     //Visualization
     QGroupBox *VisualizationGroup = new QGroupBox;
 
-    VisualizerWidget *visualizer = new VisualizerWidget(db);
+    Visualizer *visualizer = new Visualizer(db);
 
     QVBoxLayout *VisualizationLayout = new QVBoxLayout;
     VisualizationLayout->addWidget(visualizer);

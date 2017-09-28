@@ -1,6 +1,6 @@
 #include "visualizer.h"
 
-VisualizerWidget::VisualizerWidget(Database *db, QWidget *parent)
+Visualizer::Visualizer(Database *db, QWidget *parent)
     : QOpenGLWidget(parent)
 {
     this->_db = db;
@@ -8,7 +8,7 @@ VisualizerWidget::VisualizerWidget(Database *db, QWidget *parent)
     this->_showalignment = false;
 }
 
-void VisualizerWidget::initializeGL()
+void Visualizer::initializeGL()
 {
     initializeOpenGLFunctions();
 
@@ -65,11 +65,11 @@ void VisualizerWidget::initializeGL()
     glEnable(GL_COLOR_MATERIAL);
 }
 
-void VisualizerWidget::resizeGL(int w, int h)
+void Visualizer::resizeGL(int w, int h)
 {
 }
 
-void VisualizerWidget::paintGL()
+void Visualizer::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -87,7 +87,7 @@ void VisualizerWidget::paintGL()
     }
 }
 
-void VisualizerWidget::draw_graph(const Graph& g)
+void Visualizer::draw_graph(const Graph& g)
 {
     glVertexPointer(3, GL_FLOAT, 0, g.coords().data());
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -123,7 +123,7 @@ void VisualizerWidget::draw_graph(const Graph& g)
     glDisable(GL_BLEND);
 }
 
-void VisualizerWidget::draw_alignment(Alignment& a)
+void Visualizer::draw_alignment(Alignment& a)
 {
     glDepthMask(GL_FALSE);
 

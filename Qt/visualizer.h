@@ -7,7 +7,7 @@
 #include "database.h"
 #include "graph.h"
 
-class VisualizerWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class Visualizer : public QOpenGLWidget, protected QOpenGLFunctions
 {
 private:
     GLuint _textures;
@@ -17,7 +17,7 @@ private:
     bool _showalignment;
 
 public:
-    VisualizerWidget(Database *db, QWidget *parent=Q_NULLPTR);
+    Visualizer(Database *db, QWidget *parent=Q_NULLPTR);
 
 private:
     void initializeGL();
