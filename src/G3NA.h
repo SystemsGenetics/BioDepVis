@@ -7,7 +7,7 @@
 #include <cstdarg>
 #include <vector>
 
-void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *, char *f_in);
-void readOntFile(std::unordered_map<std::string, ontStruct> *array, char *ont_input);
+void parser(std::vector <graph*> *, std::vector <Alignment*> *, std::unordered_map<std::string, ontStruct> *, const char *f_in);
+void readOntFile(std::unordered_map<std::string, ontStruct> *array, const char *ont_input);
 
 #endif

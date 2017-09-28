@@ -17,12 +17,12 @@
 
 using namespace std;
 
-char* filereader(char *f_in)
+char* filereader(const char *f_in)
 {
 
 	int array_size = 65536; // define the size of character array
 	char * array = new char[array_size]; // allocating an array of 1kb
-	int position = 0; //this will be used incremently to fill characters in the array 
+	int position = 0; //this will be used incremently to fill characters in the array
 
 	ifstream fin(f_in); //opening an input stream for file test.txt
 	/*checking whether file could be opened or not. If file does not exist or don't have read permissions, file
@@ -81,11 +81,11 @@ void PrintJSONValue(const Json::Value &val)
 #define MAXCOLOR 255.0f
 
 #define EDGEALPHA 0.10f
-float edgeColor[10][4] = { 
+float edgeColor[10][4] = {
 	//{ 1.0, 1.0, 1.0, EDGEALPHA },
 	{ 166 / MAXCOLOR, 206 / MAXCOLOR, 227 / MAXCOLOR, EDGEALPHA },
 	{ 126 / MAXCOLOR, 127 / MAXCOLOR, 200 / MAXCOLOR, EDGEALPHA },
-	{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, EDGEALPHA },	
+	{ 106 / MAXCOLOR, 61 / MAXCOLOR, 154 / MAXCOLOR, EDGEALPHA },
 { 31 / MAXCOLOR, 120 / MAXCOLOR, 180 / MAXCOLOR, EDGEALPHA },
 { 178 / MAXCOLOR, 223 / MAXCOLOR, 138 / MAXCOLOR, EDGEALPHA },
 //{ 51 / MAXCOLOR, 160 / MAXCOLOR, 44 / MAXCOLOR, EDGEALPHA },
@@ -106,7 +106,7 @@ float edgeColor[10][4] = { {179 / MAXCOLOR, 88 / MAXCOLOR, 6 / MAXCOLOR, EDGEALP
 {128 / MAXCOLOR, 115 / MAXCOLOR, 172 / MAXCOLOR, EDGEALPHA}
  };*/
 
-void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr, char *f_in)
+void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr, const char *f_in)
 {
 	Json::Reader reader;
 	Json::Value root;
@@ -182,4 +182,3 @@ void parser(std::vector <graph*> *gd, std::vector <Alignment*> *ad, std::unorder
 	}
 	free(fileinfo);
 }
-

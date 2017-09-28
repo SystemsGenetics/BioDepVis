@@ -10,7 +10,7 @@
 
 
 
- void readOntFile(std::unordered_map<std::string, ontStruct> *array, char *ont_input)
+ void readOntFile(std::unordered_map<std::string, ontStruct> *array, const char *ont_input)
 {
 
 	std::string line, word;

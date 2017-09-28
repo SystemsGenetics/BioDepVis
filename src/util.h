@@ -96,7 +96,7 @@ char* filetobuf(char *file);
 unsigned char * loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight, bool flipY = true);
 std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width, unsigned *height);
 void loadTexture();
-void init(char * f_in);
+void init(const char * f_in);
 void drawGraph(graph *g);
 void Test();
 void runForceDirected(graph *g);

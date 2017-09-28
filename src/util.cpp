@@ -65,7 +65,7 @@ std::vector <Alignment*> alignmentDatabase;
 
 unsigned int m_vertexShader, m_fragmentShader;
 char *vertexsource, *fragmentsource;
-GLuint shaderprogram;   
+GLuint shaderprogram;
 Camera *camera;
 unsigned int width_particle=64, height_particle=64;
 unsigned char *data_particle;
@@ -85,7 +85,7 @@ float cx1,cy1,cz1,cx2,cy2,cz2;
 float cx12,cy12,cz12,cx22,cy22,cz22;
 float cx13,cy13,cz13,cx23,cy23,cz23;
 
-float edgeAlignmentColor[3][4] = { 
+float edgeAlignmentColor[3][4] = {
 	//{ 1.0, 1.0, 1.0, EDGEALPHA },
 	{ 189 / MAXCOLOR, 63 / MAXCOLOR, 243 / MAXCOLOR, 0.05f },
 	{ 226 / MAXCOLOR, 127 / MAXCOLOR, 202 / MAXCOLOR, 0.05f },
@@ -146,17 +146,17 @@ void loadTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, u2, v2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image2);
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, u2, v2, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image2[0]);
 
 }
 
 
-void init(char * f_in) 
+void init(const char * f_in)
 {
 	// set up camera
 	// parameters are eye point, aim point, up vector
 	cudaError_t cuerr;
-	
+
 	parser(&graphDatabase, &alignmentDatabase, &ontologyDB, f_in);
 	camera = new Camera(Vector3d(0, 10, 400), Vector3d(0, 0, 0),
 		Vector3d(0, 1, 0));
@@ -168,11 +168,11 @@ void init(char * f_in)
 //	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
-	
+
 	loadTexture();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
-	
+
 	GLfloat light_position[] = { 2.0, -200.0, 0.0, 0.0 };
 	GLfloat light_position2[] = { 0.0, 10, -5.0, 0.0 };
 	GLfloat light_position3[] = { 0.0, 10, -5.0, 0.0 };
@@ -223,15 +223,15 @@ void init(char * f_in)
 	{
 		glGetShaderiv(m_vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
 
-		
+
 		vertexInfoLog = (char *)malloc(maxLength);
 
 		glGetShaderInfoLog(m_vertexShader, maxLength, &maxLength, vertexInfoLog);
 
-		
+
 		printf("Ersror : %s\n", vertexInfoLog);
 		free(vertexInfoLog);
-		
+
 		getchar();
 		exit(0);
 	}
@@ -242,7 +242,7 @@ void init(char * f_in)
 	{
 		glGetShaderiv(m_fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
 
-		
+
 		fragmentInfoLog = (char *)malloc(maxLength);
 
 		glGetShaderInfoLog(m_fragmentShader, maxLength, &maxLength, fragmentInfoLog);
@@ -265,15 +265,15 @@ void init(char * f_in)
 	glGetProgramiv(shaderprogram, GL_LINK_STATUS, (int *)&IsLinked);
 	if (IsLinked == FALSE)
 	{
-		
+
 		glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, &maxLength);
 
-	
+
 		shaderProgramInfoLog = (char *)malloc(maxLength);
 
 		glGetProgramInfoLog(shaderprogram, maxLength, &maxLength, shaderProgramInfoLog);
 
-		
+
 		printf("Ersror : %s\n", shaderProgramInfoLog);
 		free(shaderProgramInfoLog);
 		return;
@@ -290,12 +290,12 @@ void drawGraph(graph *g)
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glEnable(GL_BLEND);
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_LIGHTING);
 	glLineWidth(0.001f);
-	//glColor4f(g->er, g->eg, g->eb, g->ea);
+	glColor4f(g->er, g->eg, g->eb, g->ea);
 	glDrawElements(GL_LINES, g->edges * 2, GL_UNSIGNED_INT, g->verticeEdgeList);
 	glDepthMask(GL_TRUE);
 
@@ -328,7 +328,7 @@ void drawGraph(graph *g)
 	glDisable(GL_BLEND);
 
 	//Orig
-	glDisable(GL_BLEND);		
+	glDisable(GL_BLEND);
 }
 
 
@@ -340,7 +340,7 @@ void Test()
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_POINT_SPRITE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-	
+
 	glPointSize(200);
 	glBegin(GL_POINTS);
 	for (int i = 0; i < 10; i++)
@@ -441,15 +441,15 @@ void drawAlignment(Alignment *align)
 			float x2 = align->vertices[k * 6 + 3];
 			float y2 = align->vertices[k * 6 + 4];
 			float z2 = align->vertices[k * 6 + 5];
-			
+
 			float cenerCtrPoint1[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, (z1 + z2) / 10.0f - 150.0f };
 			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, 9 * (z1 + z2) / 10.0f - 150.0f};
 
 			GLfloat ctrlPoints[4][3] = { { align->vertices[k * 6 + 0], align->vertices[k * 6 + 1], align->vertices[k * 6 + 2] }, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { align->vertices[k * 6 + 3], align->vertices[k * 6 + 4], align->vertices[k * 6 + 5] } };
 			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
-			
+
 			glLineWidth(0.1);
-			
+
 
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i <= 20; i++)
@@ -462,7 +462,7 @@ void drawAlignment(Alignment *align)
 
 		glDisable(GL_BLEND);
 		glDisable(GL_MAP1_VERTEX_3);
-		
+
 	}
 	glDepthMask(GL_TRUE);
 }
@@ -513,11 +513,11 @@ void drawAlignmentROI(Alignment *align,int index)
 		glColor4f(0.14,0.24,0.7, 0.15f);
 		//float cenerCtrPoint1[3] = { (align->g1->centerx + align->2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, (align->g1->centerz + align->g2->centerz) / 10.0 - 150 };
 		//float cenerCtrPoint2[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, 9 * (align->g1->centerz + align->g2->centerz) / 10.0 - 150};
-		
+
 		glEnable(GL_MAP1_VERTEX_3);
 		//for (int k = 0; k < align->edges;  k++)
 		//printf("Total Alignment = %d\n",alignEdgesROI.size())
-		
+
 		if(index == 0)
 		{
 			for (int i = 0; i < alignEdgesROI.size();  i=i+2)
@@ -531,7 +531,7 @@ void drawAlignmentROI(Alignment *align,int index)
 				float x2 = align->g2->coords[node1g2 * 3 + 0];
 				float y2 = align->g2->coords[node1g2 * 3 + 1];
 				float z2 = align->g2->coords[node1g2 * 3 + 2];
-				
+
 				//if((x1 > cx1 && x1 <  cx2 && y1 > cy1 && y1 <  cy2 && z1 > cz1 && z1 <  cz2 ) && (x2 > cx12 && x2 <  cx22 && y2 > cy12 && y2 <  cy22 && z2 > cz12 && z2 <  cz22 ))
 				{
 
@@ -541,9 +541,9 @@ void drawAlignmentROI(Alignment *align,int index)
 
 				GLfloat ctrlPoints[4][3] = { { x1,y1,z1}, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { x2,y2,z2 } };
 				glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
-				
+
 				glLineWidth(0.5);
-				
+
 
 				glBegin(GL_LINE_STRIP);
 				for (int i = 0; i <= 20; i++)
@@ -551,7 +551,7 @@ void drawAlignmentROI(Alignment *align,int index)
 					GLfloat u = i / (GLfloat)20.0;
 					glEvalCoord1f(u);
 				}
-				glEnd();			
+				glEnd();
 				}
 			}
 
@@ -581,9 +581,9 @@ void drawAlignmentROI(Alignment *align,int index)
 
 				GLfloat ctrlPoints[4][3] = { { x1,y1,z1}, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { x2,y2,z2 } };
 				glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
-				
+
 				glLineWidth(0.5);
-				
+
 				glBegin(GL_LINE_STRIP);
 				for (int i = 0; i <= 20; i++)
 				{
@@ -595,7 +595,7 @@ void drawAlignmentROI(Alignment *align,int index)
 				}
 			}
 		}
-		
+
 		if(index == 2)
 		{
 			for (int i = 0; i < alignEdgesROI3.size();  i=i+2)
@@ -611,7 +611,7 @@ void drawAlignmentROI(Alignment *align,int index)
 				float x2 = align->g2->coords[node1g2 * 3 + 0];
 				float y2 = align->g2->coords[node1g2 * 3 + 1];
 				float z2 = align->g2->coords[node1g2 * 3 + 2];
-				
+
 				//if((x1 > cx1 && x1 <  cx2 && y1 > cy1 && y1 <  cy2 && z1 > cz1 && z1 <  cz2 ) && (x2 > cx12 && x2 <  cx22 && y2 > cy12 && y2 <  cy22 && z2 > cz12 && z2 <  cz22 ))
 				{
 
@@ -621,16 +621,16 @@ void drawAlignmentROI(Alignment *align,int index)
 
 				GLfloat ctrlPoints[4][3] = { { x1,y1,z1}, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { x2,y2,z2 } };
 				glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
-				
+
 				glLineWidth(0.5);
-				
+
 				glBegin(GL_LINE_STRIP);
 				for (int i = 0; i <= 20; i++)
 				{
 					GLfloat u = i / (GLfloat)20.0;
 					glEvalCoord1f(u);
 				}
-				glEnd();	
+				glEnd();
 				}
 			}
 
@@ -638,7 +638,7 @@ void drawAlignmentROI(Alignment *align,int index)
 			glDisable(GL_MAP1_VERTEX_3);
 		}
 	}
-	
+
 	glDepthMask(GL_TRUE);
 }
 
@@ -681,8 +681,8 @@ void printw(float x, float y, float z, char* format, GLvoid *fontStylePrint, ...
 
 	//  Write formatted output using a pointer to the list of arguments
 	vsnprintf(text, len, format, args);
-	
-	//  End using variable argument list 
+
+	//  End using variable argument list
 	va_end(args);
 
 	//  Specify the raster position for pixel operations.
@@ -710,9 +710,9 @@ void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int 
 	//printf("Draw Box : %d %d\n",graphSelected, nodeSelected);
 	float vx = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 0];
 	float vy = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 1];
-	float vz = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 2];	
+	float vz = graphDatabase.at(graphSelectedIndex)->coords[nodeSelectedIndex * 3 + 2];
 	//printf("Draw Box Coords: %d %d==>%f %f %f\n",graphSelectedIndex,nodeSelectedIndex,vx,vy,vz);
-	
+
 	glTranslatef(vx,vy,vz);
 	glScalef(xs,ys,zs);
 	glColor4f(253.0f/255.0f,212.0f/255.0f,42.0f/255.0,0.8f);
@@ -727,9 +727,9 @@ void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int 
 
 void drawROIGraph()
 {
- 
+
 	glVertexPointer(3, GL_FLOAT, 0, coordsROI.data());
-	glEnableClientState(GL_VERTEX_ARRAY);	
+	glEnableClientState(GL_VERTEX_ARRAY);
 	/*
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -741,7 +741,7 @@ void drawROIGraph()
 	glColor4f(0.2,0.9,0.3,0.2);
 	//glDrawElements(GL_LINES, verticeEdgeListROI.size(), GL_UNSIGNED_INT, verticeEdgeListROI.data());
 	glDepthMask(GL_TRUE);
-	
+
 
 	*/
 
@@ -766,7 +766,7 @@ void drawROIGraph()
 	float att[3] = { 0.0f, 1.0f, 0.0f };
 	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
 	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
-	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
+	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att);
 	*/
 
 	glPointSize(4.3f);
@@ -794,15 +794,15 @@ void drawGraphROIBack(graph *g)
 
 	if (g->displayName == true)
 	{
-		
+
 		printw(g->centerx, g->centery + g->height / 2 - 40, g->centerz, g->name,font_style2);
 	}
- 
+
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glEnable(GL_BLEND);
-	
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
@@ -839,17 +839,17 @@ void drawGraphROIBack(graph *g)
 	float att[3] = { 0.0f, 1.0f, 0.0f };
 	glPointParameterfEXT(GL_POINT_SIZE_MIN, 10.0f);
 	glPointParameterfEXT(GL_POINT_SIZE_MAX, 2.0f); // NVIDIA supports up to 8192 here.
-	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att); 
+	glPointParameterfvEXT(GL_POINT_DISTANCE_ATTENUATION, att);
 	*/
 
 	glPointSize(4.3f);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(GL_FALSE);
-	
+
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
-	
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_TRUE);
@@ -889,7 +889,7 @@ void drawPoints()
 }
 
 
-void PerspDisplay() 
+void PerspDisplay()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -906,7 +906,7 @@ void PerspDisplay()
 			Alignment *alignT = alignmentDatabase.at(i);
 			drawAlignment(alignT);
 		}
-		
+
 		for (int i = 0; i < graphDatabase.size(); i++)
 		{
 			graph *graphT = graphDatabase.at(i);
@@ -915,25 +915,25 @@ void PerspDisplay()
 		}
 	}
 	else
-	{		
+	{
 		if(selectedVector.size() == 0)
 			return;
-		
+
 		int nodeSelected = selectedVector.at(0).nodeSelected;
 		int graphSelected = selectedVector.at(0).graphSelected;
 		//drawPoints();
-		
+
 		drawROIBox(graphSelected,nodeSelected,xscale,yscale,zscale);
 		drawROIBox(graphSelected2,nodeSelected2,xscale2,yscale2,zscale2);
 		if(alignmentDatabase.size() > 1)
 		drawROIBox(graphSelected3,nodeSelected3,xscale3,yscale3,zscale3);
-	
+
 		glLoadIdentity();
 		for (int i = 0; i < alignmentDatabase.size(); i++)
 		{
 			Alignment *alignT = alignmentDatabase.at(i);
 			drawAlignmentROI(alignT,i);
-				
+
 			if(backGraphMode)
 			{
 				for (int i = 0; i < graphDatabase.size(); i++)
@@ -1015,7 +1015,7 @@ void PerspDisplay()
 		{
 			int nodeSelected = searchSelectedVector.at(i).nodeSelected;
 			int graphSelected = searchSelectedVector.at(i).graphSelected;
-			
+
 			float vx = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0];
 			float vy = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1];
 			float vz = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2];
@@ -1088,9 +1088,9 @@ Vector3d ClosestPoint(const Vector3d A, const Vector3d B,
 	double ab_square = AB * AB;
 	Vector3d AP = P - A;
 	double ap_dot_ab = AP * AB;
-	// t is a projection param when we project vector AP onto AB 
+	// t is a projection param when we project vector AP onto AB
 	*t = ap_dot_ab / ab_square;
-	// calculate the closest point 
+	// calculate the closest point
 	Vector3d Q = A + AB * (*t);
 	return Q;
 }
@@ -1122,11 +1122,11 @@ bool RayTestPoints(const Vector3d &start, const Vector3d &end,
 		for (int j = 0; j < graphDatabase.at(i)->nodes;j++)
 		if (RayTest(start, end, graphDatabase.at(i)->coords[j*3 + 0], &pt, t, epsilon))
 		{
-		
+
 			printf("Valid %d \n---\n", j);//, graphDatabase.at(i)->nodeListMap["A"]);
 		}
 	}
-	
+
 	return true;
 }
 
@@ -1147,7 +1147,7 @@ void AddNodeToROI(int node, graph *tmpg)
 	float nx = tmpg->coords[node * 3 + 0];
 	float ny = tmpg->coords[node * 3 + 1];
 	float nz = tmpg->coords[node * 3 + 2];
-		
+
 	//if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2 )
 	int index = coordsROI.size()/3;
 	coordsROI.push_back(nx);coordsROI.push_back(ny);coordsROI.push_back(nz);
@@ -1164,7 +1164,7 @@ bool validROI(int node, graph *tmpg)
 	float nx = tmpg->coords[node * 3 + 0];
 	float ny = tmpg->coords[node * 3 + 1];
 	float nz = tmpg->coords[node * 3 + 2];
-		
+
 	if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2)
 	{
 		return true;
@@ -1177,7 +1177,7 @@ bool validROI(int node, graph *tmpg)
 	{
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -1202,11 +1202,11 @@ void GetPickRay(int mouseX, int mouseY)
 	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
 		viewport, &m_end.x, &m_end.y, &m_end.z);
 
-	double t;	
+	double t;
 	float w;
 	//int graphSelected = -1;
 	//int nodeSelected = -1;
-	
+
 	float min = 5.0f;
 
 	if (searchArea != true)
@@ -1230,17 +1230,17 @@ void GetPickRay(int mouseX, int mouseY)
 					printf("Valid %d = %f\n", j, d);
 					tmp.nodeSelected = j;
 					tmp.graphSelected = i;
-				
+
 					if (searchArea != true)
 					{
 						min = d;
 						selectedVector.clear();
-						selectList->delete_all();			
+						selectList->delete_all();
 					}
 
 					selectedVector.push_back(tmp);
-					
-					char tmpc[256]; 
+
+					char tmpc[256];
 					std::string nodename = lookupName(tmp.graphSelected, tmp.nodeSelected);
 					sprintf(tmpc, "%s",nodename.c_str());
 					selectList->add_item(selectedVector.size()-1, tmpc);
@@ -1249,7 +1249,7 @@ void GetPickRay(int mouseX, int mouseY)
 
 		selectList->update_size();
 		selectList->update_and_draw_text();
-		
+
 		printf("Search Length : %d Less than %f \n----\n", (int)selectedVector.size(), min);
 	}
 
@@ -1270,7 +1270,7 @@ void GetPickRay(int mouseX, int mouseY)
 
 		cx1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] - (xscale/2) ;
 		cy1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] - (yscale/2) ;
-		cz1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] - (zscale/2) ;	
+		cz1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2] - (zscale/2) ;
 
 		cx2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] + (xscale/2) ;
 		cy2 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] + (yscale/2) ;
@@ -1278,7 +1278,7 @@ void GetPickRay(int mouseX, int mouseY)
 
 		cx12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] - (xscale2/2) ;
 		cy12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] - (yscale2/2) ;
-		cz12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] - (zscale2/2) ;	
+		cz12 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 2] - (zscale2/2) ;
 
 		cx22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 0] + (xscale2/2) ;
 		cy22 = graphDatabase.at(graphSelected2)->coords[nodeSelected2 * 3 + 1] + (yscale2/2) ;
@@ -1290,7 +1290,7 @@ void GetPickRay(int mouseX, int mouseY)
 	{
 		cx13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] - (xscale3/2) ;
 		cy13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] - (yscale3/2) ;
-		cz13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] - (zscale3/2) ;	
+		cz13 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] - (zscale3/2) ;
 
 		cx23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 0] + (xscale3/2) ;
 		cy23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 1] + (yscale3/2) ;
@@ -1345,7 +1345,7 @@ void GetPickRay(int mouseX, int mouseY)
 			float nx = graphDatabase.at(i)->coords[j * 3 + 0];
 			float ny = graphDatabase.at(i)->coords[j * 3 + 1];
 			float nz = graphDatabase.at(i)->coords[j * 3 + 2];
-			
+
 			if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2 )
 			{
 				int index = coordsROI.size()/3;
@@ -1375,7 +1375,7 @@ void GetPickRay(int mouseX, int mouseY)
 							}
 				}
 
-		
+
 
 
 

@@ -11,8 +11,8 @@ typedef enum {
 
 
 typedef struct {
-	char *ont_file;
-	char *json_file;
+	std::string ont_file;
+	std::string json_file;
 } optarg_t;
 
 
@@ -32,8 +32,8 @@ void print_usage()
 int main(int argc, char **argv) {
 
 	optarg_t args = {
-		NULL,
-		NULL
+		"go-basic.obo",
+		"input.json"
 	};
 
 	struct option long_options[] = {
@@ -61,18 +61,12 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	// validate arguments
-	if ( !args.ont_file || !args.json_file ) {
-		print_usage();
-		exit(1);
-	}
-
 	// read the ontology file
-	readOntFile(&ontologyDB, args.ont_file);
-	
+	readOntFile(&ontologyDB, args.ont_file.c_str());
+
 	// set up opengl window
 	glutInit(&argc, argv);
-	
+
 	//glewInit();
 	/*
 	if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
@@ -90,13 +84,13 @@ int main(int argc, char **argv) {
 
 	// start the window in the middle of the screen
 	glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH) - WIDTH) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2);
-	
+
 	persp_win = glutCreateWindow("G3NAV");
 
 	#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 	// initialize necessary OpenGL extensions
 	glewInit();
-	
+
 	if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5"))
 	{
 		fprintf(stderr, "The following required OpenGL extensions missing:\n\tGL_VERSION_2_0\n\tGL_VERSION_1_5\n");
@@ -108,12 +102,12 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "The following required OpenGL extensions missing:\n\tGL_ARB_multitexture\n\tGL_ARB_vertex_buffer_object\n\tGL_EXT_geometry_shader4.\n");
 		exit(EXIT_SUCCESS);
 	}
-	
+
 	#endif
 
 	// initialize the camera and such, pass in the json file to be read
-	init(args.json_file);
-	
+	init(args.json_file.c_str());
+
 	// set up opengl callback functions
 	glutDisplayFunc(PerspDisplay);
 	glutMouseFunc(mouseEventHandler);
@@ -124,7 +118,7 @@ int main(int argc, char **argv) {
 	// MainGLUI
 	glui = GLUI_Master.create_glui("Ontology Lookup Window", GLUI_SUBWINDOW_RIGHT, (glutGet(GLUT_SCREEN_WIDTH) - (WIDTH*2)) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2); /* name, flags,x, and y */
 	searchglui = GLUI_Master.create_glui("Search Window", GLUI_SUBWINDOW_TOP, (glutGet(GLUT_SCREEN_WIDTH) + WIDTH) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2); /* name, flags,x, and y */
-	
+
 	new GLUI_Separator(glui);
 	new GLUI_StaticText(glui, "Selected Results");
 	new GLUI_Separator(glui);
@@ -156,14 +150,13 @@ int main(int argc, char **argv) {
 	searchBox->set_w(420);
 	searchBox->set_h(40);
 	glui->set_main_gfx_window(persp_win);
-	
-	
+
+
 	/* We register the idle callback with GLUI, *not* with GLUT */
 	//GLUI_Master.set_glutIdleFunc( myGlutIdle );
 	GLUI_Master.set_glutIdleFunc(idle);
-	
-	
+
+
 	glutMainLoop();
 	return(0);
 }
-
