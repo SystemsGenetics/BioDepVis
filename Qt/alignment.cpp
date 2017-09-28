@@ -32,7 +32,7 @@ Alignment::~Alignment()
 
 void Alignment::load_edges(const QString& filename)
 {
-    qInfo() << "- loading edge list...";
+    qInfo() << "- loading edges...";
 
     QFile file(filename);
 
@@ -49,8 +49,8 @@ void Alignment::load_edges(const QString& filename)
         QString node1 = list[0];
         QString node2 = list[1];
 
-        int i = find_node(this->_graph1->nodes(), node1);
-        int j = find_node(this->_graph2->nodes(), node2);
+        int i = this->_graph1->find_node(node1);
+        int j = this->_graph2->find_node(node2);
 
         if ( i != -1 && j != -1 ) {
             this->_edges.push_back({ i, j });

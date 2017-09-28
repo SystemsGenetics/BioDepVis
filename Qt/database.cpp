@@ -32,8 +32,8 @@ void Database::load_config(const QString& filename)
         Graph *g = new Graph(
             obj["id"].toInt(),
             obj["name"].toString(),
-            obj["fileLocation"].toString(),
             obj["clusterLocation"].toString(),
+            obj["fileLocation"].toString(),
             obj["Ontology"].toString(),
             obj["x"].toInt(),
             obj["y"].toInt(),

@@ -19,7 +19,7 @@ typedef struct {
 
 typedef struct {
     QString name;
-    int cluster_id;
+    int module_id;
     QStringList go_terms;
 } graph_node_t;
 
@@ -27,8 +27,6 @@ typedef struct {
     int node1;
     int node2;
 } graph_edge_t;
-
-int find_node(const QVector<graph_node_t>& nodes, const QString& name);
 
 class Graph
 {
@@ -49,8 +47,8 @@ private:
 public:
     Graph(
         int id, const QString& name,
-        const QString& datafile,
-        const QString& clusterfile,
+        const QString& nodefile,
+        const QString& edgefile,
         const QString& ontfile,
         float x, float y, float z, int w, int h
     );
@@ -65,9 +63,11 @@ public:
     const QVector<vec3_t>& coords() const { return this->_coords; }
     const QVector<coinfo_t>& coinfo() const { return this->_coinfo; }
 
-    void load_clusterfile(const QString& filename);
-    void load_edgefile(const QString& filename);
-    void load_ontologyfile(const QString& filename);
+    int find_node(const QString& name);
+
+    void load_nodes(const QString& filename);
+    void load_edges(const QString& filename);
+    void load_ontology(const QString& filename);
 
     void print() const;
 };

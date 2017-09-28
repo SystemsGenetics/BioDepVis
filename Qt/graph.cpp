@@ -3,27 +3,10 @@
 #include <QFile>
 #include <QTextStream>
 
-/**
- * Find a node by name.
- *
- * @param nodes
- * @param name
- */
-int find_node(const QVector<graph_node_t>& nodes, const QString& name)
-{
-    for ( int i = 0; i < nodes.size(); i++ ) {
-        if ( nodes[i].name == name ) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 Graph::Graph(
     int id, const QString& name,
-    const QString& datafile,
-    const QString& clusterfile,
+    const QString& nodefile,
+    const QString& edgefile,
     const QString& ontfile,
     float x, float y, float z, int w, int h)
 {
@@ -33,9 +16,9 @@ Graph::Graph(
     this->_width = w;
     this->_height = h;
 
-    load_clusterfile(clusterfile);
-    load_edgefile(datafile);
-    load_ontologyfile(ontfile);
+    load_nodes(nodefile);
+    load_edges(edgefile);
+    load_ontology(ontfile);
 
     // initialize coords
     this->_coords.reserve(this->_nodes.size());
@@ -66,14 +49,30 @@ Graph::~Graph()
     delete[] this->_edge_matrix;
 }
 
-void Graph::load_clusterfile(const QString& filename)
+/**
+ * Find a node by name.
+ *
+ * @param name
+ */
+int Graph::find_node(const QString& name)
 {
-    qInfo() << "- loading cluster file...";
+    for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        if ( this->_nodes[i].name == name ) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void Graph::load_nodes(const QString& filename)
+{
+    qInfo() << "- loading nodes...";
 
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
-        qWarning("warning: unable to open cluster file");
+        qWarning("warning: unable to open node file");
         return;
     }
 
@@ -82,19 +81,19 @@ void Graph::load_clusterfile(const QString& filename)
     while ( !in.atEnd() ) {
         QStringList list = in.readLine().split("\t");
         QString name = list[0];
-        int cluster_id = list[1].toInt();
+        int module_id = list[1].toInt();
 
         graph_node_t node;
         node.name = name;
-        node.cluster_id = cluster_id;
+        node.module_id = module_id;
 
         this->_nodes.push_back(node);
     }
 }
 
-void Graph::load_edgefile(const QString& filename)
+void Graph::load_edges(const QString& filename)
 {
-    qInfo() << "- loading edge list...";
+    qInfo() << "- loading edges...";
 
     QFile file(filename);
 
@@ -111,8 +110,8 @@ void Graph::load_edgefile(const QString& filename)
         QString node1 = list[0];
         QString node2 = list[1];
 
-        int i = find_node(this->_nodes, node1);
-        int j = find_node(this->_nodes, node2);
+        int i = this->find_node(node1);
+        int j = this->find_node(node2);
 
         if ( i != -1 && j != -1 ) {
             this->_edges.push_back({ i, j });
@@ -138,9 +137,9 @@ void Graph::load_edgefile(const QString& filename)
     }
 }
 
-void Graph::load_ontologyfile(const QString& filename)
+void Graph::load_ontology(const QString& filename)
 {
-    qInfo() << "- loading ontology file...";
+    qInfo() << "- loading ontology...";
 
     QFile file(filename);
 
@@ -156,7 +155,7 @@ void Graph::load_ontologyfile(const QString& filename)
         QString name = fields[1];
         QStringList go_terms = fields[9].split(",");
 
-        int nodeIndex = find_node(this->_nodes, name);
+        int nodeIndex = this->find_node(name);
 
         if ( nodeIndex != -1 ) {
             this->_nodes[nodeIndex].go_terms = go_terms;
@@ -171,7 +170,7 @@ void Graph::print() const
     // for ( int i = 0; i < this->_nodes.size(); i++ ) {
     //     qDebug()
     //         << this->_nodes[i].name
-    //         << this->_nodes[i].cluster_id
+    //         << this->_nodes[i].module_id
     //         << this->_nodes[i].go_terms.join(' ');
     // }
 }
