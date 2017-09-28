@@ -18,6 +18,13 @@ typedef struct {
 } coinfo_t;
 
 typedef struct {
+    float r;
+    float g;
+    float b;
+    float a;
+} color_t;
+
+typedef struct {
     QString name;
     int module_id;
     QStringList go_terms;
@@ -40,6 +47,7 @@ private:
     QVector<graph_node_t> _nodes;
     QVector<vec3_t> _coords;
     QVector<coinfo_t> _coinfo;
+    QVector<color_t> _colors;
 
     QVector<graph_edge_t> _edges;
     float *_edge_matrix;

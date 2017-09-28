@@ -3,6 +3,42 @@
 #include <QFile>
 #include <QTextStream>
 
+const float CLUSTER_SIZE = 360.0f;
+const float NODE_ALPHA = 0.6f;
+
+color_t hsv_to_rgb(float h, float s, float v)
+{
+    int i;
+    float f, p, q, t;
+
+    if ( s == 0 ) {
+        return (color_t) { v, v, v, 0 };
+    }
+
+    h /= 60;
+    i = floor(h);
+    f = h - i;
+    p = v * (1 - s);
+    q = v * (1 - s * f);
+    t = v * (1 - s * (1 - f));
+
+    switch ( i ) {
+    case 0:
+        return (color_t) { v, t, p, 0 };
+    case 1:
+        return (color_t) { q, v, p, 0 };
+    case 2:
+        return (color_t) { p, v, t, 0 };
+    case 3:
+        return (color_t) { p, q, v, 0 };
+    case 4:
+        return (color_t) { t, p, v, 0 };
+    case 5:
+    default:
+        return (color_t) { v, p, q, 0 };
+    }
+}
+
 Graph::Graph(
     int id, const QString& name,
     const QString& nodefile,
@@ -36,6 +72,35 @@ Graph::Graph(
 
     for ( int i = 0; i < this->_nodes.size(); i++ ) {
         this->_coinfo.push_back({ 0, 0, 0, 1 });
+    }
+
+    // initialize colors
+    this->_colors.reserve(this->_nodes.size());
+
+    for ( const graph_node_t& node : this->_nodes ) {
+        float h = node.module_id / CLUSTER_SIZE * 360.0f;
+        float s = 0.8f;
+        float v = 1.0f - node.module_id / CLUSTER_SIZE;
+
+        color_t color = hsv_to_rgb(h, s, v);
+        color.a = NODE_ALPHA;
+
+        this->_colors.push_back(color);
+    }
+
+    // initialize edge matrix
+    int rows = this->_nodes.size();
+
+    this->_edge_matrix = new float[rows * rows];
+
+    memset(this->_edge_matrix, 0, rows * rows * sizeof(float));
+
+    for ( const graph_edge_t& edge : this->_edges ) {
+        int i = edge.node1;
+        int j = edge.node2;
+
+        this->_edge_matrix[i * rows + j] = 1;
+        this->_edge_matrix[j * rows + i] = 1;
     }
 }
 
@@ -102,7 +167,6 @@ void Graph::load_edges(const QString& filename)
         return;
     }
 
-    // load edges from file
     QTextStream in(&file);
 
     while ( !in.atEnd() ) {
@@ -119,21 +183,6 @@ void Graph::load_edges(const QString& filename)
         else {
             qWarning() << "warning: could not find nodes " << node1 << node2;
         }
-    }
-
-    // initialize edge matrix
-    int rows = this->_nodes.size();
-
-    this->_edge_matrix = new float[rows * rows];
-
-    memset(this->_edge_matrix, 0, rows * rows * sizeof(float));
-
-    for ( const graph_edge_t& edge : this->_edges ) {
-        int i = edge.node1;
-        int j = edge.node2;
-
-        this->_edge_matrix[i * rows + j] = 1;
-        this->_edge_matrix[j * rows + i] = 1;
     }
 }
 

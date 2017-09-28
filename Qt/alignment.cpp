@@ -8,13 +8,24 @@ Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
     this->_graph1 = graph1;
     this->_graph2 = graph2;
 
+    load_edges(filename);
+
+    // initialize edge matrix
     this->_rows = graph1->nodes().size();
     this->_cols = graph2->nodes().size();
     this->_edge_matrix = new float[this->_rows * this->_cols];
 
     memset(this->_edge_matrix, 0, this->_rows * this->_cols * sizeof(float));
 
-    load_edges(filename);
+    for ( const graph_edge_t& edge : this->_edges ) {
+        int i = edge.node1;
+        int j = edge.node2;
+
+        this->_edge_matrix[i * this->_cols + j] = 1;
+    }
+
+    // initialize vertices
+    this->_vertices.reserve(this->_edges.size());
 }
 
 Alignment::Alignment()
@@ -41,7 +52,6 @@ void Alignment::load_edges(const QString& filename)
         return;
     }
 
-    // load edges from file
     QTextStream in(&file);
 
     while ( !in.atEnd() ) {
@@ -59,17 +69,6 @@ void Alignment::load_edges(const QString& filename)
             qWarning() << "warning: could not find nodes " << node1 << node2;
         }
     }
-
-    // initialize edge matrix
-    for ( const graph_edge_t& edge : this->_edges ) {
-        int i = edge.node1;
-        int j = edge.node2;
-
-        this->_edge_matrix[i * this->_cols + j] = 1;
-    }
-
-    // initialize vertices
-    this->_vertices.reserve(this->_edges.size());
 }
 
 void Alignment::update()
