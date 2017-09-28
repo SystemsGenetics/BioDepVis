@@ -4,5 +4,6 @@ glui-2.37
 # build files, executables
 *.o
 *.pyc
+BioDepVis
 biodep-vis
 build
