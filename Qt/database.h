@@ -25,6 +25,9 @@ private:
 public:
     Database() {};
 
+    QHash<int, Graph *>& graphs() { return this->_graphs; }
+    QVector<Alignment>& alignments() { return this->_alignments; }
+
     void load_config(const QString& filename);
     void load_ontology(const QString& filename);
 

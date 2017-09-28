@@ -9,7 +9,7 @@
  * @param nodes
  * @param name
  */
-int find_node(const QVector<node_t>& nodes, const QString& name)
+int find_node(const QVector<graph_node_t>& nodes, const QString& name)
 {
     for ( int i = 0; i < nodes.size(); i++ ) {
         if ( nodes[i].name == name ) {
@@ -37,15 +37,22 @@ Graph::Graph(
     load_edgefile(datafile);
     load_ontologyfile(ontfile);
 
-    // initialize node coords, coinfo
-    for ( node_t& node : this->_nodes ) {
-        node.coord = {
+    // initialize coords
+    this->_coords.reserve(this->_nodes.size());
+
+    for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        this->_coords.push_back({
             x - w/2 + qrand() % w,
             y - w/2 + qrand() % h,
             z
-        };
+        });
+    }
 
-        node.coinfo = { 0, 0, 0, 1 };
+    // initialize coinfo
+    this->_coinfo.reserve(this->_nodes.size());
+
+    for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        this->_coinfo.push_back({ 0, 0, 0, 1 });
     }
 }
 
@@ -77,7 +84,7 @@ void Graph::load_clusterfile(const QString& filename)
         QString name = list[0];
         int cluster_id = list[1].toInt();
 
-        node_t node;
+        graph_node_t node;
         node.name = name;
         node.cluster_id = cluster_id;
 
@@ -122,9 +129,9 @@ void Graph::load_edgefile(const QString& filename)
 
     memset(this->_edge_matrix, 0, rows * rows * sizeof(float));
 
-    for ( auto& edge : this->_edges ) {
-        int i = edge.first;
-        int j = edge.second;
+    for ( const graph_edge_t& edge : this->_edges ) {
+        int i = edge.node1;
+        int j = edge.node2;
 
         this->_edge_matrix[i * rows + j] = 1;
         this->_edge_matrix[j * rows + i] = 1;

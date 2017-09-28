@@ -22,14 +22,12 @@ Alignment::Alignment()
     this->_graph1 = nullptr;
     this->_graph2 = nullptr;
     this->_edge_matrix = nullptr;
-    this->_vertices = nullptr;
 }
 
 Alignment::~Alignment()
 {
     // TODO: causes segfault, need copy constructor?
     // delete[] this->_edge_matrix;
-    // delete[] this->_vertices;
 }
 
 void Alignment::load_edges(const QString& filename)
@@ -63,25 +61,25 @@ void Alignment::load_edges(const QString& filename)
     }
 
     // initialize edge matrix
-    for ( auto& edge : this->_edges ) {
-        int i = edge.first;
-        int j = edge.second;
+    for ( const graph_edge_t& edge : this->_edges ) {
+        int i = edge.node1;
+        int j = edge.node2;
 
         this->_edge_matrix[i * this->_cols + j] = 1;
     }
 
     // initialize vertices
-    this->_vertices = new edge_t[this->_edges.size()];
+    this->_vertices.reserve(this->_edges.size());
 }
 
 void Alignment::update()
 {
     for ( int k = 0; k < this->_edges.size(); k++ ) {
-        int i = this->_edges[k].first;
-        int j = this->_edges[k].second;
+        int i = this->_edges[k].node1;
+        int j = this->_edges[k].node2;
 
-        this->_vertices[k].v1 = this->_graph1->nodes()[i].coord;
-        this->_vertices[k].v2 = this->_graph2->nodes()[j].coord;
+        this->_vertices[k].v1 = this->_graph1->coords()[i];
+        this->_vertices[k].v2 = this->_graph2->coords()[j];
     }
 }
 

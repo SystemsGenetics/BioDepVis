@@ -1,8 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <QLineEdit>
+#include <QMainWindow>
+#include "database.h"
 
 class MainWindow : public QWidget
 {
@@ -14,14 +15,10 @@ private:
     } _treeForm;
 
 public:
-    MainWindow();
+    MainWindow(Database *db);
 
 public slots:
     bool search();
     bool clear();
-
-private:
-    void createGUI();
-
 };
 #endif // MAINWINDOW_H

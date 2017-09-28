@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     format.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(format);
 
-    MainWindow w;
+    MainWindow w(&db);
     w.resize(1280, 720);
     w.show();
 

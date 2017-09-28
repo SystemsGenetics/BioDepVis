@@ -3,24 +3,29 @@
 
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
-#include "graph.h"
 #include "alignment.h"
+#include "database.h"
+#include "graph.h"
 
 class VisualizerWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
 private:
-    GLuint textures;
+    GLuint _textures;
+
+    Database *_db;
+    bool _animate;
+    bool _showalignment;
 
 public:
-    VisualizerWidget(QWidget *parent=Q_NULLPTR) : QOpenGLWidget(parent) {};
+    VisualizerWidget(Database *db, QWidget *parent=Q_NULLPTR);
 
 private:
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
-    void drawGraph(Graph *g);
-    void drawAlignment(Alignment *align);
 
-
+    void draw_graph(const Graph& g);
+    void draw_alignment(Alignment& a);
 };
+
 #endif

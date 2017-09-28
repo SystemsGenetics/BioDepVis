@@ -1,27 +1,17 @@
-#include "mainwindow.h"
-#include "visualizer.h"
-#include <QFile>
-#include <QFileDialog>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QHeaderView>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
-#include <QProcess>
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QTableWidget>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include "mainwindow.h"
+#include "visualizer.h"
 
-MainWindow::MainWindow()
-{
-    this->createGUI();
-}
-
-void MainWindow::createGUI()
+MainWindow::MainWindow(Database *db)
 {
     QGridLayout *layout = new QGridLayout;
 
@@ -91,7 +81,7 @@ void MainWindow::createGUI()
     //Visualization
     QGroupBox *VisualizationGroup = new QGroupBox;
 
-    VisualizerWidget *visualizer = new VisualizerWidget();
+    VisualizerWidget *visualizer = new VisualizerWidget(db);
 
     QVBoxLayout *VisualizationLayout = new QVBoxLayout;
     VisualizationLayout->addWidget(visualizer);
@@ -156,7 +146,6 @@ void MainWindow::createGUI()
 
     LegendLayout->addWidget(controlTable,0,0);
     LegendGroup->setLayout(LegendLayout);
-
 
     //Add Groups to Layout
     layout->setColumnStretch(0, 1);

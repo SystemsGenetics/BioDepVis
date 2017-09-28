@@ -1,7 +1,6 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <QPair>
 #include <QString>
 #include <QVector>
 
@@ -22,25 +21,30 @@ typedef struct {
     QString name;
     int cluster_id;
     QStringList go_terms;
-    vec3_t coord;
-    coinfo_t coinfo;
-} node_t;
+} graph_node_t;
 
-int find_node(const QVector<node_t>& nodes, const QString& name);
+typedef struct {
+    int node1;
+    int node2;
+} graph_edge_t;
+
+int find_node(const QVector<graph_node_t>& nodes, const QString& name);
 
 class Graph
 {
 private:
     int _id;
     QString _name;
-    QVector<node_t> _nodes;
-    QVector<QPair<int, int>> _edges;
-
-    float *_edge_matrix;
-
     vec3_t _center;
     int _width;
     int _height;
+
+    QVector<graph_node_t> _nodes;
+    QVector<vec3_t> _coords;
+    QVector<coinfo_t> _coinfo;
+
+    QVector<graph_edge_t> _edges;
+    float *_edge_matrix;
 
 public:
     Graph(
@@ -55,8 +59,11 @@ public:
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
-    const QVector<node_t>& nodes() const { return this->_nodes; }
-    const QVector<QPair<int, int>>& edges() const { return this->_edges; }
+    const QVector<graph_node_t>& nodes() const { return this->_nodes; }
+    const QVector<graph_edge_t>& edges() const { return this->_edges; }
+
+    const QVector<vec3_t>& coords() const { return this->_coords; }
+    const QVector<coinfo_t>& coinfo() const { return this->_coinfo; }
 
     void load_clusterfile(const QString& filename);
     void load_edgefile(const QString& filename);
