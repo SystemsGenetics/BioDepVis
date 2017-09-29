@@ -41,22 +41,13 @@ void Visualizer::initializeGL()
 
     // load texture image
     QImage image("particle.png");
-    image = image.convertToFormat(QImage::Format_RGBA8888);
-
-    // scale each image dimension to next power of two
-    int u2 = 1;
-    int v2 = 1;
-    while ( u2 < image.width() ) u2 *= 2;
-    while ( v2 < image.height() ) v2 *= 2;
-
-    image = image.scaled(u2, v2);
 
     glGenTextures(1, &_textures);
     glBindTexture(GL_TEXTURE_2D, _textures);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, u2, v2, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
