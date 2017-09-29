@@ -11,17 +11,14 @@ Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
     load_edges(filename);
 
     // initialize edge matrix
-    this->_rows = graph1->nodes().size();
-    this->_cols = graph2->nodes().size();
-    this->_edge_matrix = new float[this->_rows * this->_cols];
-
-    memset(this->_edge_matrix, 0, this->_rows * this->_cols * sizeof(float));
+    this->_edge_matrix = Matrix(graph1->nodes().size(), graph2->nodes().size());
+    this->_edge_matrix.init_zeros();
 
     for ( const graph_edge_t& edge : this->_edges ) {
         int i = edge.node1;
         int j = edge.node2;
 
-        this->_edge_matrix[i * this->_cols + j] = 1;
+        this->_edge_matrix.elem(i, j) = 1;
     }
 
     // initialize vertices
@@ -32,12 +29,6 @@ Alignment::Alignment()
 {
     this->_graph1 = nullptr;
     this->_graph2 = nullptr;
-    this->_edge_matrix = nullptr;
-}
-
-Alignment::~Alignment()
-{
-    delete[] this->_edge_matrix;
 }
 
 /**

@@ -15,15 +15,12 @@ private:
     Graph *_graph2;
     QVector<graph_edge_t> _edges;
     QVector<align_edge_t> _vertices;
-
-    int _rows;
-    int _cols;
-    float *_edge_matrix;
+    Matrix _edge_matrix;
 
 public:
     Alignment(const QString& filename, Graph *graph1, Graph *graph2);
     Alignment();
-    ~Alignment();
+    ~Alignment() {};
 
     const QVector<graph_edge_t>& edges() const { return this->_edges; }
     const QVector<align_edge_t>& vertices() const { return this->_vertices; }

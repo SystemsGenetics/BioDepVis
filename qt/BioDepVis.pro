@@ -32,6 +32,7 @@ SOURCES += \
     graph.cpp \
     main.cpp \
     mainwindow.cpp \
+    matrix.cpp \
     vector.cpp \
     visualizer.cpp
 
@@ -41,6 +42,7 @@ HEADERS += \
     database.h \
     graph.h \
     mainwindow.h \
+    matrix.h \
     vector.h \
     visualizer.h
 

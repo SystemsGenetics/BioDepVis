@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QVector>
+#include "matrix.h"
 #include "vector.h"
 
 typedef struct {
@@ -43,9 +44,8 @@ private:
     QVector<vec3_t> _coords;
     QVector<coinfo_t> _coinfo;
     QVector<color_t> _colors;
-
     QVector<graph_edge_t> _edges;
-    float *_edge_matrix;
+    Matrix _edge_matrix;
 
 public:
     Graph(
@@ -55,8 +55,8 @@ public:
         const QString& ontfile,
         float x, float y, float z, int w, int h
     );
-    Graph();
-    ~Graph();
+    Graph() {};
+    ~Graph() {};
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }

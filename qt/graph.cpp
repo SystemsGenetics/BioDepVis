@@ -89,29 +89,16 @@ Graph::Graph(
     }
 
     // initialize edge matrix
-    int rows = this->_nodes.size();
-
-    this->_edge_matrix = new float[rows * rows];
-
-    memset(this->_edge_matrix, 0, rows * rows * sizeof(float));
+    this->_edge_matrix = Matrix(this->_nodes.size(), this->_nodes.size());
+    this->_edge_matrix.init_zeros();
 
     for ( const graph_edge_t& edge : this->_edges ) {
         int i = edge.node1;
         int j = edge.node2;
 
-        this->_edge_matrix[i * rows + j] = 1;
-        this->_edge_matrix[j * rows + i] = 1;
+        this->_edge_matrix.elem(i, j) = 1;
+        this->_edge_matrix.elem(j, i) = 1;
     }
-}
-
-Graph::Graph()
-{
-    this->_edge_matrix = nullptr;
-}
-
-Graph::~Graph()
-{
-    delete[] this->_edge_matrix;
 }
 
 /**
