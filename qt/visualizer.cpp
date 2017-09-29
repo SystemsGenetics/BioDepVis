@@ -20,6 +20,11 @@ const color_t ALIGN_EDGE_COLORS[] = {
 Visualizer::Visualizer(Database *db, QWidget *parent)
     : QOpenGLWidget(parent)
 {
+    this->_camera = Camera(
+        { 0, 10, 400 },
+        { 0, 0, 0 },
+        { 0, 1, 0 }
+    );
     this->_db = db;
     this->_animate = false;
     this->_showalignment = false;
@@ -91,7 +96,7 @@ void Visualizer::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // TODO: camera->PerspectiveDisplay
+    this->_camera.display(this->width(), this->height());
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

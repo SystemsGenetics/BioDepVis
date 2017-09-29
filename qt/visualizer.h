@@ -4,6 +4,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include "alignment.h"
+#include "camera.h"
 #include "database.h"
 #include "graph.h"
 
@@ -12,6 +13,7 @@ class Visualizer : public QOpenGLWidget, protected QOpenGLFunctions
 private:
     GLuint _textures;
 
+    Camera _camera;
     Database *_db;
     bool _animate;
     bool _showalignment;
