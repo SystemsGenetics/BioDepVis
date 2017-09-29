@@ -162,10 +162,7 @@ void init(const char * f_in)
 		Vector3d(0, 1, 0));
 
 	// grey background for window
-	//glClearColor(0.15, 0.15, 0.15, 0.0);
-	//glClearColor(1.0, 1.0, 1.0, 0.0);
 	glClearColor(1.0, 1.0, 1.0, 0.0);
-//	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
 
@@ -177,6 +174,7 @@ void init(const char * f_in)
 	GLfloat light_position2[] = { 0.0, 10, -5.0, 0.0 };
 	GLfloat light_position3[] = { 0.0, 10, -5.0, 0.0 };
 	float specref[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 	// Light values and coordinates
 	float ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
 	float diffuseLight[] = { 0.7f, 0.7f, 0.7f, 1.0f };
@@ -285,7 +283,6 @@ void init(const char * f_in)
 
 void drawGraph(graph *g)
 {
-
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -300,7 +297,7 @@ void drawGraph(graph *g)
 	glDepthMask(GL_TRUE);
 
  	glColor4f(g->nr, g->ng, g->nb, g->na);
-	//glColor4f(0,0,0,0.5);
+
 	if (cluster == true)
 	{
 		glColorPointer(4, GL_FLOAT, 0, g->color);
@@ -312,10 +309,8 @@ void drawGraph(graph *g)
 	glEnable(GL_POINT_SPRITE);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 
-
 	glPointSize(4.3f);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE, GL_ONE);
 	glDepthMask(GL_FALSE);
 	glDrawArrays(GL_POINTS, 0, g->nodes);
 	glDisableClientState(GL_COLOR_ARRAY);
@@ -323,33 +318,6 @@ void drawGraph(graph *g)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_TRUE);
 
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_POINT_SPRITE);
-	glDisable(GL_BLEND);
-
-	//Orig
-	glDisable(GL_BLEND);
-}
-
-
-void Test()
-{
-	glEnable(GL_BLEND);
-
-	glBindTexture(GL_TEXTURE_2D, textures);
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_POINT_SPRITE);
-	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-
-	glPointSize(200);
-	glBegin(GL_POINTS);
-	for (int i = 0; i < 10; i++)
-	{
-
-		glVertex3f(0, i * 10, 0);
-	}
-	glEnd();
-	//New
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_POINT_SPRITE);
 	glDisable(GL_BLEND);
@@ -418,20 +386,11 @@ void drawAlignment(Alignment *align)
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		/*glLineStipple(1, 0xAAAA);//  # [1]
-		glEnable(GL_LINE_STIPPLE);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
-		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
-		glLineWidth(0.1);
-		glDrawArrays(GL_LINES, 0, align->edges);*/
-		float r = ((double)rand() / (RAND_MAX)), g = ((double)rand() / (RAND_MAX)), b = ((double)rand() / (RAND_MAX));
 
 		glColor4f(0.69,0.19,0.29, 0.005f);
-		//float cenerCtrPoint1[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, (align->g1->centerz + align->g2->centerz) / 10.0 - 150 };
-		//float cenerCtrPoint2[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, 9 * (align->g1->centerz + align->g2->centerz) / 10.0 - 150};
 
 		glEnable(GL_MAP1_VERTEX_3);
+
 		for (int k = 0; k < align->edges;  k++)
 		{
 			float x1 = align->vertices[k * 6 + 0];
@@ -450,7 +409,6 @@ void drawAlignment(Alignment *align)
 
 			glLineWidth(0.1);
 
-
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i <= 20; i++)
 			{
@@ -462,7 +420,6 @@ void drawAlignment(Alignment *align)
 
 		glDisable(GL_BLEND);
 		glDisable(GL_MAP1_VERTEX_3);
-
 	}
 	glDepthMask(GL_TRUE);
 }
@@ -501,22 +458,10 @@ void drawAlignmentROI(Alignment *align,int index)
 		glLoadIdentity();
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		/*glLineStipple(1, 0xAAAA);//  # [1]
-		glEnable(GL_LINE_STIPPLE);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
-		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
-		glLineWidth(0.1);
-		glDrawArrays(GL_LINES, 0, align->edges);*/
-		float r = ((double)rand() / (RAND_MAX)), g = ((double)rand() / (RAND_MAX)), b = ((double)rand() / (RAND_MAX));
 
 		glColor4f(0.14,0.24,0.7, 0.15f);
-		//float cenerCtrPoint1[3] = { (align->g1->centerx + align->2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, (align->g1->centerz + align->g2->centerz) / 10.0 - 150 };
-		//float cenerCtrPoint2[3] = { (align->g1->centerx + align->g2->centerx) / 2.0, (align->g1->centery + align->g2->centery) / 2.0, 9 * (align->g1->centerz + align->g2->centerz) / 10.0 - 150};
 
 		glEnable(GL_MAP1_VERTEX_3);
-		//for (int k = 0; k < align->edges;  k++)
-		//printf("Total Alignment = %d\n",alignEdgesROI.size())
 
 		if(index == 0)
 		{
@@ -949,7 +894,6 @@ void PerspDisplay()
 	}
 
 
-	//Test();
 	/*
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textures);

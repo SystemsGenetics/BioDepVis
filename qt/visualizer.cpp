@@ -41,6 +41,7 @@ void Visualizer::initializeGL()
 
     // load texture image
     QImage image("particle.png");
+    image = image.convertToFormat(QImage::Format_RGBA8888);
 
     // scale each image dimension to next power of two
     int u2 = 1;
@@ -152,8 +153,6 @@ void Visualizer::draw_graph(const Graph& g, const color_t& edge_color)
 
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_POINT_SPRITE);
-    glDisable(GL_BLEND);
-
     glDisable(GL_BLEND);
 }
 
