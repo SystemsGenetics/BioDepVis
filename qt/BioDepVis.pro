@@ -1,16 +1,6 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-08-30T16:48:24
-#
-#-------------------------------------------------
-
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+QT += widgets
 TARGET = BioDepVis
 TEMPLATE = app
-
 CONFIG += c++11 debug
 LIBS += -lGLU
 
@@ -45,6 +35,3 @@ HEADERS += \
     matrix.h \
     vector.h \
     visualizer.h
-
-FORMS += \
-    mainwindow.ui
