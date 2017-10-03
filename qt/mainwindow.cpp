@@ -37,7 +37,7 @@ MainWindow::MainWindow(Database *db)
     OntologyLayout->addWidget(descriptionScrollArea,3,0);
     OntologyGroup->setLayout(OntologyLayout);
 
-    //Go Term List
+    // Go Term List
     QGroupBox *GoTermGroup = new QGroupBox("Go Term List");
 
     QWidget *termsContent = new QWidget();
@@ -55,14 +55,13 @@ MainWindow::MainWindow(Database *db)
     GoTermLayout->addWidget(termDescriptionScrollArea,2,0);
     GoTermGroup->setLayout(GoTermLayout);
 
-    //Search Window
+    // Search Window
     QGroupBox *SearchWindowGroup = new QGroupBox("Search Window");
     QLabel *searchTermLabel = new QLabel("Search Term");
 
     QWidget *searchTermsContent = new QWidget();
     QScrollArea *searchTermsScrollArea = new QScrollArea();
     searchTermsScrollArea->setWidget(searchTermsContent);
-
 
     QPushButton *searchButton = new QPushButton("Search");
     connect(searchButton, SIGNAL(clicked()), this, SLOT(search()));
@@ -77,8 +76,7 @@ MainWindow::MainWindow(Database *db)
     SearchWindowLayout->addWidget(clearButton,3,0);
     SearchWindowGroup->setLayout(SearchWindowLayout);
 
-
-    //Visualization
+    // Visualization
     QGroupBox *VisualizationGroup = new QGroupBox;
 
     Visualizer *visualizer = new Visualizer(db);
@@ -87,7 +85,7 @@ MainWindow::MainWindow(Database *db)
     VisualizationLayout->addWidget(visualizer);
     VisualizationGroup->setLayout(VisualizationLayout);
 
-    //Legend
+    // Legend
     QGroupBox *LegendGroup = new QGroupBox("Controls");
     QVBoxLayout *LegendLayout = new QVBoxLayout;
 
@@ -96,66 +94,43 @@ MainWindow::MainWindow(Database *db)
         "Action"
     };
 
-    QTableWidget * controlTable = new QTableWidget(21,2);
+    QVector<QPair<QString, QString>> controls {
+        { "R", "Reset View" },
+        { "G", "Toggle GPU" },
+        { "Space", "Toggle FDL" },
+        { ",", "Toggle module coloring" },
+        { "V", "Toggle alignment" },
+        { "W/S", "Rotate X-axis" },
+        { "A/D", "Rotate Y-axis" },
+        { "Q/E", "Zoom" },
+        { "I/K", "Pan Left/Right" },
+        { "J/L", "Pan Up/Down" }
+    };
+
+    QTableWidget *controlTable = new QTableWidget(controls.size(), 2);
     controlTable->setHorizontalHeaderLabels(controlHeaders);
     controlTable->horizontalHeader()->setStretchLastSection(true);
     controlTable->verticalHeader()->setVisible(false);
 
-    //Control Commands
-    controlTable->setItem(0, 0, new QTableWidgetItem("Space"));
-    controlTable->setItem(0, 1, new QTableWidgetItem("FDL"));
+    for ( int i = 0; i < controls.size(); i++ ) {
+        auto& ctrl = controls[i];
 
-    controlTable->setItem(1, 0, new QTableWidgetItem("Q"));
-    controlTable->setItem(1, 1, new QTableWidgetItem("Zoom Out"));
+        controlTable->setItem(i, 0, new QTableWidgetItem(ctrl.first));
+        controlTable->setItem(i, 1, new QTableWidgetItem(ctrl.second));
+    }
 
-    controlTable->setItem(2, 0, new QTableWidgetItem("W"));
-    controlTable->setItem(2, 1, new QTableWidgetItem("Rotate on y axis"));
-
-    controlTable->setItem(3, 0, new QTableWidgetItem("E"));
-    controlTable->setItem(3, 1, new QTableWidgetItem("Zoom In"));
-
-    controlTable->setItem(4, 0, new QTableWidgetItem("R"));
-    controlTable->setItem(4, 1, new QTableWidgetItem("Reset View"));
-
-    controlTable->setItem(5, 0, new QTableWidgetItem("U,A,J"));
-    controlTable->setItem(5, 1, new QTableWidgetItem("Pan Down View"));
-
-    controlTable->setItem(6, 0, new QTableWidgetItem("O"));
-    controlTable->setItem(6, 1, new QTableWidgetItem("Pan Down View (slow)"));
-
-    controlTable->setItem(7, 0, new QTableWidgetItem("I"));
-    controlTable->setItem(7, 1, new QTableWidgetItem("Pan Left View"));
-
-    controlTable->setItem(8, 0, new QTableWidgetItem("S,K"));
-    controlTable->setItem(8, 1, new QTableWidgetItem("Pan Right View"));
-
-    controlTable->setItem(9, 0, new QTableWidgetItem("D"));
-    controlTable->setItem(9, 1, new QTableWidgetItem("Rotate on X axis and zoom out"));
-
-    controlTable->setItem(10, 0, new QTableWidgetItem("L"));
-    controlTable->setItem(10, 1, new QTableWidgetItem(" Pan Up View"));
-
-    controlTable->setItem(11, 0, new QTableWidgetItem("X"));
-    controlTable->setItem(11, 1, new QTableWidgetItem("Show only selected nodes"));
-
-    controlTable->setItem(12, 0, new QTableWidgetItem("V"));
-    controlTable->setItem(12, 1, new QTableWidgetItem("Change Edge Design (curved to 2D)"));
-
-    controlTable->setItem(13, 0, new QTableWidgetItem(","));
-    controlTable->setItem(13, 1, new QTableWidgetItem("Show node type"));
-
-    LegendLayout->addWidget(controlTable,0,0);
+    LegendLayout->addWidget(controlTable, 0, 0);
     LegendGroup->setLayout(LegendLayout);
 
-    //Add Groups to Layout
+    // Add Groups to Layout
     layout->setColumnStretch(0, 1);
     layout->setColumnStretch(1, 2);
     layout->setColumnStretch(2, 2);
-    layout->addWidget(OntologyGroup, 0, 0,2,1);
-    layout->addWidget(GoTermGroup, 2, 0,1,1);
-    layout->addWidget(SearchWindowGroup, 3, 0,1,1);
+    layout->addWidget(OntologyGroup,      0, 0, 2, 1);
+    layout->addWidget(GoTermGroup,        2, 0, 1, 1);
+    layout->addWidget(SearchWindowGroup,  3, 0, 1, 1);
     layout->addWidget(VisualizationGroup, 0, 1, 4, 3);
-    layout->addWidget(LegendGroup, 0, 4, 4, 3);
+    layout->addWidget(LegendGroup,        0, 4, 4, 3);
     this->setLayout(layout);
 }
 

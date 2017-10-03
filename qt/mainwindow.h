@@ -9,11 +9,6 @@ class MainWindow : public QWidget
 {
     Q_OBJECT
 
-private:
-    struct {
-        QLineEdit *filename;
-    } _treeForm;
-
 public:
     MainWindow(Database *db);
 
