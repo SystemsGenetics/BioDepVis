@@ -1,67 +1,35 @@
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QHeaderView>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QSignalMapper>
-#include <QTableWidget>
-#include <QVBoxLayout>
-#include <QScrollArea>
 #include "mainwindow.h"
 #include "visualizer.h"
 
 MainWindow::MainWindow(Database *db)
 {
+    this->_db = db;
+
     QGridLayout *layout = new QGridLayout;
 
-    // Ontology Window
-    QGroupBox *OntologyGroup = new QGroupBox("Ontology Window");
+    // search interface
+    QGroupBox *searchGroup = new QGroupBox("Search");
+    QGridLayout *searchLayout = new QGridLayout;
+    searchGroup->setLayout(searchLayout);
 
-    QLabel *resultsLabel = new QLabel("Selected Results");
-    QLabel *descriptionLabel = new QLabel("Description");
-    QWidget *resultsContent = new QWidget();
+    QLabel *geneListLabel = new QLabel("Genes");
+    this->_gene_list = new QListWidget();
 
-    QWidget *descriptionContent = new QWidget();
+    QLabel *geneDescLabel = new QLabel("Description");
+    this->_gene_desc = new QLabel();
+    QScrollArea *geneDescScrollArea = new QScrollArea();
+    geneDescScrollArea->setWidget(this->_gene_desc);
 
-    QScrollArea *resultsScrollArea = new QScrollArea();
-    resultsScrollArea->setWidget(resultsContent);
+    QLabel *goTermListLabel = new QLabel("Ontology Terms");
+    this->_go_term_list = new QListWidget();
 
-    QScrollArea *descriptionScrollArea = new QScrollArea();
-    descriptionScrollArea->setWidget(descriptionContent);
+    QLabel *goTermDescLabel = new QLabel("Description");
+    this->_go_term_desc = new QLabel();
+    QScrollArea *goTermDescScrollArea = new QScrollArea();
+    goTermDescScrollArea->setWidget(this->_go_term_desc);
 
-    QGridLayout *OntologyLayout = new QGridLayout;
-    OntologyLayout->addWidget(resultsLabel, 0, 0);
-    OntologyLayout->addWidget(resultsScrollArea,1,0);
-    OntologyLayout->addWidget(descriptionLabel,2,0);
-    OntologyLayout->addWidget(descriptionScrollArea,3,0);
-    OntologyGroup->setLayout(OntologyLayout);
-
-    // Go Term List
-    QGroupBox *GoTermGroup = new QGroupBox("Go Term List");
-
-    QWidget *termsContent = new QWidget();
-
-    QWidget *termDescriptionContent = new QWidget();
-
-    QScrollArea *termsScrollArea = new QScrollArea();
-    termsScrollArea->setWidget(termsContent);
-
-    QScrollArea *termDescriptionScrollArea = new QScrollArea();
-    termDescriptionScrollArea->setWidget(termDescriptionContent);
-
-    QGridLayout *GoTermLayout = new QGridLayout;
-    GoTermLayout->addWidget(termsScrollArea,1,0);
-    GoTermLayout->addWidget(termDescriptionScrollArea,2,0);
-    GoTermGroup->setLayout(GoTermLayout);
-
-    // Search Window
-    QGroupBox *SearchWindowGroup = new QGroupBox("Search Window");
     QLabel *searchTermLabel = new QLabel("Search Term");
-
-    QWidget *searchTermsContent = new QWidget();
-    QScrollArea *searchTermsScrollArea = new QScrollArea();
-    searchTermsScrollArea->setWidget(searchTermsContent);
+    this->_search = new QLineEdit();
 
     QPushButton *searchButton = new QPushButton("Search");
     connect(searchButton, SIGNAL(clicked()), this, SLOT(search()));
@@ -69,25 +37,32 @@ MainWindow::MainWindow(Database *db)
     QPushButton *clearButton = new QPushButton("Clear");
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
 
-    QGridLayout *SearchWindowLayout = new QGridLayout;
-    SearchWindowLayout->addWidget(searchTermLabel, 0, 0);
-    SearchWindowLayout->addWidget(searchTermsScrollArea,1,0);
-    SearchWindowLayout->addWidget(searchButton,2,0);
-    SearchWindowLayout->addWidget(clearButton,3,0);
-    SearchWindowGroup->setLayout(SearchWindowLayout);
+    searchLayout->addWidget(geneListLabel,         0, 0, 1, 1);
+    searchLayout->addWidget(this->_gene_list,      1, 0, 1, 1);
+    searchLayout->addWidget(geneDescLabel,         2, 0, 1, 1);
+    searchLayout->addWidget(geneDescScrollArea,    3, 0, 1, 1);
+    searchLayout->addWidget(goTermListLabel,       4, 0, 1, 1);
+    searchLayout->addWidget(this->_go_term_list,   5, 0, 1, 1);
+    searchLayout->addWidget(goTermDescLabel,       6, 0, 1, 1);
+    searchLayout->addWidget(goTermDescScrollArea,  7, 0, 1, 1);
+    searchLayout->addWidget(searchTermLabel,       8, 0, 1, 1);
+    searchLayout->addWidget(this->_search,         9, 0, 1, 1);
+    searchLayout->addWidget(searchButton,         10, 0, 1, 1);
+    searchLayout->addWidget(clearButton,          11, 0, 1, 1);
 
-    // Visualization
-    QGroupBox *VisualizationGroup = new QGroupBox;
+    // visualizer
+    QGroupBox *visGroup = new QGroupBox("Visualizer");
+    QVBoxLayout *visLayout = new QVBoxLayout;
+    visGroup->setLayout(visLayout);
 
     Visualizer *visualizer = new Visualizer(db);
 
-    QVBoxLayout *VisualizationLayout = new QVBoxLayout;
-    VisualizationLayout->addWidget(visualizer);
-    VisualizationGroup->setLayout(VisualizationLayout);
+    visLayout->addWidget(visualizer);
 
-    // Legend
-    QGroupBox *LegendGroup = new QGroupBox("Controls");
-    QVBoxLayout *LegendLayout = new QVBoxLayout;
+    // keyboard legend
+    QGroupBox *legendGroup = new QGroupBox("Controls");
+    QVBoxLayout *legendLayout = new QVBoxLayout;
+    legendGroup->setLayout(legendLayout);
 
     QStringList controlHeaders {
         "Key",
@@ -119,30 +94,57 @@ MainWindow::MainWindow(Database *db)
         controlTable->setItem(i, 1, new QTableWidgetItem(ctrl.second));
     }
 
-    LegendLayout->addWidget(controlTable, 0, 0);
-    LegendGroup->setLayout(LegendLayout);
+    legendLayout->addWidget(controlTable, 0, 0);
 
-    // Add Groups to Layout
+    // add groups to layout
     layout->setColumnStretch(0, 1);
-    layout->setColumnStretch(1, 2);
-    layout->setColumnStretch(2, 2);
-    layout->addWidget(OntologyGroup,      0, 0, 2, 1);
-    layout->addWidget(GoTermGroup,        2, 0, 1, 1);
-    layout->addWidget(SearchWindowGroup,  3, 0, 1, 1);
-    layout->addWidget(VisualizationGroup, 0, 1, 4, 3);
-    layout->addWidget(LegendGroup,        0, 4, 4, 3);
+    layout->setColumnStretch(1, 3);
+    layout->setColumnStretch(2, 1);
+    layout->addWidget(searchGroup, 0, 0);
+    layout->addWidget(visGroup,    0, 1);
+    layout->addWidget(legendGroup, 0, 2);
     this->setLayout(layout);
 }
 
-bool MainWindow::search()
+void MainWindow::search()
 {
-    // TODO: stub
+    QString term = this->_search->text();
 
-    return true;
+    this->_genes.clear();
+
+    for ( const ont_term_t& ont : this->_db->ontology().values() ) {
+        if ( ont.def.contains(term) ) {
+            this->_genes.append(ont.connected_nodes);
+        }
+    }
+
+    this->update_gui();
 }
-bool MainWindow::clear()
-{
-    // TODO: stub
 
-    return true;
+void MainWindow::clear()
+{
+    this->_genes.clear();
+
+    this->update_gui();
+}
+
+void MainWindow::update_gui()
+{
+    // update gene list
+    this->_gene_list->clear();
+
+    for ( const node_ref_t& ref : this->_genes ) {
+        const graph_node_t& node = this->_db->graphs()[ref.graph_id]->nodes()[ref.node_id];
+
+        this->_gene_list->addItem(node.name);
+    }
+
+    // update gene description
+    // TODO
+
+    // update ontology term list
+    // TODO
+
+    // update ontology term description
+    // TODO
 }

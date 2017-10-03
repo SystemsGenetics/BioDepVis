@@ -86,11 +86,11 @@ void Database::load_ontology(const QString& filename)
     qInfo() << "Loading ontology terms...";
 
     QTextStream in(&file);
+    ont_term_t ont;
 
     while ( !in.atEnd() ) {
         QStringList list = in.readLine().split(" ");
 
-        ont_term_t ont;
         if ( list[0] == "id:" ) {
             ont.id = list[1];
         }
@@ -102,7 +102,7 @@ void Database::load_ontology(const QString& filename)
             list.removeFirst();
             ont.def = list.join(" ");
 
-            this->_ontology[ont.id] = ont;
+            this->_ontology.insert(ont.id, ont);
         }
     }
 
@@ -115,11 +115,13 @@ void Database::load_ontology(const QString& filename)
                 ont_term_t& ont = this->_ontology[term];
 
                 ont.connected_nodes.push_back(node_ref_t {
-                    g->id() - 1, i
+                    g->id(), i
                 });
             }
         }
     }
+
+    qInfo() << "Loaded" << this->_ontology.values().size() << "terms.";
 }
 
 void Database::print() const
