@@ -162,7 +162,7 @@ void init(const char * f_in)
 		Vector3d(0, 1, 0));
 
 	// grey background for window
-	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glShadeModel(GL_SMOOTH);
 	glDepthRange(0.0, 1.0);
 
