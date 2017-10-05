@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "visualizer.h"
+#include "glwidget.h"
 
 MainWindow::MainWindow(Database *db)
 {
@@ -55,9 +55,9 @@ MainWindow::MainWindow(Database *db)
     QVBoxLayout *visLayout = new QVBoxLayout;
     visGroup->setLayout(visLayout);
 
-    Visualizer *visualizer = new Visualizer(db);
+    GLWidget *glWidget = new GLWidget(this->_db->graphs().values()[0]);
 
-    visLayout->addWidget(visualizer);
+    visLayout->addWidget(glWidget);
 
     // keyboard legend
     QGroupBox *legendGroup = new QGroupBox("Controls");

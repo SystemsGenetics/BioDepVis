@@ -60,9 +60,10 @@ Graph::Graph(
     this->_coords.reserve(this->_nodes.size());
 
     for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        // TODO: get w and h to work with visualizer
         this->_coords.push_back({
-            x - w/2 + qrand() % w,
-            y - w/2 + qrand() % h,
+            x - 0.5f + float(qrand()) / RAND_MAX,
+            y - 0.5f + float(qrand()) / RAND_MAX,
             z
         });
     }

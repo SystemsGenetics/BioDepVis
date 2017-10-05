@@ -4,7 +4,12 @@
 #include <QString>
 #include <QVector>
 #include "matrix.h"
-#include "vector.h"
+
+typedef struct {
+	float x;
+	float y;
+	float z;
+} vec3_t;
 
 typedef struct {
     float dx;
