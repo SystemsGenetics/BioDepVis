@@ -55,7 +55,7 @@ MainWindow::MainWindow(Database *db)
     QVBoxLayout *visLayout = new QVBoxLayout;
     visGroup->setLayout(visLayout);
 
-    GLWidget *glWidget = new GLWidget(this->_db->graphs().values()[0]);
+    GLWidget *glWidget = new GLWidget(this->_db);
 
     visLayout->addWidget(glWidget);
 

@@ -1,13 +1,11 @@
-#include "glwidget.h"
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
-#include <QCoreApplication>
-#include <math.h>
+#include "glwidget.h"
 
-GLWidget::GLWidget(Graph *g, QWidget *parent)
+GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _rot(0, 0, 0),
-      _graph(g),
+      _db(db),
       _program(0)
 {
 }
@@ -15,9 +13,15 @@ GLWidget::GLWidget(Graph *g, QWidget *parent)
 GLWidget::~GLWidget()
 {
     makeCurrent();
-    _vbo.destroy();
+
+    for ( GraphObject *obj : _graphs ) {
+        obj->vbo.destroy();
+        delete obj;
+    }
+
     delete _program;
     _program = 0;
+
     doneCurrent();
 }
 
@@ -70,6 +74,7 @@ void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     glClearColor(1, 1, 1, 0);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     _program = new QOpenGLShaderProgram;
     _program->addShaderFromSourceCode(QOpenGLShader::Vertex, VERTEX_SHADER_SOURCE);
@@ -80,19 +85,27 @@ void GLWidget::initializeGL()
     _program->bind();
     _ref_mvp_matrix = _program->uniformLocation("mvpMatrix");
 
-    // initialize vertex array object
-    _vao.create();
-    QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
+    // initialize scene object for each graph
+    for ( Graph *g : _db->graphs().values() ) {
+        GraphObject *obj = new GraphObject();
+        obj->g = g;
 
-    // initialize vertex buffer object for logo
-    _vbo.create();
-    _vbo.bind();
-    _vbo.allocate(_graph->coords().data(), _graph->coords().size() * sizeof(vec3_t));
+        // initialize vertex array object
+        obj->vao.create();
 
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    _vbo.release();
+        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
+
+        // initialize buffer for node positions
+        obj->vbo.create();
+        obj->vbo.bind();
+        obj->vbo.allocate(g->coords().data(), g->coords().size() * sizeof(vec3_t));
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        obj->vbo.release();
+
+        _graphs.push_back(obj);
+    }
 
     // initialize view matrix (camera)
     _view.setToIdentity();
@@ -113,13 +126,21 @@ void GLWidget::paintGL()
     _model.rotate(_rot.y() / 16.0f, 0, 1, 0);
     _model.rotate(_rot.z() / 16.0f, 0, 0, 1);
 
-    // set model, view, projection, normal matrices in shader program
-    QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
-    _program->bind();
-    _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
+    // draw each graph
+    for ( GraphObject *obj : _graphs ) {
+        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
 
-    // draw nodes
-    glDrawArrays(GL_POINTS, 0, _graph->coords().size());
+        // set MVP matrix in shader program
+        _program->bind();
+        _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
+
+        // draw nodes
+        glDrawArrays(GL_POINTS, 0, obj->g->coords().size());
+
+        // TODO: draw edges
+        // glLineWidth(0.001f);
+        // glDrawElements(GL_LINES, obj->g->edges().size() * sizeof(graph_edge_t), GL_UNSIGNED_INT, obj->g->edges().data());
+    }
 
     _program->release();
 }

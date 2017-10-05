@@ -6,16 +6,22 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLWidget>
 #include <QOpenGLVertexArrayObject>
-#include "graph.h"
+#include "database.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
+
+typedef struct {
+    Graph *g;
+    QOpenGLVertexArrayObject vao;
+    QOpenGLBuffer vbo;
+} GraphObject;
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
 public:
-    GLWidget(Graph *g, QWidget *parent = Q_NULLPTR);
+    GLWidget(Database *db, QWidget *parent = Q_NULLPTR);
     ~GLWidget();
 
 public slots:
@@ -33,9 +39,8 @@ protected:
 private:
     QVector3D _rot;
     QPoint _prev_pos;
-    Graph *_graph;
-    QOpenGLVertexArrayObject _vao;
-    QOpenGLBuffer _vbo;
+    Database *_db;
+    QVector<GraphObject *> _graphs;
     QOpenGLShaderProgram *_program;
     int _ref_mvp_matrix;
     int _ref_normal_matrix;

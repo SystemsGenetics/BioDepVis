@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <QHash>
+#include <QMap>
 #include "alignment.h"
 
 typedef struct {
@@ -18,14 +19,14 @@ typedef struct {
 
 class Database {
 private:
-    QHash<int, Graph *> _graphs;
+    QMap<int, Graph *> _graphs;
     QVector<Alignment *> _alignments;
     QHash<QString, ont_term_t> _ontology;
 
 public:
     Database() {};
 
-    QHash<int, Graph *>& graphs() { return this->_graphs; }
+    QMap<int, Graph *>& graphs() { return this->_graphs; }
     QVector<Alignment *>& alignments() { return this->_alignments; }
     QHash<QString, ont_term_t> ontology() { return this->_ontology; }
 
