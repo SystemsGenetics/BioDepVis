@@ -44,7 +44,7 @@ Graph::Graph(
     const QString& nodefile,
     const QString& edgefile,
     const QString& ontfile,
-    float x, float y, float z, int w, int h)
+    float x, float y, float z, float w, float h)
 {
     this->_id = id;
     this->_name = name;
@@ -60,10 +60,9 @@ Graph::Graph(
     this->_coords.reserve(this->_nodes.size());
 
     for ( int i = 0; i < this->_nodes.size(); i++ ) {
-        // TODO: get w and h to work with visualizer
         this->_coords.push_back({
-            x - 0.5f + float(qrand()) / RAND_MAX,
-            y - 0.5f + float(qrand()) / RAND_MAX,
+            x - w / 2 + w * qrand() / RAND_MAX,
+            y - h / 2 + h * qrand() / RAND_MAX,
             z
         });
     }

@@ -42,8 +42,8 @@ private:
     int _id;
     QString _name;
     vec3_t _center;
-    int _width;
-    int _height;
+    float _width;
+    float _height;
 
     QVector<graph_node_t> _nodes;
     QVector<vec3_t> _coords;
@@ -58,7 +58,7 @@ public:
         const QString& nodefile,
         const QString& edgefile,
         const QString& ontfile,
-        float x, float y, float z, int w, int h
+        float x, float y, float z, float w, float h
     );
     Graph() {};
     ~Graph() {};

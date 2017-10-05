@@ -35,11 +35,11 @@ void Database::load_config(const QString& filename)
             obj["clusterLocation"].toString(),
             obj["fileLocation"].toString(),
             obj["Ontology"].toString(),
-            obj["x"].toInt(),
-            obj["y"].toInt(),
-            obj["z"].toInt(),
-            obj["w"].toInt(),
-            obj["h"].toInt()
+            obj["x"].toDouble(),
+            obj["y"].toDouble(),
+            obj["z"].toDouble(),
+            obj["w"].toDouble(),
+            obj["h"].toDouble()
         );
 
         this->_graphs.insert(g->id(), g);
