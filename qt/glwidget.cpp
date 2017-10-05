@@ -56,7 +56,7 @@ static const char *VERTEX_SHADER_SOURCE =
     "uniform mat4 mvpMatrix;\n"
     "void main() {\n"
     "   gl_Position = mvpMatrix * position;\n"
-    "   gl_PointSize = 10.0;\n"
+    "   gl_PointSize = 5.0;\n"
     "}\n";
 
 static const char *FRAGMENT_SHADER_SOURCE =
@@ -96,7 +96,7 @@ void GLWidget::initializeGL()
 
     // initialize view matrix (camera)
     _view.setToIdentity();
-    _view.translate(0, 0, -1);
+    _view.translate(0, 0, -400);
 
     _program->release();
 }
@@ -118,7 +118,7 @@ void GLWidget::paintGL()
     _program->bind();
     _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
 
-    // draw vertices
+    // draw nodes
     glDrawArrays(GL_POINTS, 0, _graph->coords().size());
 
     _program->release();
@@ -128,7 +128,7 @@ void GLWidget::resizeGL(int w, int h)
 {
     // update projection matrix
     _proj.setToIdentity();
-    _proj.perspective(45.0f, float(w) / h, 0.01f, 100.0f);
+    _proj.perspective(60.0f, float(w) / h, 0.0001f, 1000.0f);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
