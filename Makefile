@@ -17,36 +17,39 @@ ifeq "$(PLATFORM)" "Linux"
 	LIBS = -lGL -lGLU -lglut $(GLUILIB) -lglui
 endif
 
-BINS = biodep-vis
+OBJDIR = obj
 OBJS = \
-	alignment.o \
-	Camera.o \
-	cuda_code.o \
-	events.o \
-	graph.o \
-	jsoncpp.o \
-	lodepng.o \
-	main.o \
-	Matrix.o \
-	miscgl.o \
-	Ont.o \
-	parse.o \
-	texture.o \
-	util.o \
-	Utility.o \
-	Vector.o
+	$(OBJDIR)/alignment.o \
+	$(OBJDIR)/Camera.o \
+	$(OBJDIR)/cuda_code.o \
+	$(OBJDIR)/events.o \
+	$(OBJDIR)/graph.o \
+	$(OBJDIR)/jsoncpp.o \
+	$(OBJDIR)/lodepng.o \
+	$(OBJDIR)/main.o \
+	$(OBJDIR)/Matrix.o \
+	$(OBJDIR)/miscgl.o \
+	$(OBJDIR)/Ont.o \
+	$(OBJDIR)/parse.o \
+	$(OBJDIR)/texture.o \
+	$(OBJDIR)/util.o \
+	$(OBJDIR)/Utility.o \
+	$(OBJDIR)/Vector.o
+BINS = biodep-vis
 
 all: $(BINS)
-	rm *.o
 
-%.o: $(SRC)/%.cpp
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.o: $(SRC)/%.cpp | $(OBJDIR)
 	$(NVCC) -c $(GLUIINC) -std=c++11 -o $@ $<
 
-%.o: $(SRC)/%.cu
+$(OBJDIR)/%.o: $(SRC)/%.cu | $(OBJDIR)
 	$(NVCC) -c $(GLUIINC) -std=c++11 -o $@ $<
 
 biodep-vis: $(OBJS)
 	$(NVCC) -o $@ $^ $(LIBS)
 
 clean:
-	rm -rf *.o $(BINS)
+	rm -rf $(OBJDIR) $(BINS)
