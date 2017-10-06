@@ -1,10 +1,15 @@
-#include "mainwindow.h"
 #include "glwidget.h"
+#include "mainwindow.h"
 
 MainWindow::MainWindow(Database *db)
 {
     this->_db = db;
 
+    create_gui();
+}
+
+void MainWindow::create_gui()
+{
     QGridLayout *layout = new QGridLayout;
 
     // search interface
@@ -99,28 +104,6 @@ MainWindow::MainWindow(Database *db)
     this->setLayout(layout);
 }
 
-void MainWindow::search()
-{
-    QString term = this->_search->text();
-
-    this->_genes.clear();
-
-    for ( const ont_term_t& ont : this->_db->ontology().values() ) {
-        if ( ont.def.contains(term) ) {
-            this->_genes.append(ont.connected_nodes);
-        }
-    }
-
-    this->update_gui();
-}
-
-void MainWindow::clear()
-{
-    this->_genes.clear();
-
-    this->update_gui();
-}
-
 void MainWindow::update_gui()
 {
     // update gene list
@@ -140,4 +123,26 @@ void MainWindow::update_gui()
 
     // update ontology term description
     // TODO
+}
+
+void MainWindow::search()
+{
+    QString term = _search->text();
+
+    _genes.clear();
+
+    for ( const ont_term_t& ont : _db->ontology().values() ) {
+        if ( ont.def.contains(term) ) {
+            _genes.append(ont.connected_nodes);
+        }
+    }
+
+    update_gui();
+}
+
+void MainWindow::clear()
+{
+    _genes.clear();
+
+    update_gui();
 }

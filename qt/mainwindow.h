@@ -26,6 +26,7 @@ public slots:
     void clear();
 
 private:
+    void create_gui();
     void update_gui();
 };
 #endif // MAINWINDOW_H
