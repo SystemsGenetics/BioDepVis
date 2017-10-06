@@ -104,30 +104,16 @@ To stop recording, enter `Ctrl-C` and an FLV file will be saved.
 
 ## Keyboard Commands
 
-Space - Force Directed Layout
-
-Q - Zoom Out
-
-W - Rotate on y axis
-
-E - Zoom In
-
-R - Reset View
-
-U,A,J - Pan Down View
-
-O - Pan Down View (slow)
-
-I - Pan Left View
-
-S,K - Pan Right View
-
-D - Rotate on X axis and zoom out
-
-L - Pan Up View
-
-X - Show only selected nodes
-
-V - change Edge Design (curved to 2D)
-
-, - Show node type
+- `R`: Reset view
+- `I/K`: Pan up/down
+- `J/L`: Pan left/right
+- `W/S`: Rotate up/down
+- `A/D`: Rotate left/right
+- `Q/E`: Zoom
+- `G`: Toggle GPU
+- `Space`: Toggle Force Directed Layout
+- `V`: Toggle alignment (curved/2D)
+- `,`: Toggle module coloring
+- `T`: Toggle search area
+- `Z`: Toggle "back graph" mode
+- `X`: Toggle ROI mode

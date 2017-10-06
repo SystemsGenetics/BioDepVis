@@ -40,7 +40,7 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 	case ',':
 		cluster = !cluster;
 		break;
-	case 'v':
+	case 'v': case 'V':
 		showalignment = !showalignment;
 		break;
 	case 'w': case 'W':
@@ -61,23 +61,17 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 	case 'e': case 'E':
 		camera->Pos.z -= SHIFT;
 		break;
-	case 'i': case 'I':
-		camera->Aim.x += SHIFT;
-		break;
-	case 'k': case 'K':
+	case 'j': case 'J':
 		camera->Aim.x -= SHIFT;
 		break;
-	case 'j': case 'J':
+	case 'l': case 'L':
+		camera->Aim.x += SHIFT;
+		break;
+	case 'i': case 'I':
 		camera->Aim.y += SHIFT;
 		break;
-	case 'l': case 'L':
+	case 'k': case 'K':
 		camera->Aim.y -= SHIFT;
-		break;
-	case 'u': case 'U':
-		camera->Aim.z += SHIFT;
-		break;
-	case 'o': case 'O':
-		camera->Aim.z -= SHIFT;
 		break;
 	case 't': case 'T':
 		searchArea = !searchArea;
@@ -112,10 +106,10 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 	case '-':
 		searchRadius=-10;
 		break;
-	case 'x':
+	case 'x': case 'X':
 		roiMODE=!roiMODE;
 		break;
-	case 'X':
+	case 'z': case 'Z':
 		backGraphMode=!backGraphMode;
 		break;
 	case 27:
