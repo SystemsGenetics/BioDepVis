@@ -1,3 +1,4 @@
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 #include "glwidget.h"
@@ -5,9 +6,11 @@
 GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _rot(0, 0, 0),
+      _zoom(0),
       _db(db),
       _program(0)
 {
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 GLWidget::~GLWidget()
@@ -107,10 +110,6 @@ void GLWidget::initializeGL()
         _graphs.push_back(obj);
     }
 
-    // initialize view matrix (camera)
-    _view.setToIdentity();
-    _view.translate(0, 0, -400);
-
     _program->release();
 }
 
@@ -120,11 +119,23 @@ void GLWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    // update model matrix
+    // compute model matrix
     _model.setToIdentity();
     _model.rotate(_rot.x() / 16.0f, 1, 0, 0);
     _model.rotate(_rot.y() / 16.0f, 0, 1, 0);
     _model.rotate(_rot.z() / 16.0f, 0, 0, 1);
+
+    // compute view matrix (camera)
+    _view.setToIdentity();
+    _view.translate(0, 0, -400);
+
+    // compute projection matrix
+    _proj.setToIdentity();
+    _proj.perspective(
+        qMin(qMax(1.0f, 45.0f + _zoom), 270.0f),
+        float(width()) / height(),
+        0.0001f, 1000.0f
+    );
 
     // draw each graph
     for ( GraphObject *obj : _graphs ) {
@@ -145,16 +156,25 @@ void GLWidget::paintGL()
     _program->release();
 }
 
-void GLWidget::resizeGL(int w, int h)
+void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    // update projection matrix
-    _proj.setToIdentity();
-    _proj.perspective(60.0f, float(w) / h, 0.0001f, 1000.0f);
+    switch ( event->key() ) {
+    case Qt::Key_Q:
+        _zoom += 1.0f;
+        break;
+    case Qt::Key_E:
+        _zoom -= 1.0f;
+        break;
+    }
+
+    update();
+    QOpenGLWidget::keyPressEvent(event);
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     _prev_pos = event->pos();
+    QOpenGLWidget::mousePressEvent(event);
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -171,4 +191,5 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         setZRotation(_rot.z() + 8 * dx);
     }
     _prev_pos = event->pos();
+    QOpenGLWidget::mousePressEvent(event);
 }

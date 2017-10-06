@@ -32,12 +32,13 @@ public slots:
 protected:
     void initializeGL() override;
     void paintGL() override;
-    void resizeGL(int width, int height) override;
+    void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
     QVector3D _rot;
+    float _zoom;
     QPoint _prev_pos;
     Database *_db;
     QVector<GraphObject *> _graphs;
