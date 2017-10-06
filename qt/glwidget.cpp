@@ -1,6 +1,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
+#include <QWheelEvent>
 #include "glwidget.h"
 
 static const char *VERTEX_SHADER_SOURCE =
@@ -70,6 +71,11 @@ void GLWidget::setRotZ(int angle)
     _rot.setZ(angle);
 }
 
+void GLWidget::setZoom(float zoom)
+{
+    _zoom = qMin(qMax(1.0f, zoom), 180.0f);
+}
+
 void GLWidget::init_camera()
 {
     // initialize rotation angle
@@ -78,7 +84,7 @@ void GLWidget::init_camera()
     _rot.setZ(0);
 
     // initialize zoom
-    _zoom = 0;
+    _zoom = 45.0f;
 
     // initialize view matrix (camera)
     _view.setToIdentity();
@@ -143,7 +149,7 @@ void GLWidget::paintGL()
     // compute projection matrix
     _proj.setToIdentity();
     _proj.perspective(
-        qMin(qMax(1.0f, 45.0f + _zoom), 270.0f),
+        _zoom,
         float(width()) / height(),
         0.0001f, 1000.0f
     );
@@ -171,6 +177,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     const float SHIFT_ROT = 16;
     const float SHIFT_TRANS = 10;
+    const float SHIFT_ZOOM = 1;
 
     switch ( event->key() ) {
     case Qt::Key_R:
@@ -201,10 +208,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         setRotY(_rot.y() - SHIFT_ROT);
         break;
     case Qt::Key_Q:
-        _zoom += 1.0f;
+        setZoom(_zoom + SHIFT_ZOOM);
         break;
     case Qt::Key_E:
-        _zoom -= 1.0f;
+        setZoom(_zoom - SHIFT_ZOOM);
         break;
     }
 
@@ -215,7 +222,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     _prev_pos = event->pos();
-    QOpenGLWidget::mousePressEvent(event);
+    event->accept();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -226,13 +233,29 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if ( event->buttons() & Qt::LeftButton ) {
         setRotX(_rot.x() + 8 * dy);
         setRotY(_rot.y() + 8 * dx);
-        update();
     }
     else if ( event->buttons() & Qt::RightButton ) {
         setRotX(_rot.x() + 8 * dy);
         setRotZ(_rot.z() + 8 * dx);
-        update();
     }
     _prev_pos = event->pos();
-    QOpenGLWidget::mousePressEvent(event);
+
+    update();
+    event->accept();
+}
+
+void GLWidget::wheelEvent(QWheelEvent *event)
+{
+    QPoint pixels = event->pixelDelta();
+    QPoint degrees = event->angleDelta();
+
+    if ( !pixels.isNull() ) {
+        setZoom(_zoom - pixels.y() / 10.0f);
+    }
+    else if ( !degrees.isNull() ) {
+        setZoom(_zoom - degrees.y() / 10.0f);
+    }
+
+    update();
+    event->accept();
 }

@@ -28,6 +28,7 @@ public slots:
     void setRotX(int angle);
     void setRotY(int angle);
     void setRotZ(int angle);
+    void setZoom(float zoom);
 
 protected:
     void init_camera();
@@ -36,6 +37,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private:
     QVector3D _rot;
