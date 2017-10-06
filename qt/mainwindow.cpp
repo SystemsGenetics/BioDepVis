@@ -61,13 +61,8 @@ MainWindow::MainWindow(Database *db)
 
     // keyboard legend
     QGroupBox *legendGroup = new QGroupBox("Controls");
-    QVBoxLayout *legendLayout = new QVBoxLayout;
+    QGridLayout *legendLayout = new QGridLayout;
     legendGroup->setLayout(legendLayout);
-
-    QStringList controlHeaders {
-        "Key",
-        "Action"
-    };
 
     QVector<QPair<QString, QString>> controls {
         { "R", "Reset View" },
@@ -82,19 +77,17 @@ MainWindow::MainWindow(Database *db)
         { "J/L", "Pan Up/Down" }
     };
 
-    QTableWidget *controlTable = new QTableWidget(controls.size(), 2);
-    controlTable->setHorizontalHeaderLabels(controlHeaders);
-    controlTable->horizontalHeader()->setStretchLastSection(true);
-    controlTable->verticalHeader()->setVisible(false);
+    legendLayout->setColumnStretch(0, 1);
+    legendLayout->setColumnStretch(1, 3);
 
     for ( int i = 0; i < controls.size(); i++ ) {
         auto& ctrl = controls[i];
 
-        controlTable->setItem(i, 0, new QTableWidgetItem(ctrl.first));
-        controlTable->setItem(i, 1, new QTableWidgetItem(ctrl.second));
+        QLabel *label1 = new QLabel(ctrl.first);
+        QLabel *label2 = new QLabel(ctrl.second);
+        legendLayout->addWidget(label1, i, 0, 1, 1);
+        legendLayout->addWidget(label2, i, 1, 1, 1);
     }
-
-    legendLayout->addWidget(controlTable, 0, 0);
 
     // add groups to layout
     layout->setColumnStretch(0, 1);
