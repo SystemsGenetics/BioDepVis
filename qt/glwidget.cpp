@@ -4,20 +4,33 @@
 #include <QWheelEvent>
 #include "glwidget.h"
 
+const QColor GRAPH_EDGE_COLORS[] = {
+    { 166, 206, 227, 96 },
+    { 126, 127, 200, 96 },
+    { 106,  61, 154, 96 },
+    {  31, 120, 180, 96 },
+    { 178, 223, 138, 96 },
+    { 255, 127,   0, 96 }
+};
+
 static const char *VERTEX_SHADER_SOURCE =
     "#version 150\n"
     "in vec4 position;\n"
     "uniform mat4 mvpMatrix;\n"
+    "uniform vec4 color;\n"
+    "out vec4 frag_color;\n"
     "void main() {\n"
     "   gl_Position = mvpMatrix * position;\n"
-    "   gl_PointSize = 5.0;\n"
+    "   gl_PointSize = 3.0;\n"
+    "   frag_color = color;\n"
     "}\n";
 
 static const char *FRAGMENT_SHADER_SOURCE =
     "#version 150\n"
+    "in highp vec4 frag_color;\n"
     "out highp vec4 out_color;\n"
     "void main() {\n"
-    "   out_color = vec4(0.0, 0.0, 0.0, 1.0);\n"
+    "   out_color = frag_color;\n"
     "}\n";
 
 GLWidget::GLWidget(Database *db, QWidget *parent)
@@ -73,7 +86,7 @@ void GLWidget::init_camera()
     _rot.setZ(0);
 
     // initialize zoom
-    _zoom = 45.0f;
+    _zoom = 60.0f;
 
     // initialize view matrix (camera)
     _view.setToIdentity();
@@ -94,11 +107,14 @@ void GLWidget::initializeGL()
 
     _program->bind();
     _ref_mvp_matrix = _program->uniformLocation("mvpMatrix");
+    _ref_color = _program->uniformLocation("color");
 
     // initialize scene object for each graph
-    for ( Graph *g : _db->graphs().values() ) {
+    for ( int i = 0; i < _db->graphs().size(); i++ ) {
+        Graph *g = _db->graphs().values()[i];
         GraphObject *obj = new GraphObject();
         obj->g = g;
+        obj->edge_color = GRAPH_EDGE_COLORS[i];
 
         // initialize vertex array object
         obj->vao.create();
@@ -126,8 +142,9 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
     glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     // compute model matrix
     _model.setToIdentity();
@@ -152,11 +169,15 @@ void GLWidget::paintGL()
         _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
 
         // draw nodes
+        _program->setUniformValue(_ref_color, QColor(0, 0, 0));
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         glDrawArrays(GL_POINTS, 0, obj->g->coords().size());
 
-        // TODO: draw edges
-        // glLineWidth(0.001f);
-        // glDrawElements(GL_LINES, obj->g->edges().size() * sizeof(graph_edge_t), GL_UNSIGNED_INT, obj->g->edges().data());
+        // draw edges
+        _program->setUniformValue(_ref_color, obj->edge_color);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glLineWidth(0.001f);
+        glDrawElements(GL_LINES, obj->g->edges().size(), GL_UNSIGNED_INT, obj->g->edges().data());
     }
 
     _program->release();

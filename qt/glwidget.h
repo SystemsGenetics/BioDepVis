@@ -12,6 +12,7 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 typedef struct {
     Graph *g;
+    QColor edge_color;
     QOpenGLVertexArrayObject vao;
     QOpenGLBuffer vbo;
 } GraphObject;
@@ -47,8 +48,7 @@ private:
     QVector<GraphObject *> _graphs;
     QOpenGLShaderProgram *_program;
     int _ref_mvp_matrix;
-    int _ref_normal_matrix;
-    int _ref_light_pos;
+    int _ref_color;
     QMatrix4x4 _model;
     QMatrix4x4 _view;
     QMatrix4x4 _proj;
