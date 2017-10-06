@@ -4,29 +4,22 @@
 #include <cuda.h>
 #include "graph.h"
 #include "alignment.h"
-#define MAX_DISPLACEMENT_SQUARED 2.0f
-// Kernel that executes on the CUDA device
 
+#define MAX_DISPLACEMENT_SQUARED 2.0f
 
 extern "C"
 cudaError_t gpuSetup(graph *g)
 {
   int graphsize = g->nodes;
-  printf("Graph Size :%d for GPU\n",graphsize);
+
   //Mallocing Edge Space
-  printf("Malloc Edge Matrix\n");
   cudaMalloc((void **)&(g->edgeMatrix_d),graphsize * graphsize * sizeof(float));
-  printf("Malloc Node Position\n");
   cudaMalloc((void**)&(g->coords_d), graphsize * sizeof(float) * 3 );
-  printf("Malloc Node Prop\n");
   cudaMalloc((void**)&(g->coinfo_d),graphsize * sizeof(float) * INFOCOUNT);
-  printf("Mem Cpy Node Position\n");
   cudaMemcpy(g->coords_d,g->coords,graphsize * sizeof(float) * 3, cudaMemcpyHostToDevice);
-  printf("Mem Cpy Node Prop\n");
   cudaMemcpy(g->coinfo_d, g->coinfo,graphsize * sizeof(float) * INFOCOUNT,cudaMemcpyHostToDevice);
-  printf("Mem Cpy Edge\n");
   cudaMemcpy(g->edgeMatrix_d,g->edgeMatrix,sizeof(float) * graphsize * graphsize, cudaMemcpyHostToDevice);
-  printf("Setup Complete \n");
+
   return cudaGetLastError();
 }
 
@@ -34,23 +27,20 @@ extern "C"
 cudaError_t gpuAlignSetup(Alignment *align)
 {
   //Mallocing Edge Space
-  printf("Malloc Align Edge Matrix\n");
   cudaMalloc((void **)&(align->edgeAlignMatrix_d),align->rows * align->cols * sizeof(float));
-  printf("Mem Cpy Edge Align\n");
   cudaMemcpy(align->edgeAlignMatrix_d,align->edgeAlignMatrix,sizeof(float) * align->rows * align->cols, cudaMemcpyHostToDevice);
-  printf("Setup Complete \n");
+
   return cudaGetLastError();
 }
 
 extern "C"
 cudaError_t gpuFree(graph *g)
 {
-    printf("Free Initiated\n");
     cudaFree(g->coords_d);
-cudaFree(g->coinfo_d);
-cudaFree(g->edgeMatrix_d);
-printf("Free Complete\n");
-return cudaGetLastError();
+    cudaFree(g->coinfo_d);
+    cudaFree(g->edgeMatrix_d);
+
+    return cudaGetLastError();
 }
 
 
@@ -58,7 +48,6 @@ __global__ void testforceDirectedKernel(int graphsize,float *nodePosition, float
 {
 int id = threadIdx.x + blockIdx.x *  blockDim.x;
 if(id < graphsize){
-//	printf("%d => %2.3f %2.3f %2.3f\n",id,nodePosition[id].x, nodePosition[id].y, nodePosition[id].z);
     nodePosition[id * 3 + 1] += 1.1f;
     }
 }
@@ -68,7 +57,6 @@ __global__ void forceDirectedKernel3d(int graphsize,float *nodePosition, float *
 {
 int id = threadIdx.x + blockIdx.x *  blockDim.x;
 if(id < graphsize){
-    //printf("%d => %2.3f %2.3f %2.3f\n",id,nodePosition[id].x, nodePosition[id].y, nodePosition[id].z);
     float K_r = 25.0f; //2
     float K_s = 15.0f; //1
     float L = 1.2f;
@@ -121,39 +109,12 @@ if(id < graphsize){
     }
   }
 }
-/*
-__global__ void forceDirectedKernel2d(int graphsize, float *nodePosition, float *nodeProperty, float *matrixEdge)
-{
-	int i = threadIdx.x + blockIdx.x *  blockDim.x;
-	int j;
-	if (i < graphsize)
-	{
-		for (j = 0; j < graphsize; j++)
-		{
-			float dx = nodePosition[j * 3 + 0] - nodePosition[i * 3 + 0];
-			float dy = nodePosition[j * 3 + 1] - nodePosition[i * 3 + 1];
-			float distance = sqrt(dx * dx + dy * dy);
-			if (distance != 0)
-			{
-				if ()
-				nodeProperty[i*INFOCOUNT + 0] = 
-
-
-
-
-			}
-
-		}
-
-	}
-}*/
 
 
 __global__ void forceDirectedKernel2d(int graphsize,float *nodePosition, float *nodeProperty, float *matrixEdge)
 {
 int id = threadIdx.x + blockIdx.x *  blockDim.x;
 if(id < graphsize){
-    //printf("%d => %2.3f %2.3f %2.3f\n",id,nodePosition[id].x, nodePosition[id].y, nodePosition[id].z);
     float K_r = 0.2; //2
     float K_s = 1.0   ; //1
     float L = 2.2;
@@ -173,8 +134,8 @@ if(id < graphsize){
                 float force =0.0f,force2=0.0f;
 
 
-                
-                
+
+
                 if(matrixEdge[i * graphsize + j] == 1.0f)
                 force2 =  K_s * (distance - L);
 				else
@@ -212,7 +173,6 @@ if(id < graphsize){
 extern "C"
 cudaError_t runForceDirectedGPU(graph *g)
 {
-//printf("running kernel\n");
 //testforceDirectedKernel<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
 forceDirectedKernel2d<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
 //cudaDeviceSynchronize();

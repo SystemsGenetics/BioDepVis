@@ -28,7 +28,6 @@ void print_usage()
 	);
 }
 
-//void readOntFile(std::unordered_map<std::string, ontStruct> *);
 int main(int argc, char **argv) {
 
 	optarg_t args = {
@@ -66,17 +65,6 @@ int main(int argc, char **argv) {
 
 	// set up opengl window
 	glutInit(&argc, argv);
-
-	//glewInit();
-	/*
-	if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
-		printf("Ready for GLSL\n");
-	else {
-		printf("Not totally ready :( \n");
-		getchar();
-		exit(1);
-	}
-	*/
 
 	// create the main window that shows the graphs and alignments
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -136,7 +124,6 @@ int main(int argc, char **argv) {
 	gotermList->set_w(220);
 	goDescription = new GLUI_TextBox(glui, true);
 	goDescription->set_text("GO TERM DESCRIPTION");
-	//goDescription->disable();
 	goDescription->set_w(420);
 	goDescription->set_h(80);
 
@@ -153,7 +140,6 @@ int main(int argc, char **argv) {
 
 
 	/* We register the idle callback with GLUI, *not* with GLUT */
-	//GLUI_Master.set_glutIdleFunc( myGlutIdle );
 	GLUI_Master.set_glutIdleFunc(idle);
 
 

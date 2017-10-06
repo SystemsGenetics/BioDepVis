@@ -21,7 +21,6 @@
 #include "Gl\glui.h"
 #else
 #include <GL/glui.h>
-//#include <GL/glew.h>
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
@@ -80,7 +79,6 @@ extern int persp_win;
 extern int WIDTH;
 extern int HEIGHT;
 
-// void printw(float x, float y, float z, char* format, GLvoid *, ...);
 extern "C"
 cudaError_t runForceDirectedGPU(graph *g);
 extern "C"
@@ -98,7 +96,6 @@ std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width,
 void loadTexture();
 void init(const char * f_in);
 void drawGraph(graph *g);
-void Test();
 void runForceDirected(graph *g);
 void runAlignmentLayout(Alignment * a);
 void drawAlignment(Alignment *align);
@@ -109,7 +106,6 @@ void printw(float x, float y, float z, char* format, GLvoid *fontStylePrint, ...
 void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int zs);
 void drawROIGraph();
 void drawGraphROIBack(graph *g);
-void drawPoints();
 void PerspDisplay();
 void idle();
 void cleanup();
