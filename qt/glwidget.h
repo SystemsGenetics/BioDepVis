@@ -25,11 +25,12 @@ public:
     ~GLWidget();
 
 public slots:
-    void setXRotation(int angle);
-    void setYRotation(int angle);
-    void setZRotation(int angle);
+    void setRotX(int angle);
+    void setRotY(int angle);
+    void setRotZ(int angle);
 
 protected:
+    void init_camera();
     void initializeGL() override;
     void paintGL() override;
     void keyPressEvent(QKeyEvent *event) override;

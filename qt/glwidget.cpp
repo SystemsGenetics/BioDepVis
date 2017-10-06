@@ -3,6 +3,22 @@
 #include <QOpenGLShaderProgram>
 #include "glwidget.h"
 
+static const char *VERTEX_SHADER_SOURCE =
+    "#version 150\n"
+    "in vec4 position;\n"
+    "uniform mat4 mvpMatrix;\n"
+    "void main() {\n"
+    "   gl_Position = mvpMatrix * position;\n"
+    "   gl_PointSize = 5.0;\n"
+    "}\n";
+
+static const char *FRAGMENT_SHADER_SOURCE =
+    "#version 150\n"
+    "out highp vec4 out_color;\n"
+    "void main() {\n"
+    "   out_color = vec4(0.0, 0.0, 0.0, 1.0);\n"
+    "}\n";
+
 GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _rot(0, 0, 0),
@@ -36,42 +52,38 @@ static void qNormalizeAngle(int &angle)
         angle -= 360 * 16;
 }
 
-void GLWidget::setXRotation(int angle)
+void GLWidget::setRotX(int angle)
 {
     qNormalizeAngle(angle);
     _rot.setX(angle);
-    update();
 }
 
-void GLWidget::setYRotation(int angle)
+void GLWidget::setRotY(int angle)
 {
     qNormalizeAngle(angle);
     _rot.setY(angle);
-    update();
 }
 
-void GLWidget::setZRotation(int angle)
+void GLWidget::setRotZ(int angle)
 {
     qNormalizeAngle(angle);
     _rot.setZ(angle);
-    update();
 }
 
-static const char *VERTEX_SHADER_SOURCE =
-    "#version 150\n"
-    "in vec4 position;\n"
-    "uniform mat4 mvpMatrix;\n"
-    "void main() {\n"
-    "   gl_Position = mvpMatrix * position;\n"
-    "   gl_PointSize = 5.0;\n"
-    "}\n";
+void GLWidget::init_camera()
+{
+    // initialize rotation angle
+    _rot.setX(0);
+    _rot.setY(0);
+    _rot.setZ(0);
 
-static const char *FRAGMENT_SHADER_SOURCE =
-    "#version 150\n"
-    "out highp vec4 out_color;\n"
-    "void main() {\n"
-    "   out_color = vec4(0.0, 0.0, 0.0, 1.0);\n"
-    "}\n";
+    // initialize zoom
+    _zoom = 0;
+
+    // initialize view matrix (camera)
+    _view.setToIdentity();
+    _view.translate(0, 0, -400);
+}
 
 void GLWidget::initializeGL()
 {
@@ -110,6 +122,9 @@ void GLWidget::initializeGL()
         _graphs.push_back(obj);
     }
 
+    // initialize camera
+    init_camera();
+
     _program->release();
 }
 
@@ -124,10 +139,6 @@ void GLWidget::paintGL()
     _model.rotate(_rot.x() / 16.0f, 1, 0, 0);
     _model.rotate(_rot.y() / 16.0f, 0, 1, 0);
     _model.rotate(_rot.z() / 16.0f, 0, 0, 1);
-
-    // compute view matrix (camera)
-    _view.setToIdentity();
-    _view.translate(0, 0, -400);
 
     // compute projection matrix
     _proj.setToIdentity();
@@ -158,7 +169,37 @@ void GLWidget::paintGL()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
+    const float SHIFT_ROT = 16;
+    const float SHIFT_TRANS = 10;
+
     switch ( event->key() ) {
+    case Qt::Key_R:
+        init_camera();
+        break;
+    case Qt::Key_I:
+        _view.translate(0, -SHIFT_TRANS, 0);
+        break;
+    case Qt::Key_K:
+        _view.translate(0, +SHIFT_TRANS, 0);
+        break;
+    case Qt::Key_J:
+        _view.translate(+SHIFT_TRANS, 0, 0);
+        break;
+    case Qt::Key_L:
+        _view.translate(-SHIFT_TRANS, 0, 0);
+        break;
+    case Qt::Key_W:
+        setRotX(_rot.x() + SHIFT_ROT);
+        break;
+    case Qt::Key_S:
+        setRotX(_rot.x() - SHIFT_ROT);
+        break;
+    case Qt::Key_A:
+        setRotY(_rot.y() + SHIFT_ROT);
+        break;
+    case Qt::Key_D:
+        setRotY(_rot.y() - SHIFT_ROT);
+        break;
     case Qt::Key_Q:
         _zoom += 1.0f;
         break;
@@ -183,12 +224,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int dy = event->y() - _prev_pos.y();
 
     if ( event->buttons() & Qt::LeftButton ) {
-        setXRotation(_rot.x() + 8 * dy);
-        setYRotation(_rot.y() + 8 * dx);
+        setRotX(_rot.x() + 8 * dy);
+        setRotY(_rot.y() + 8 * dx);
+        update();
     }
     else if ( event->buttons() & Qt::RightButton ) {
-        setXRotation(_rot.x() + 8 * dy);
-        setZRotation(_rot.z() + 8 * dx);
+        setRotX(_rot.x() + 8 * dy);
+        setRotZ(_rot.z() + 8 * dx);
+        update();
     }
     _prev_pos = event->pos();
     QOpenGLWidget::mousePressEvent(event);

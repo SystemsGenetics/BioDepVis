@@ -66,15 +66,15 @@ MainWindow::MainWindow(Database *db)
 
     QVector<QPair<QString, QString>> controls {
         { "R", "Reset View" },
+        { "I/K", "Pan Up/Down" },
+        { "J/L", "Pan Left/Right" },
+        { "W/S", "Rotate Up/Down" },
+        { "A/D", "Rotate Left/Right" },
+        { "Q/E", "Zoom" },
         { "G", "Toggle GPU" },
         { "Space", "Toggle FDL" },
         { ",", "Toggle module coloring" },
-        { "V", "Toggle alignment" },
-        { "W/S", "Rotate X-axis" },
-        { "A/D", "Rotate Y-axis" },
-        { "Q/E", "Zoom" },
-        { "I/K", "Pan Left/Right" },
-        { "J/L", "Pan Up/Down" }
+        { "V", "Toggle alignment" }
     };
 
     legendLayout->setColumnStretch(0, 1);
