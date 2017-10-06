@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
 #include <QWheelEvent>
+#include "fdl.h"
 #include "glwidget.h"
 
 const QColor GRAPH_EDGE_COLORS[] = {
@@ -136,7 +137,7 @@ void GLWidget::initializeGL()
         // initialize buffer for node positions
         obj->vbo.create();
         obj->vbo.bind();
-        obj->vbo.allocate(g->coords().data(), g->coords().size() * sizeof(vec3_t));
+        obj->vbo.allocate(g->coords().size() * sizeof(vec3_t));
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -160,7 +161,7 @@ void GLWidget::initializeGL()
         // initialize buffer for edge vertices
         obj->vbo.create();
         obj->vbo.bind();
-        obj->vbo.allocate(a->vertices().data(), a->vertices().size() * sizeof(align_edge_t));
+        obj->vbo.allocate(a->vertices().size() * sizeof(align_edge_t));
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -204,6 +205,11 @@ void GLWidget::paintGL()
     for ( GraphObject *obj : _graphs ) {
         QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
 
+        // update node coordinates
+        obj->vbo.bind();
+        obj->vbo.write(0, obj->g->coords().data(), obj->g->coords().size() * sizeof(vec3_t));
+        obj->vbo.release();
+
         // draw nodes
         _program->setUniformValue(_ref_color, QColor(0, 0, 0));
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -220,6 +226,11 @@ void GLWidget::paintGL()
     if ( _show_alignment ) {
         for ( AlignObject *obj : _alignments ) {
             QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
+
+            // update edge coordinates
+            obj->vbo.bind();
+            obj->vbo.write(0, obj->a->vertices().data(), obj->a->vertices().size() * sizeof(align_edge_t));
+            obj->vbo.release();
 
             // draw edges
             _program->setUniformValue(_ref_color, obj->edge_color);
@@ -271,6 +282,14 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_E:
         setZoom(_zoom - SHIFT_ZOOM);
+        break;
+    case Qt::Key_Space:
+        for ( Graph *g : _db->graphs().values() ) {
+            force_directed_layout(g);
+        }
+        for ( Alignment *a : _db->alignments() ) {
+            a->update();
+        }
         break;
     case Qt::Key_V:
         _show_alignment = !_show_alignment;

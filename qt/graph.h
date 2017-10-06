@@ -12,13 +12,6 @@ typedef struct {
 } vec3_t;
 
 typedef struct {
-    float dx;
-    float dy;
-    float dz;
-    float radius;
-} coinfo_t;
-
-typedef struct {
     float r;
     float g;
     float b;
@@ -47,7 +40,7 @@ private:
 
     QVector<graph_node_t> _nodes;
     QVector<vec3_t> _coords;
-    QVector<coinfo_t> _coinfo;
+    QVector<vec3_t> _coords_d;
     QVector<color_t> _colors;
     QVector<graph_edge_t> _edges;
     Matrix _edge_matrix;
@@ -67,9 +60,10 @@ public:
     const QString& name() const { return this->_name; }
     const QVector<graph_node_t>& nodes() const { return this->_nodes; }
     const QVector<graph_edge_t>& edges() const { return this->_edges; }
+    const Matrix& edge_matrix() const { return this->_edge_matrix; }
 
-    const QVector<vec3_t>& coords() const { return this->_coords; }
-    const QVector<coinfo_t>& coinfo() const { return this->_coinfo; }
+    QVector<vec3_t>& coords() { return this->_coords; }
+    QVector<vec3_t>& coords_d() { return this->_coords_d; }
     const QVector<color_t>& colors() const { return this->_colors; }
 
     int find_node(const QString& name);

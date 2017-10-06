@@ -67,11 +67,11 @@ Graph::Graph(
         });
     }
 
-    // initialize coinfo
-    this->_coinfo.reserve(this->_nodes.size());
+    // initialize delta coords
+    this->_coords_d.reserve(this->_nodes.size());
 
     for ( int i = 0; i < this->_nodes.size(); i++ ) {
-        this->_coinfo.push_back({ 0, 0, 0, 1 });
+        this->_coords_d.push_back({ 0, 0, 0 });
     }
 
     // initialize colors

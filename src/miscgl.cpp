@@ -14,13 +14,10 @@ void forceDirectedLayout(float *nodePos,float *nodePosD,int nodes, float *matrix
     {
         for(j = 0;j < nodes;j++)
         {
-           // float dz = nodePos[j*3+2] - nodePos[i*3+2];
-
             float dy = nodePos[j*3+1] - nodePos[i*3+1];
             float dx = nodePos[j*3+0] - nodePos[i*3+0];
             if(dx != 0.0f && dy!= 0.0f &&  i!=j)
             {
-                //float distance  = sqrt(dx * dx + dy * dy + dz * dz);
                 float distance  = sqrt(dx * dx + dy * dy )+0.001;
 
                 float force2= 0.0f;
@@ -43,19 +40,14 @@ void forceDirectedLayout(float *nodePos,float *nodePosD,int nodes, float *matrix
 
         }
 
-
         float d_x = delta_t * nodePosD[i*INFOCOUNT+0];
         float d_y = delta_t * nodePosD[i*INFOCOUNT+1];
-//        float d_z = delta_t * nodePosD[i*4+2];
-//        float displacementSquared = d_x*d_x + d_y*d_y + d_z*d_z;
           float displacementSquared = d_x*d_x + d_y*d_y ;
         if ( displacementSquared > MAX_DISPLACEMENT_SQUARED ){
             float s = sqrt( MAX_DISPLACEMENT_SQUARED  / displacementSquared );
             d_x = d_x * s;
             d_y = d_y * s;
-  //          d_z = d_z * s;
         }
-  //      nodePos[i*3+2] += d_z;
 
         if(std::isnan(d_x)){
             d_x = 0.001;//printf("NAN");
@@ -68,10 +60,5 @@ void forceDirectedLayout(float *nodePos,float *nodePosD,int nodes, float *matrix
 
         nodePosD[i*INFOCOUNT+0] *= .09f;
         nodePosD[i*INFOCOUNT+1] *= .09f;
-
-      //  nodePosD[i*4+2] *= .06f;
-
     }
-      //  i =1;
-
 }

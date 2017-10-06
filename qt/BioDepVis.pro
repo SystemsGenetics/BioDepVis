@@ -17,6 +17,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 SOURCES += \
     alignment.cpp \
     database.cpp \
+    fdl.cpp \
     glwidget.cpp \
     graph.cpp \
     main.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
 HEADERS += \
     alignment.h \
     database.h \
+    fdl.h \
     glwidget.h \
     graph.h \
     mainwindow.h \
