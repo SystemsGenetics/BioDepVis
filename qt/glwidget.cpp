@@ -45,29 +45,18 @@ GLWidget::~GLWidget()
     doneCurrent();
 }
 
-static void qNormalizeAngle(int &angle)
+void GLWidget::setRotX(float angle)
 {
-    while (angle < 0)
-        angle += 360 * 16;
-    while (angle > 360 * 16)
-        angle -= 360 * 16;
-}
-
-void GLWidget::setRotX(int angle)
-{
-    qNormalizeAngle(angle);
     _rot.setX(angle);
 }
 
-void GLWidget::setRotY(int angle)
+void GLWidget::setRotY(float angle)
 {
-    qNormalizeAngle(angle);
     _rot.setY(angle);
 }
 
-void GLWidget::setRotZ(int angle)
+void GLWidget::setRotZ(float angle)
 {
-    qNormalizeAngle(angle);
     _rot.setZ(angle);
 }
 
@@ -142,9 +131,9 @@ void GLWidget::paintGL()
 
     // compute model matrix
     _model.setToIdentity();
-    _model.rotate(_rot.x() / 16.0f, 1, 0, 0);
-    _model.rotate(_rot.y() / 16.0f, 0, 1, 0);
-    _model.rotate(_rot.z() / 16.0f, 0, 0, 1);
+    _model.rotate(_rot.x(), 1, 0, 0);
+    _model.rotate(_rot.y(), 0, 1, 0);
+    _model.rotate(_rot.z(), 0, 0, 1);
 
     // compute projection matrix
     _proj.setToIdentity();
@@ -175,7 +164,7 @@ void GLWidget::paintGL()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    const float SHIFT_ROT = 16;
+    const float SHIFT_ROT = 1;
     const float SHIFT_TRANS = 10;
     const float SHIFT_ZOOM = 1;
 
@@ -231,12 +220,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int dy = event->y() - _prev_pos.y();
 
     if ( event->buttons() & Qt::LeftButton ) {
-        setRotX(_rot.x() + 8 * dy);
-        setRotY(_rot.y() + 8 * dx);
+        setRotX(_rot.x() + 0.5f * dy);
+        setRotY(_rot.y() + 0.5f * dx);
     }
     else if ( event->buttons() & Qt::RightButton ) {
-        setRotX(_rot.x() + 8 * dy);
-        setRotZ(_rot.z() + 8 * dx);
+        setRotX(_rot.x() + 0.5f * dy);
+        setRotZ(_rot.z() + 0.5f * dx);
     }
     _prev_pos = event->pos();
 

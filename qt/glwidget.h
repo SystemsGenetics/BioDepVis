@@ -25,9 +25,9 @@ public:
     ~GLWidget();
 
 public slots:
-    void setRotX(int angle);
-    void setRotY(int angle);
-    void setRotZ(int angle);
+    void setRotX(float angle);
+    void setRotY(float angle);
+    void setRotZ(float angle);
     void setZoom(float zoom);
 
 protected:
