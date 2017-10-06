@@ -155,18 +155,15 @@ void init(const char * f_in)
 {
 	// set up camera
 	// parameters are eye point, aim point, up vector
-	cudaError_t cuerr;
-
 	parser(&graphDatabase, &alignmentDatabase, &ontologyDB, f_in);
 	camera = new Camera(Vector3d(0, 10, 400), Vector3d(0, 0, 0),
 		Vector3d(0, 1, 0));
 
-	// grey background for window
+	// white background for window
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-	glShadeModel(GL_SMOOTH);
-	glDepthRange(0.0, 1.0);
 
 	loadTexture();
+	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 
@@ -200,84 +197,6 @@ void init(const char * f_in)
 	//glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
-
-	//glEnable(GL_BLEND);
-	/*
-
-	m_vertexShader=  glCreateShader(GL_VERTEX_SHADER);
-	m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-
-	vertexsource = filetobuf("vertexshader.vert");
-	fragmentsource = filetobuf("fragmentshader.frag");
-
-	int IsCompiled_VS, IsCompiled_FS, maxLength, IsLinked;
-	char *vertexInfoLog, *fragmentInfoLog, *shaderProgramInfoLog;
-
-	glShaderSource(m_vertexShader, 1, (const GLchar**)&vertexsource, 0);
-	glCompileShader(m_vertexShader);
-	glGetShaderiv(m_vertexShader, GL_COMPILE_STATUS, &IsCompiled_VS);
-	if (IsCompiled_VS == FALSE)
-	{
-		glGetShaderiv(m_vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-
-		vertexInfoLog = (char *)malloc(maxLength);
-
-		glGetShaderInfoLog(m_vertexShader, maxLength, &maxLength, vertexInfoLog);
-
-
-		printf("Ersror : %s\n", vertexInfoLog);
-		free(vertexInfoLog);
-
-		getchar();
-		exit(0);
-	}
-	glShaderSource(m_fragmentShader, 1, (const GLchar**)&fragmentsource, 0);
-	glCompileShader(m_fragmentShader);
-	glGetShaderiv(m_fragmentShader, GL_COMPILE_STATUS, &IsCompiled_FS);
-	if (IsCompiled_FS == FALSE)
-	{
-		glGetShaderiv(m_fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-
-		fragmentInfoLog = (char *)malloc(maxLength);
-
-		glGetShaderInfoLog(m_fragmentShader, maxLength, &maxLength, fragmentInfoLog);
-
-
-		printf("Ersror : %s\n", fragmentInfoLog);
-		free(fragmentInfoLog);
-
-		getchar();
-		exit(0);
-	}
-
-	shaderprogram = glCreateProgram();
-
-
-	glAttachShader(shaderprogram, m_vertexShader);
-	glAttachShader(shaderprogram, m_fragmentShader);
-	glLinkProgram(shaderprogram);
-
-	glGetProgramiv(shaderprogram, GL_LINK_STATUS, (int *)&IsLinked);
-	if (IsLinked == FALSE)
-	{
-
-		glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, &maxLength);
-
-
-		shaderProgramInfoLog = (char *)malloc(maxLength);
-
-		glGetProgramInfoLog(shaderprogram, maxLength, &maxLength, shaderProgramInfoLog);
-
-
-		printf("Ersror : %s\n", shaderProgramInfoLog);
-		free(shaderProgramInfoLog);
-		return;
-	}
-	printf("Vertex Shader ID : %d \n Fragment Shader ID : %d \n", m_vertexShader, m_fragmentShader);
-	*/
 }
 
 
@@ -285,8 +204,6 @@ void drawGraph(graph *g)
 {
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glEnable(GL_BLEND);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
@@ -320,7 +237,6 @@ void drawGraph(graph *g)
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_POINT_SPRITE);
-	glDisable(GL_BLEND);
 }
 
 
@@ -363,33 +279,22 @@ void drawAlignment(Alignment *align)
 
 	if (showalignment == true)
 	{
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glLineStipple(1, 0xAAAA);//  # [1]
-		//glEnable(GL_LINE_STIPPLE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
-		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
-		glColor4f(0.69,0.19,0.29, 0.005f);
 		glColor4f(edgeAlignmentColor[countalignmentdraw][0],edgeAlignmentColor[countalignmentdraw][1],edgeAlignmentColor[countalignmentdraw][2],edgeAlignmentColor[countalignmentdraw][3] );
-		countalignmentdraw++;
-		countalignmentdraw = (countalignmentdraw)%alignmentDatabase.size();
-		//printf("countalignmentdraw : %d\n",countalignmentdraw);
+		countalignmentdraw = (countalignmentdraw + 1) % alignmentDatabase.size();
 		glLineWidth(0.1);
 		glDrawArrays(GL_LINES, 0, align->edges);
-		glDisable(GL_BLEND);
-		glDisable(GL_LINE_STIPPLE);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
 	if (animate == false && showalignment == false)
 	{
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glColor4f(0.69,0.19,0.29, 0.005f);
-
+		glColor4f(0.69f, 0.19f, 0.29f, 0.005f);
 		glEnable(GL_MAP1_VERTEX_3);
+		glLineWidth(0.1);
 
 		for (int k = 0; k < align->edges;  k++)
 		{
@@ -405,10 +310,8 @@ void drawAlignment(Alignment *align)
 			float cenerCtrPoint2[3] = { (x1 + x2) / 2.0f, (y1 + y2) / 2.0f, 9 * (z1 + z2) / 10.0f - 150.0f};
 
 			GLfloat ctrlPoints[4][3] = { { align->vertices[k * 6 + 0], align->vertices[k * 6 + 1], align->vertices[k * 6 + 2] }, { cenerCtrPoint1[0], cenerCtrPoint1[1], cenerCtrPoint1[2] }, { cenerCtrPoint2[0], cenerCtrPoint2[1], cenerCtrPoint2[2] }, { align->vertices[k * 6 + 3], align->vertices[k * 6 + 4], align->vertices[k * 6 + 5] } };
+
 			glMap1f(GL_MAP1_VERTEX_3, 0.0, 1.0, 3, 4, &ctrlPoints[0][0]);
-
-			glLineWidth(0.1);
-
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i <= 20; i++)
 			{
@@ -418,7 +321,6 @@ void drawAlignment(Alignment *align)
 			glEnd();
 		}
 
-		glDisable(GL_BLEND);
 		glDisable(GL_MAP1_VERTEX_3);
 	}
 	glDepthMask(GL_TRUE);
@@ -434,29 +336,19 @@ void drawAlignmentROI(Alignment *align,int index)
 
 	if (showalignment == true)
 	{
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glLineStipple(1, 0xAAAA);//  # [1]
-		//glEnable(GL_LINE_STIPPLE);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glVertexPointer(3, GL_FLOAT, 0, align->vertices);
-		glColor4f(0.3f, 0.3f, 0.3f, 0.5f);
-		glColor4f(0.69,0.19,0.29, 0.05f);
 		glColor4f(edgeAlignmentColor[countalignmentdraw][0],edgeAlignmentColor[countalignmentdraw][1],edgeAlignmentColor[countalignmentdraw][2],edgeAlignmentColor[countalignmentdraw][3] );
-		countalignmentdraw++;
-		countalignmentdraw = (countalignmentdraw)%alignmentDatabase.size();
-		//printf("countalignmentdraw : %d\n",countalignmentdraw);
+		countalignmentdraw = (countalignmentdraw + 1) % alignmentDatabase.size();
 		glLineWidth(0.1);
 		glDrawArrays(GL_LINES, 0, align->edges);
-		glDisable(GL_BLEND);
-		glDisable(GL_LINE_STIPPLE);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
 
 	if (animate == false && showalignment == false)
 	{
 		glLoadIdentity();
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glColor4f(0.14,0.24,0.7, 0.15f);
@@ -579,7 +471,6 @@ void drawAlignmentROI(Alignment *align,int index)
 				}
 			}
 
-			glDisable(GL_BLEND);
 			glDisable(GL_MAP1_VERTEX_3);
 		}
 	}
@@ -646,7 +537,6 @@ void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int 
 {
 	//Draw Rect
 	//printf("Draawing ROI");
-	glEnable(GL_BLEND);
 	glLoadIdentity();
 	glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	glPushMatrix();
@@ -666,7 +556,6 @@ void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int 
 	glutWireCube(1.0);
 
 	glPopMatrix();
-	glDisable(GL_BLEND);
 }
 
 
@@ -676,7 +565,6 @@ void drawROIGraph()
 	glVertexPointer(3, GL_FLOAT, 0, coordsROI.data());
 	glEnableClientState(GL_VERTEX_ARRAY);
 	/*
-	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthMask(GL_FALSE);
@@ -726,10 +614,6 @@ void drawROIGraph()
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_POINT_SPRITE);
-	glDisable(GL_BLEND);
-
-	//Orig
-	glDisable(GL_BLEND);
 }
 
 
@@ -745,8 +629,6 @@ void drawGraphROIBack(graph *g)
 
 	glVertexPointer(3, GL_FLOAT, 0, g->coords);
 	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glEnable(GL_BLEND);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -801,7 +683,6 @@ void drawGraphROIBack(graph *g)
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_POINT_SPRITE);
-	glDisable(GL_BLEND);
 }
 
 
