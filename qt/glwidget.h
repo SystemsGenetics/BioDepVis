@@ -48,18 +48,22 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 private:
+    Database *_db;
+    bool _show_alignment;
+
+    QPoint _prev_pos;
     QVector3D _rot;
     float _zoom;
-    QPoint _prev_pos;
-    Database *_db;
-    QVector<GraphObject *> _graphs;
-    QVector<AlignObject *> _alignments;
+
     QOpenGLShaderProgram *_program;
     int _ref_mvp_matrix;
     int _ref_color;
     QMatrix4x4 _model;
     QMatrix4x4 _view;
     QMatrix4x4 _proj;
+
+    QVector<GraphObject *> _graphs;
+    QVector<AlignObject *> _alignments;
 };
 
 #endif

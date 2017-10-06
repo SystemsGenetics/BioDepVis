@@ -41,9 +41,10 @@ static const char *FRAGMENT_SHADER_SOURCE =
 
 GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
+      _db(db),
+      _show_alignment(false),
       _rot(0, 0, 0),
       _zoom(0),
-      _db(db),
       _program(0)
 {
     setFocusPolicy(Qt::ClickFocus);
@@ -216,14 +217,16 @@ void GLWidget::paintGL()
     }
 
     // draw each alignment
-    for ( AlignObject *obj : _alignments ) {
-        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
+    if ( _show_alignment ) {
+        for ( AlignObject *obj : _alignments ) {
+            QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
 
-        // draw edges
-        _program->setUniformValue(_ref_color, obj->edge_color);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glLineWidth(0.1f);
-        glDrawArrays(GL_LINES, 0, obj->a->vertices().size());
+            // draw edges
+            _program->setUniformValue(_ref_color, obj->edge_color);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glLineWidth(0.1f);
+            glDrawArrays(GL_LINES, 0, obj->a->vertices().size());
+        }
     }
 
     _program->release();
@@ -269,10 +272,13 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_E:
         setZoom(_zoom - SHIFT_ZOOM);
         break;
+    case Qt::Key_V:
+        _show_alignment = !_show_alignment;
+        break;
     }
 
     update();
-    QOpenGLWidget::keyPressEvent(event);
+    event->accept();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
