@@ -22,7 +22,9 @@ Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
     }
 
     // initialize vertices
-    this->_vertices.reserve(this->_edges.size());
+    this->_vertices.resize(this->_edges.size());
+
+    update();
 }
 
 Alignment::Alignment()

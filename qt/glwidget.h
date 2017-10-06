@@ -17,6 +17,13 @@ typedef struct {
     QOpenGLBuffer vbo;
 } GraphObject;
 
+typedef struct {
+    Alignment *a;
+    QColor edge_color;
+    QOpenGLVertexArrayObject vao;
+    QOpenGLBuffer vbo;
+} AlignObject;
+
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -46,6 +53,7 @@ private:
     QPoint _prev_pos;
     Database *_db;
     QVector<GraphObject *> _graphs;
+    QVector<AlignObject *> _alignments;
     QOpenGLShaderProgram *_program;
     int _ref_mvp_matrix;
     int _ref_color;

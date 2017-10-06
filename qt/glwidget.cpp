@@ -13,6 +13,12 @@ const QColor GRAPH_EDGE_COLORS[] = {
     { 255, 127,   0, 96 }
 };
 
+const QColor ALIGN_EDGE_COLORS[] = {
+    { 178,  48,  74, 32 },
+    { 226, 127, 202, 32 },
+    { 226, 127, 202, 32 }
+};
+
 static const char *VERTEX_SHADER_SOURCE =
     "#version 150\n"
     "in vec4 position;\n"
@@ -48,6 +54,11 @@ GLWidget::~GLWidget()
     makeCurrent();
 
     for ( GraphObject *obj : _graphs ) {
+        obj->vbo.destroy();
+        delete obj;
+    }
+
+    for ( AlignObject *obj : _alignments ) {
         obj->vbo.destroy();
         delete obj;
     }
@@ -133,6 +144,30 @@ void GLWidget::initializeGL()
         _graphs.push_back(obj);
     }
 
+    // initialize scene object for each alignment
+    for ( int i = 0; i < _db->alignments().size(); i++ ) {
+        Alignment *a = _db->alignments()[i];
+        AlignObject *obj = new AlignObject();
+        obj->a = a;
+        obj->edge_color = ALIGN_EDGE_COLORS[i];
+
+        // initialize vertex array object
+        obj->vao.create();
+
+        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
+
+        // initialize buffer for edge vertices
+        obj->vbo.create();
+        obj->vbo.bind();
+        obj->vbo.allocate(a->vertices().data(), a->vertices().size() * sizeof(align_edge_t));
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        obj->vbo.release();
+
+        _alignments.push_back(obj);
+    }
+
     // initialize camera
     init_camera();
 
@@ -160,13 +195,13 @@ void GLWidget::paintGL()
         0.0001f, 1000.0f
     );
 
+    // set MVP matrix in shader program
+    _program->bind();
+    _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
+
     // draw each graph
     for ( GraphObject *obj : _graphs ) {
         QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
-
-        // set MVP matrix in shader program
-        _program->bind();
-        _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
 
         // draw nodes
         _program->setUniformValue(_ref_color, QColor(0, 0, 0));
@@ -178,6 +213,17 @@ void GLWidget::paintGL()
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glLineWidth(0.001f);
         glDrawElements(GL_LINES, obj->g->edges().size(), GL_UNSIGNED_INT, obj->g->edges().data());
+    }
+
+    // draw each alignment
+    for ( AlignObject *obj : _alignments ) {
+        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
+
+        // draw edges
+        _program->setUniformValue(_ref_color, obj->edge_color);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glLineWidth(0.1f);
+        glDrawArrays(GL_LINES, 0, obj->a->vertices().size());
     }
 
     _program->release();
