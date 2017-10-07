@@ -11,21 +11,27 @@ class MainWindow : public QWidget
 private:
     Database *_db;
     QVector<node_ref_t> _genes;
+    int _gene_index;
+    QStringList _go_terms;
+    int _go_term_index;
 
     QListWidget *_gene_list;
-    QLabel *_gene_desc;
+    QTextEdit *_gene_desc;
     QListWidget *_go_term_list;
-    QLabel *_go_term_desc;
+    QTextEdit *_go_term_desc;
     QLineEdit *_search;
 
 public:
     MainWindow(Database *db);
 
 public slots:
+    void select_gene();
+    void select_go_term();
     void search();
     void clear();
 
 private:
+    void init_controls();
     void create_gui();
     void update_gui();
 };

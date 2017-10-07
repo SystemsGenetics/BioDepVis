@@ -5,7 +5,16 @@ MainWindow::MainWindow(Database *db)
 {
     this->_db = db;
 
+    init_controls();
     create_gui();
+}
+
+void MainWindow::init_controls()
+{
+    this->_genes.clear();
+    this->_gene_index = -1;
+    this->_go_terms.clear();
+    this->_go_term_index = -1;
 }
 
 void MainWindow::create_gui()
@@ -13,25 +22,33 @@ void MainWindow::create_gui()
     QGridLayout *layout = new QGridLayout;
 
     // search interface
-    QGroupBox *searchGroup = new QGroupBox("Search");
-    QGridLayout *searchLayout = new QGridLayout;
+    QGroupBox *searchGroup = new QGroupBox("Gene Ontology Search");
+    QVBoxLayout *searchLayout = new QVBoxLayout;
     searchGroup->setLayout(searchLayout);
 
     QLabel *geneListLabel = new QLabel("Genes");
     this->_gene_list = new QListWidget();
+    connect(this->_gene_list, SIGNAL(itemSelectionChanged()), this, SLOT(select_gene()));
 
     QLabel *geneDescLabel = new QLabel("Description");
-    this->_gene_desc = new QLabel();
-    QScrollArea *geneDescScrollArea = new QScrollArea();
-    geneDescScrollArea->setWidget(this->_gene_desc);
+    this->_gene_desc = new QTextEdit();
+    this->_gene_desc->setReadOnly(true);
+
+    QFrame *line1 = new QFrame;
+    line1->setFrameShape(QFrame::HLine);
+    line1->setFrameShadow(QFrame::Sunken);
 
     QLabel *goTermListLabel = new QLabel("Ontology Terms");
     this->_go_term_list = new QListWidget();
+    connect(this->_go_term_list, SIGNAL(itemSelectionChanged()), this, SLOT(select_go_term()));
 
     QLabel *goTermDescLabel = new QLabel("Description");
-    this->_go_term_desc = new QLabel();
-    QScrollArea *goTermDescScrollArea = new QScrollArea();
-    goTermDescScrollArea->setWidget(this->_go_term_desc);
+    this->_go_term_desc = new QTextEdit();
+    this->_go_term_desc->setReadOnly(true);
+
+    QFrame *line2 = new QFrame;
+    line2->setFrameShape(QFrame::HLine);
+    line2->setFrameShadow(QFrame::Sunken);
 
     QLabel *searchTermLabel = new QLabel("Search Term");
     this->_search = new QLineEdit();
@@ -42,18 +59,20 @@ void MainWindow::create_gui()
     QPushButton *clearButton = new QPushButton("Clear");
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
 
-    searchLayout->addWidget(geneListLabel,         0, 0, 1, 1);
-    searchLayout->addWidget(this->_gene_list,      1, 0, 1, 1);
-    searchLayout->addWidget(geneDescLabel,         2, 0, 1, 1);
-    searchLayout->addWidget(geneDescScrollArea,    3, 0, 1, 1);
-    searchLayout->addWidget(goTermListLabel,       4, 0, 1, 1);
-    searchLayout->addWidget(this->_go_term_list,   5, 0, 1, 1);
-    searchLayout->addWidget(goTermDescLabel,       6, 0, 1, 1);
-    searchLayout->addWidget(goTermDescScrollArea,  7, 0, 1, 1);
-    searchLayout->addWidget(searchTermLabel,       8, 0, 1, 1);
-    searchLayout->addWidget(this->_search,         9, 0, 1, 1);
-    searchLayout->addWidget(searchButton,         10, 0, 1, 1);
-    searchLayout->addWidget(clearButton,          11, 0, 1, 1);
+    searchLayout->addWidget(geneListLabel);
+    searchLayout->addWidget(this->_gene_list);
+    searchLayout->addWidget(geneDescLabel);
+    searchLayout->addWidget(this->_gene_desc);
+    searchLayout->addWidget(line1);
+    searchLayout->addWidget(goTermListLabel);
+    searchLayout->addWidget(this->_go_term_list);
+    searchLayout->addWidget(goTermDescLabel);
+    searchLayout->addWidget(this->_go_term_desc);
+    searchLayout->addWidget(line2);
+    searchLayout->addWidget(searchTermLabel);
+    searchLayout->addWidget(this->_search);
+    searchLayout->addWidget(searchButton);
+    searchLayout->addWidget(clearButton);
 
     // visualizer
     QGroupBox *visGroup = new QGroupBox("Visualizer");
@@ -65,8 +84,8 @@ void MainWindow::create_gui()
     visLayout->addWidget(glWidget);
 
     // keyboard legend
-    QGroupBox *legendGroup = new QGroupBox("Controls");
-    QGridLayout *legendLayout = new QGridLayout;
+    QGroupBox *legendGroup = new QGroupBox("Keyboard Controls");
+    QFormLayout *legendLayout = new QFormLayout;
     legendGroup->setLayout(legendLayout);
 
     QVector<QPair<QString, QString>> controls {
@@ -82,16 +101,10 @@ void MainWindow::create_gui()
         { "V", "Toggle alignment" }
     };
 
-    legendLayout->setColumnStretch(0, 1);
-    legendLayout->setColumnStretch(1, 3);
-
-    for ( int i = 0; i < controls.size(); i++ ) {
-        auto& ctrl = controls[i];
-
+    for ( auto& ctrl : controls ) {
         QLabel *label1 = new QLabel(ctrl.first);
         QLabel *label2 = new QLabel(ctrl.second);
-        legendLayout->addWidget(label1, i, 0, 1, 1);
-        legendLayout->addWidget(label2, i, 1, 1, 1);
+        legendLayout->addRow(label1, label2);
     }
 
     // add groups to layout
@@ -106,30 +119,70 @@ void MainWindow::create_gui()
 
 void MainWindow::update_gui()
 {
-    // update gene list
-    this->_gene_list->clear();
+    if ( _gene_index == -1 ) {
+        // update gene list
+        _gene_list->clear();
 
-    for ( const node_ref_t& ref : this->_genes ) {
-        const graph_node_t& node = this->_db->graphs()[ref.graph_id]->nodes()[ref.node_id];
+        for ( const node_ref_t& ref : _genes ) {
+            const graph_node_t& node = _db->graphs()[ref.graph_id]->nodes()[ref.node_id];
 
-        this->_gene_list->addItem(node.name);
+            _gene_list->addItem(node.name);
+        }
+    }
+    else {
+        // update gene description
+        const node_ref_t& ref = _genes[_gene_index];
+
+        _gene_desc->setText(_db->graphs()[ref.graph_id]->nodes()[ref.node_id].name);
     }
 
-    // update gene description
-    // TODO
+    if ( _go_term_index == -1 ) {
+        // update ontology term list
+        _go_term_list->clear();
 
-    // update ontology term list
-    // TODO
+        for ( const QString& id : _go_terms ) {
+            _go_term_list->addItem(id);
+        }
+    }
+    else {
+        // update ontology term description
+        const QString& id = _go_terms[_go_term_index];
 
-    // update ontology term description
-    // TODO
+        _go_term_desc->setText(_db->ontology()[id].def);
+    }
+}
+
+void MainWindow::select_gene()
+{
+    _gene_index = 0;
+    while ( !_gene_list->item(_gene_index)->isSelected() ) {
+        _gene_index++;
+    }
+
+    // update go term list
+    const node_ref_t& ref = _genes[_gene_index];
+
+    _go_terms = _db->graphs()[ref.graph_id]->nodes()[ref.node_id].go_terms;
+    _go_term_index = -1;
+
+    update_gui();
+}
+
+void MainWindow::select_go_term()
+{
+    _go_term_index = 0;
+    while ( !_go_term_list->item(_go_term_index)->isSelected() ) {
+        _go_term_index++;
+    }
+
+    update_gui();
 }
 
 void MainWindow::search()
 {
     QString term = _search->text();
 
-    _genes.clear();
+    init_controls();
 
     for ( const ont_term_t& ont : _db->ontology().values() ) {
         if ( ont.def.contains(term) ) {
@@ -142,7 +195,6 @@ void MainWindow::search()
 
 void MainWindow::clear()
 {
-    _genes.clear();
-
+    init_controls();
     update_gui();
 }
