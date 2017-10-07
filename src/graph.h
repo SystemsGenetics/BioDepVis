@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unordered_map>
-// #include "util.h"
 
 struct nodeSelectedStruct
 {
@@ -28,17 +27,11 @@ struct ontStruct{
     std::vector<nodeSelectedStruct> connectedNodes;
 };
 
-//#define STACKVIEW 1
 #define INFOCOUNT 5
 void forceDirectedLayout(float *,float *,int nodes, float *matrix);
 
 class graph
 {
-
-
-private:
-
-
 public:
     void allocate(int,int,int,int,int);
     void randAllocate(int);
@@ -49,9 +42,8 @@ public:
 	void cleanup();
 	void readOntology(char *, std::unordered_map<std::string, ontStruct> *);
 	void UpdateOntologyInfo(std::string, std::string, std::unordered_map<std::string, ontStruct> *);
-	
-	
-    graph extractGraph(int *);
+
+
     float *coords;
     float *coinfo; //dx,dy,dz,radius
     float *color;
@@ -69,9 +61,8 @@ public:
     int edges;
     float er,eg,eb,ea;
     float nr,ng,nb,na;
-    //std::vector<std::string> nodeVec;
 	std::unordered_map<std::string,int> nodeListMap;
-	
+
 
     int centerx;
     int centery;
@@ -91,4 +82,3 @@ public:
 };
 
 #endif // GRAPH
-

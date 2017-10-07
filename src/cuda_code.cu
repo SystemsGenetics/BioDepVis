@@ -1,18 +1,22 @@
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
-#include <thrust/sort.h>
-#include <cuda.h>
+#include <cassert>
+#include <cuda_runtime.h>
 #include "graph.h"
 #include "alignment.h"
 
 #define MAX_DISPLACEMENT_SQUARED 2.0f
 
-extern "C"
-cudaError_t gpuSetup(graph *g)
+void checkError(cudaError_t err)
+{
+    if ( err != cudaSuccess ) {
+        printf("CUDA Error: %s\n", cudaGetErrorString(err));
+        exit(1);
+    }
+}
+
+void gpuSetup(graph *g)
 {
   int graphsize = g->nodes;
 
-  //Mallocing Edge Space
   cudaMalloc((void **)&(g->edgeMatrix_d),graphsize * graphsize * sizeof(float));
   cudaMalloc((void**)&(g->coords_d), graphsize * sizeof(float) * 3 );
   cudaMalloc((void**)&(g->coinfo_d),graphsize * sizeof(float) * INFOCOUNT);
@@ -20,36 +24,22 @@ cudaError_t gpuSetup(graph *g)
   cudaMemcpy(g->coinfo_d, g->coinfo,graphsize * sizeof(float) * INFOCOUNT,cudaMemcpyHostToDevice);
   cudaMemcpy(g->edgeMatrix_d,g->edgeMatrix,sizeof(float) * graphsize * graphsize, cudaMemcpyHostToDevice);
 
-  return cudaGetLastError();
+  checkError(cudaGetLastError());
 }
 
-extern "C"
-cudaError_t gpuAlignSetup(Alignment *align)
+void gpuAlignSetup(Alignment *align)
 {
-  //Mallocing Edge Space
   cudaMalloc((void **)&(align->edgeAlignMatrix_d),align->rows * align->cols * sizeof(float));
   cudaMemcpy(align->edgeAlignMatrix_d,align->edgeAlignMatrix,sizeof(float) * align->rows * align->cols, cudaMemcpyHostToDevice);
 
-  return cudaGetLastError();
+  checkError(cudaGetLastError());
 }
 
-extern "C"
-cudaError_t gpuFree(graph *g)
+void gpuFree(void *ptr)
 {
-    cudaFree(g->coords_d);
-    cudaFree(g->coinfo_d);
-    cudaFree(g->edgeMatrix_d);
+    cudaFree(ptr);
 
-    return cudaGetLastError();
-}
-
-
-__global__ void testforceDirectedKernel(int graphsize,float *nodePosition, float *nodeProperty,float *matrixEdge)
-{
-int id = threadIdx.x + blockIdx.x *  blockDim.x;
-if(id < graphsize){
-    nodePosition[id * 3 + 1] += 1.1f;
-    }
+    checkError(cudaGetLastError());
 }
 
 
@@ -142,8 +132,6 @@ if(id < graphsize){
 					force = K_r / (distance * distance);
             nodeProperty[i*INFOCOUNT+0] = nodeProperty[i*INFOCOUNT+0] - ((force * dx)/distance) +((force2*dx)/distance) ;
             nodeProperty[i*INFOCOUNT+1] = nodeProperty[i*INFOCOUNT+1] - ((force * dy)/distance) +((force2*dy)/distance) ;
-            //nodeProperty[j*INFOCOUNT+0] = nodeProperty[j*INFOCOUNT+0] + ((force * dx)/distance) -((force2*dx)/distance) ;
-            //nodeProperty[j*INFOCOUNT+1] = nodeProperty[j*INFOCOUNT+1] + ((force * dy)/distance) -((force2*dy)/distance) ;
             }
 
         }
@@ -164,33 +152,29 @@ if(id < graphsize){
         nodePosition[i*3+0] += d_x * .84f;
         nodeProperty[i*INFOCOUNT+0] *= .6f;
         nodeProperty[i*INFOCOUNT+1] *= .6f;
-		//nodeProperty[i*INFOCOUNT + 0] = 0;
-		//nodeProperty[i*INFOCOUNT + 1] = 0;
     }
   }
 }
 
-extern "C"
-cudaError_t runForceDirectedGPU(graph *g)
+void runForceDirectedGPU(graph *g)
 {
-//testforceDirectedKernel<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
-forceDirectedKernel2d<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
-//cudaDeviceSynchronize();
-return cudaGetLastError();
+    forceDirectedKernel2d<<<(int)(g->nodes/256)+1,256>>>(g->nodes,g->coords_d,g->coinfo_d,g->edgeMatrix_d);
+
+    checkError(cudaGetLastError());
 }
 
-extern "C"
-cudaError_t copyForceDirectedGPU(graph *g)
+void copyForceDirectedGPU(graph *g)
 {
-    cudaMemcpy(g->coords,g->coords_d,g->nodes * sizeof(float)*3, cudaMemcpyDeviceToHost);
-    return cudaGetLastError();
+    cudaMemcpy(g->coords, g->coords_d, g->nodes * sizeof(float) * 3, cudaMemcpyDeviceToHost);
+
+    checkError(cudaGetLastError());
 }
 
-extern "C"
-cudaError_t gpuDeviceSync()
+void gpuDeviceSync()
 {
     cudaDeviceSynchronize();
-	return cudaGetLastError();
+
+    checkError(cudaGetLastError());
 }
 
 
@@ -199,7 +183,6 @@ __global__ void forceAlignKernel2d(int rows,int cols ,float *graph1Pos, float *g
 
 int id = threadIdx.x + blockIdx.x *  blockDim.x;
 if(id < rows){
-//	printf("%d => %2.3f %2.3f %2.3f\n",id,nodePosition[id].x, nodePosition[id].y, nodePosition[id].z);
     for(int j = 0;j < cols;j++)
     if(matrixEdge[id * cols + j] == 1)
     {
@@ -219,13 +202,11 @@ if(id < rows){
 
 }
 
-#define radius 2
 __global__ void forceAlignStackKernel2d(int rows,int cols ,float *nodePosition1, float *nodePosition2,float *nodeProperty1,float *nodeProperty2,float *matrixEdge)
 {
 
 int id = threadIdx.x + blockIdx.x *  blockDim.x;
 if(id < rows){
-//	printf("%d => %2.3f %2.3f %2.3f\n",id,nodePosition[id].x, nodePosition[id].y, nodePosition[id].z);
     for(int j = 0;j < cols;j++)
     {
     float xdiff=0.0,ydiff =0.0;
@@ -233,9 +214,6 @@ if(id < rows){
     {
          xdiff += (nodePosition2[j * 3 + 0 ] - nodePosition1[id * 3 + 0 ]);
         ydiff += (nodePosition2[j * 3 + 1 ] - nodePosition1[id * 3 + 1 ]);
-
-        //nodePosition1[id * 3 + 2 ] = 45.0f;
-        //nodePosition2[j * 3 + 2 ] = -45.0f;
     }
     __syncthreads();
     nodePosition1[id * 3 + 0 ] += xdiff*.9;
@@ -243,15 +221,11 @@ if(id < rows){
 
     }
 }
-
-
-
 }
-extern "C"
-cudaError_t runAlignmentForceGPU(Alignment *algn)
+
+void runAlignmentForceGPU(Alignment *algn)
 {
-//printf("running alignment kernel\n");
-//printf("Running Normal Kernel\n");
-forceAlignKernel2d<<<(int)( algn->rows/256)+1,256>>>(algn->rows,algn->cols,algn->g1->coords_d,algn->g2->coords_d,algn->edgeAlignMatrix_d);
-return cudaGetLastError();
+    forceAlignKernel2d<<<(int)( algn->rows/256)+1,256>>>(algn->rows,algn->cols,algn->g1->coords_d,algn->g2->coords_d,algn->edgeAlignMatrix_d);
+
+    checkError(cudaGetLastError());
 }

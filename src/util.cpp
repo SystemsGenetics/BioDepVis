@@ -25,8 +25,6 @@ int HEIGHT = 600;
 
 float searchRadius = 40;
 
-//  The number of frames
-int frameCount = 0;
 //  currentTime - previousTime is the time elapsed
 //  between every call of the Idle function
 int currentTime = 0, previousTime = 0;
@@ -36,13 +34,8 @@ std::vector <nodeSelectedStruct> searchSelectedVector;
 GLvoid *font_style = GLUT_BITMAP_HELVETICA_10;
 GLvoid *font_style2 = GLUT_BITMAP_TIMES_ROMAN_24;
 
-//  Number of frames per second
-float fps = 0;
-
 int   wireframe = 0;
 int   segments = 8;
-
-//Beg of my Dec
 
 bool animate = false;
 bool cluster = false;
@@ -53,18 +46,10 @@ bool searchArea = false;
 bool roiMODE = false;
 bool backGraphMode = false;
 
-int listBoxVal;
-std::string text = "Hello World!";
-int   obj = 0;
-int counter = 0;
-
 std::vector <nodeSelectedStruct> *SelectedGoPtr;
 std::vector <graph*> graphDatabase;
 std::vector <Alignment*> alignmentDatabase;
 
-unsigned int m_vertexShader, m_fragmentShader;
-char *vertexsource, *fragmentsource;
-GLuint shaderprogram;
 Camera *camera;
 unsigned int width_particle=64, height_particle=64;
 unsigned char *data_particle;
@@ -74,8 +59,6 @@ GLuint textures;
 std::vector<float> colorROI;
 std::vector<int> verticeEdgeListROI;
 std::vector<float> coordsROI;
-//std::vector<int> selectedNodeROI;
-//std::vector<int> selectedGraphROI;
 std::vector<int> alignEdgesROI;
 std::vector<int> alignEdgesROI2;
 std::vector<int> alignEdgesROI3;
@@ -242,9 +225,7 @@ void runForceDirected(graph *g)
 			forceDirectedLayout(g->coords, g->coinfo, g->nodes, g->edgeMatrix);
 		else
 		{
-			cudaError_t cuerr = runForceDirectedGPU(g);
-			if (cuerr != cudaSuccess)
-				cout << "CUDA Error: " << cudaGetErrorString(cuerr) << endl;
+			runForceDirectedGPU(g);
 		}
 	}
 }
@@ -255,12 +236,9 @@ void runAlignmentLayout(Alignment * a)
 	if (animate == true)
 	{
 		if (gpuEnabled){
-			cudaError_t cuerr = runAlignmentForceGPU(a);
-			if (cuerr != cudaSuccess)
-				cout << "CUDA Error: " << cudaGetErrorString(cuerr) << endl;
+			runAlignmentForceGPU(a);
 		}
 	}
-
 }
 
 
@@ -583,7 +561,6 @@ void drawGraphROIBack(graph *g)
 
 	if (g->displayName == true)
 	{
-
 		printw(g->centerx, g->centery + g->height / 2 - 40, g->centerz, g->name,font_style2);
 	}
 
@@ -686,7 +663,6 @@ void PerspDisplay()
 		}
 	}
 
-	//if (graphSelected != -1 || nodeSelected != -1){
 	if (selectedVector.size() > 0)
 	{
 		for (int i = 0; i < selectedVector.size(); i++)
@@ -770,10 +746,10 @@ void idle()
 		runAlignmentLayout(alignT);
 	}
 
-	gpuDeviceSync();
-
 	if (gpuEnabled)
 	{
+		gpuDeviceSync();
+
 		for (int i = 0; i < graphDatabase.size(); i++)
 		{
 			graph *graphT = graphDatabase.at(i);

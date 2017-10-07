@@ -1,22 +1,16 @@
 CXX  = g++
-NVCC = nvcc -Wno-deprecated-gpu-targets
+NVCC = nvcc
 
-GLUIDIR = glui-2.37
-SRC     = src
+CUDADIR ?= /usr/local/cuda
+GLUIDIR ?= glui-2.37
 
-GLUIINC = -I $(GLUIDIR)/include
-GLUILIB = -L $(GLUIDIR)/lib
+CXXFLAGS = -std=c++11 -I $(GLUIDIR)/include -g
 
-PLATFORM = $(shell uname -s)
+LIBS = -lGL -lGLU -lglut \
+	   -L $(CUDADIR)/lib64 -lcudart \
+	   -L $(GLUIDIR)/lib -lglui
 
-ifeq "$(PLATFORM)" "Darwin"
-	LIBS = -Xlinker -framework,GLUT -Xlinker -framework,OpenGL
-endif
-
-ifeq "$(PLATFORM)" "Linux"
-	LIBS = -lGL -lGLU -lglut $(GLUILIB) -lglui
-endif
-
+SRC = src
 OBJDIR = obj
 OBJS = \
 	$(OBJDIR)/alignment.o \
@@ -31,7 +25,6 @@ OBJS = \
 	$(OBJDIR)/miscgl.o \
 	$(OBJDIR)/Ont.o \
 	$(OBJDIR)/parse.o \
-	$(OBJDIR)/texture.o \
 	$(OBJDIR)/util.o \
 	$(OBJDIR)/Utility.o \
 	$(OBJDIR)/Vector.o
@@ -42,14 +35,14 @@ all: $(BINS)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-$(OBJDIR)/%.o: $(SRC)/%.cpp | $(OBJDIR)
-	$(NVCC) -c $(GLUIINC) -std=c++11 -o $@ $<
-
 $(OBJDIR)/%.o: $(SRC)/%.cu | $(OBJDIR)
-	$(NVCC) -c $(GLUIINC) -std=c++11 -o $@ $<
+	$(NVCC) -c $(CXXFLAGS) -o $@ $<
+
+$(OBJDIR)/%.o: $(SRC)/%.cpp | $(OBJDIR)
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 biodep-vis: $(OBJS)
-	$(NVCC) -o $@ $^ $(LIBS)
+	$(CXX) -o $@ $^ $(LIBS)
 
 clean:
 	rm -rf $(OBJDIR) $(BINS)

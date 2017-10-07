@@ -7,7 +7,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <GL/glui.h>
-#include <cuda_runtime.h>
 
 #include "alignment.h"
 #include "graph.h"
@@ -79,19 +78,13 @@ extern int persp_win;
 extern int WIDTH;
 extern int HEIGHT;
 
-extern "C"
-cudaError_t runForceDirectedGPU(graph *g);
-extern "C"
-cudaError_t runAlignmentForceGPU(Alignment *);
-extern "C"
-cudaError_t copyForceDirectedGPU(graph *g);
-extern "C"
-cudaError_t gpuDeviceSync();
+void runForceDirectedGPU(graph *g);
+void runAlignmentForceGPU(Alignment *);
+void copyForceDirectedGPU(graph *g);
+void gpuDeviceSync();
 
 
 // function prototypes
-char* filetobuf(char *file);
-unsigned char * loadBMPRaw(const char * imagepath, unsigned int& outWidth, unsigned int& outHeight, bool flipY = true);
 std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width, unsigned *height);
 void loadTexture();
 void init(const char * f_in);
