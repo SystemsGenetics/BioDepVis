@@ -384,7 +384,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_Space:
         for ( Graph *g : _db->graphs().values() ) {
-            force_directed_layout(g);
+            force_directed_layout_2d(
+                g->nodes().size(),
+                g->coords().data(),
+                g->coords_d().data(),
+                g->edge_matrix().data()
+            );
         }
         for ( Alignment *a : _db->alignments() ) {
             a->update();

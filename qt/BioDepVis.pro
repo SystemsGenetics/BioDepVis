@@ -31,4 +31,5 @@ HEADERS += \
     glwidget.h \
     graph.h \
     mainwindow.h \
-    matrix.h
+    matrix.h \
+    vector.h

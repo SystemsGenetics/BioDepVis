@@ -6,7 +6,7 @@ Matrix::Matrix(int rows, int cols)
 {
 	this->_rows = rows;
 	this->_cols = cols;
-	this->_data = new float[rows * cols];
+	this->_data = new int[rows * cols];
 }
 
 Matrix::Matrix()
@@ -27,22 +27,11 @@ Matrix::~Matrix()
 	delete[] this->_data;
 }
 
-void Matrix::init_identity()
-{
-	Matrix& M = *this;
-
-	for ( int i = 0; i < M._rows; i++ ) {
-		for ( int j = 0; j < M._cols; j++ ) {
-			M.elem(i, j) = (i == j);
-		}
-	}
-}
-
 void Matrix::init_zeros()
 {
 	Matrix& M = *this;
 
-	memset(M._data, 0, M._rows * M._cols * sizeof(float));
+	memset(M._data, 0, M._rows * M._cols * sizeof(int));
 }
 
 void swap(Matrix& A, Matrix& B)
