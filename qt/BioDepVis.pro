@@ -14,6 +14,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
 
+LIBS += \
+    -L/usr/local/cuda/lib64 -lcudart
+
+OBJECTS += \
+    fdl_cuda.o
+
 SOURCES += \
     alignment.cpp \
     database.cpp \

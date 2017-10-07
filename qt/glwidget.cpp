@@ -44,6 +44,7 @@ GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _db(db),
       _alignment(false),
+      _gpu(false),
       _module_color(false),
       _select_multi(false),
       _rot(0, 0, 0),
@@ -382,14 +383,21 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_E:
         setZoom(_zoom - SHIFT_ZOOM);
         break;
+    case Qt::Key_G:
+        _gpu = !_gpu;
+        break;
     case Qt::Key_Space:
         for ( Graph *g : _db->graphs().values() ) {
-            force_directed_layout_2d(
-                g->nodes().size(),
-                g->coords().data(),
-                g->coords_d().data(),
-                g->edge_matrix().data()
-            );
+            if ( _gpu ) {
+            }
+            else {
+                fdl_2d_cpu(
+                    g->nodes().size(),
+                    g->coords().data(),
+                    g->coords_d().data(),
+                    g->edge_matrix().data()
+                );
+            }
         }
         for ( Alignment *a : _db->alignments() ) {
             a->update();

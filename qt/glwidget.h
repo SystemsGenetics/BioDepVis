@@ -58,6 +58,7 @@ protected:
 private:
     Database *_db;
     bool _alignment;
+    bool _gpu;
     bool _module_color;
     bool _select_multi;
 

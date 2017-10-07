@@ -98,7 +98,7 @@ void MainWindow::create_gui()
         { "A/D", "Rotate Left/Right" },
         { "Q/E", "Zoom" },
         { "G", "Toggle GPU" },
-        { "Space", "Toggle FDL" },
+        { "Space", "Toggle force-directed layout" },
         { "C", "Toggle module coloring" },
         { "V", "Toggle alignment" },
         { "B", "Toggle multi-select" }

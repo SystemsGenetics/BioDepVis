@@ -2,11 +2,14 @@
 #include <cmath>
 #include "fdl.h"
 
-const float MAX_DIST_SQR = 10.0f;
+const float MAX_DISPLACEMENT_SQR = 10.0f;
 
-#define ELEM(M, cols, i, j) (M)[(i) * (cols) + (j)]
+inline int ELEM(int *data, int cols, int i, int j)
+{
+    return data[i * cols + j];
+}
 
-void force_directed_layout_2d(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
 {
     float K_r = 25.0f;
     float K_s = 15.0f;
@@ -38,11 +41,11 @@ void force_directed_layout_2d(int n, vec3_t *coords, vec3_t *coords_d, int *edge
 
         float dx = coords_d[i].x * dt;
         float dy = coords_d[i].y * dt;
-        float dist_sqr = dx * dx + dy * dy;
+        float disp_sqr = dx * dx + dy * dy;
 
-        if ( dist_sqr > MAX_DIST_SQR ) {
-            dx *= sqrtf(MAX_DIST_SQR / dist_sqr);
-            dy *= sqrtf(MAX_DIST_SQR / dist_sqr);
+        if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
+            dx *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+            dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
         }
 
         assert(!std::isnan(dx) && !std::isnan(dy));
@@ -54,7 +57,7 @@ void force_directed_layout_2d(int n, vec3_t *coords, vec3_t *coords_d, int *edge
     }
 }
 
-void force_directed_layout_3d(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
 {
     float K_r = 25.0f;
     float K_s = 15.0f;
@@ -90,12 +93,12 @@ void force_directed_layout_3d(int n, vec3_t *coords, vec3_t *coords_d, int *edge
         float dx = coords_d[i].x * dt;
         float dy = coords_d[i].y * dt;
         float dz = coords_d[i].z * dt;
-        float dist_sqr = dx * dx + dy * dy + dz * dz;
+        float disp_sqr = dx * dx + dy * dy + dz * dz;
 
-        if ( dist_sqr > MAX_DIST_SQR ) {
-            dx *= sqrtf(MAX_DIST_SQR / dist_sqr);
-            dy *= sqrtf(MAX_DIST_SQR / dist_sqr);
-            dz *= sqrtf(MAX_DIST_SQR / dist_sqr);
+        if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
+            dx *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+            dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+            dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
         }
 
         assert(!std::isnan(dx) && !std::isnan(dy) && !std::isnan(dz));
