@@ -99,9 +99,9 @@ void MainWindow::create_gui()
         { "Q/E", "Zoom" },
         { "G", "Toggle GPU" },
         { "Space", "Toggle FDL" },
-        { ",", "Toggle module coloring" },
+        { "C", "Toggle module coloring" },
         { "V", "Toggle alignment" },
-        { "T", "Toggle multi-select" }
+        { "B", "Toggle multi-select" }
     };
 
     for ( auto& ctrl : controls ) {
@@ -118,6 +118,9 @@ void MainWindow::create_gui()
     layout->addWidget(visGroup,    0, 1);
     layout->addWidget(legendGroup, 0, 2);
     this->setLayout(layout);
+
+    // set focus
+    glWidget->setFocus();
 }
 
 void MainWindow::update_gui()

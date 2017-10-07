@@ -12,16 +12,19 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 typedef struct {
     Graph *g;
-    QColor edge_color;
+    QVector<color_t> node_colors;
+    QVector<color_t> edge_colors;
     QOpenGLVertexArrayObject vao;
-    QOpenGLBuffer vbo;
+    QOpenGLBuffer vbo_coords;
+    QOpenGLBuffer vbo_colors;
 } GraphObject;
 
 typedef struct {
     Alignment *a;
-    QColor edge_color;
+    QVector<color_t> edge_colors;
     QOpenGLVertexArrayObject vao;
-    QOpenGLBuffer vbo;
+    QOpenGLBuffer vbo_coords;
+    QOpenGLBuffer vbo_colors;
 } AlignObject;
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -55,6 +58,7 @@ protected:
 private:
     Database *_db;
     bool _alignment;
+    bool _module_color;
     bool _select_multi;
 
     QPoint _prev_pos;
@@ -64,7 +68,6 @@ private:
 
     QOpenGLShaderProgram *_program;
     int _ref_mvp_matrix;
-    int _ref_color;
     QMatrix4x4 _model;
     QMatrix4x4 _view;
     QMatrix4x4 _proj;

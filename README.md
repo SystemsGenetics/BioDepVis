@@ -112,8 +112,8 @@ To stop recording, enter `Ctrl-C` and an FLV file will be saved.
 - `Q/E`: Zoom
 - `G`: Toggle GPU
 - `Space`: Toggle Force Directed Layout
-- `V`: Toggle alignment (curved/2D)
-- `,`: Toggle module coloring
-- `T`: Toggle search area
-- `Z`: Toggle "back graph" mode
+- `Z`: Toggle back-graph mode
 - `X`: Toggle ROI mode
+- `C`: Toggle module coloring
+- `V`: Toggle alignment mode (curved/2D)
+- `B`: Toggle multi-select

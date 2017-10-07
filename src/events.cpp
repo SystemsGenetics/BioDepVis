@@ -31,18 +31,6 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 	case 'f': case 'F':
 		camera->SetCenterOfFocus(Vector3d(0, 0, 0));
 		break;
-	case 'g': case 'G':
-		gpuEnabled = !gpuEnabled;
-		break;
-	case ' ':
-		animate = !animate;
-		break;
-	case ',':
-		cluster = !cluster;
-		break;
-	case 'v': case 'V':
-		showalignment = !showalignment;
-		break;
 	case 'w': case 'W':
 		camera->Pos.x += SHIFT;
 		break;
@@ -72,9 +60,6 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 		break;
 	case 'k': case 'K':
 		camera->Aim.y -= SHIFT;
-		break;
-	case 't': case 'T':
-		searchArea = !searchArea;
 		break;
 	case 'p':
 		yscale+=2;
@@ -106,11 +91,26 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 	case '-':
 		searchRadius=-10;
 		break;
-	case 'x': case 'X':
-		roiMODE=!roiMODE;
+	case 'g': case 'G':
+		gpuEnabled = !gpuEnabled;
+		break;
+	case ' ':
+		animate = !animate;
 		break;
 	case 'z': case 'Z':
-		backGraphMode=!backGraphMode;
+		backGraphMode = !backGraphMode;
+		break;
+	case 'x': case 'X':
+		roiMODE = !roiMODE;
+		break;
+	case 'c': case 'C':
+		cluster = !cluster;
+		break;
+	case 'v': case 'V':
+		showalignment = !showalignment;
+		break;
+	case 'b': case 'B':
+		searchArea = !searchArea;
 		break;
 	case 27:
 		cleanup();
@@ -146,7 +146,6 @@ void control_cb(int control)
 		int id = selectList->get_current_item();
 		GLUI_List_Item *item = selectList->get_item_ptr(id);
 
-		printf("ID : %d = \n", id);
 		description->set_text(item->text.c_str());
 		gotermList->delete_all();
 

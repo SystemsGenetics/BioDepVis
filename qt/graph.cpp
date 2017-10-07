@@ -55,8 +55,8 @@ Graph::Graph(
         QColor c = QColor::fromHsvF(
             (float) node.module_id / num_modules,
             0.8f,
-            1.0f - (float) node.module_id / num_modules,
-            0.6f
+            0.8f,
+            1.0f
         );
 
         this->_colors.push_back({
