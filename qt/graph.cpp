@@ -1,43 +1,8 @@
-#include "graph.h"
+#include <QColor>
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
-
-const float CLUSTER_SIZE = 360.0f;
-const float NODE_ALPHA = 0.6f;
-
-color_t hsv_to_rgb(float h, float s, float v)
-{
-    int i;
-    float f, p, q, t;
-
-    if ( s == 0 ) {
-        return (color_t) { v, v, v, 0 };
-    }
-
-    h /= 60;
-    i = floor(h);
-    f = h - i;
-    p = v * (1 - s);
-    q = v * (1 - s * f);
-    t = v * (1 - s * (1 - f));
-
-    switch ( i ) {
-    case 0:
-        return (color_t) { v, t, p, 0 };
-    case 1:
-        return (color_t) { q, v, p, 0 };
-    case 2:
-        return (color_t) { p, v, t, 0 };
-    case 3:
-        return (color_t) { p, q, v, 0 };
-    case 4:
-        return (color_t) { t, p, v, 0 };
-    case 5:
-    default:
-        return (color_t) { v, p, q, 0 };
-    }
-}
+#include "graph.h"
 
 Graph::Graph(
     int id, const QString& name,
@@ -74,18 +39,32 @@ Graph::Graph(
         this->_coords_d.push_back({ 0, 0, 0 });
     }
 
+    // determine number of modules
+    int num_modules = 0;
+
+    for ( const graph_node_t& node : this->_nodes ) {
+        if ( num_modules < node.module_id ) {
+            num_modules = node.module_id;
+        }
+    }
+
     // initialize colors
     this->_colors.reserve(this->_nodes.size());
 
     for ( const graph_node_t& node : this->_nodes ) {
-        float h = node.module_id / CLUSTER_SIZE * 360.0f;
-        float s = 0.8f;
-        float v = 1.0f - node.module_id / CLUSTER_SIZE;
+        QColor c = QColor::fromHsvF(
+            (float) node.module_id / num_modules,
+            0.8f,
+            1.0f - (float) node.module_id / num_modules,
+            0.6f
+        );
 
-        color_t color = hsv_to_rgb(h, s, v);
-        color.a = NODE_ALPHA;
-
-        this->_colors.push_back(color);
+        this->_colors.push_back({
+            (float) c.redF(),
+            (float) c.greenF(),
+            (float) c.blueF(),
+            (float) c.alphaF()
+        });
     }
 
     // initialize edge matrix
