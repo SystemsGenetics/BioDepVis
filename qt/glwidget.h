@@ -36,24 +36,31 @@ public slots:
     void setRotX(float angle);
     void setRotY(float angle);
     void setRotZ(float angle);
+    void setSelectedNodes(const QVector<node_ref_t>& nodes);
     void setZoom(float zoom);
+
+signals:
+    void nodesSelected(const QVector<node_ref_t>& nodes);
 
 protected:
     void init_camera();
     void initializeGL() override;
     void paintGL() override;
     void keyPressEvent(QKeyEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
 private:
     Database *_db;
-    bool _show_alignment;
+    bool _alignment;
+    bool _select_multi;
 
     QPoint _prev_pos;
     QVector3D _rot;
     float _zoom;
+    QVector<node_ref_t> _selected_nodes;
 
     QOpenGLShaderProgram *_program;
     int _ref_mvp_matrix;

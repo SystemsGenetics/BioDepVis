@@ -28,7 +28,7 @@ void MainWindow::create_gui()
 
     QLabel *geneListLabel = new QLabel("Genes");
     this->_gene_list = new QListWidget();
-    connect(this->_gene_list, SIGNAL(itemSelectionChanged()), this, SLOT(select_gene()));
+    connect(this->_gene_list, SIGNAL(itemActivated(QListWidgetItem *)), this, SLOT(selectGene()));
 
     QLabel *geneDescLabel = new QLabel("Description");
     this->_gene_desc = new QTextEdit();
@@ -40,7 +40,7 @@ void MainWindow::create_gui()
 
     QLabel *goTermListLabel = new QLabel("Ontology Terms");
     this->_go_term_list = new QListWidget();
-    connect(this->_go_term_list, SIGNAL(itemSelectionChanged()), this, SLOT(select_go_term()));
+    connect(this->_go_term_list, SIGNAL(itemActivated(QListWidgetItem *)), this, SLOT(selectGoTerm()));
 
     QLabel *goTermDescLabel = new QLabel("Description");
     this->_go_term_desc = new QTextEdit();
@@ -80,6 +80,8 @@ void MainWindow::create_gui()
     visGroup->setLayout(visLayout);
 
     GLWidget *glWidget = new GLWidget(this->_db);
+    connect(glWidget, SIGNAL(nodesSelected(const QVector<node_ref_t>&)), this, SLOT(setSelectedGenes(const QVector<node_ref_t>&)));
+    connect(this, SIGNAL(genesSelected(const QVector<node_ref_t>&)), glWidget, SLOT(setSelectedNodes(const QVector<node_ref_t>&)));
 
     visLayout->addWidget(glWidget);
 
@@ -98,7 +100,8 @@ void MainWindow::create_gui()
         { "G", "Toggle GPU" },
         { "Space", "Toggle FDL" },
         { ",", "Toggle module coloring" },
-        { "V", "Toggle alignment" }
+        { "V", "Toggle alignment" },
+        { "T", "Toggle multi-select" }
     };
 
     for ( auto& ctrl : controls ) {
@@ -128,6 +131,8 @@ void MainWindow::update_gui()
 
             _gene_list->addItem(node.name);
         }
+
+        _gene_desc->setText("");
     }
     else {
         // update gene description
@@ -143,6 +148,8 @@ void MainWindow::update_gui()
         for ( const QString& id : _go_terms ) {
             _go_term_list->addItem(id);
         }
+
+        _go_term_desc->setText("");
     }
     else {
         // update ontology term description
@@ -152,7 +159,17 @@ void MainWindow::update_gui()
     }
 }
 
-void MainWindow::select_gene()
+void MainWindow::setSelectedGenes(const QVector<node_ref_t>& genes)
+{
+    init_controls();
+
+    _genes = genes;
+
+    emit genesSelected(_genes);
+    update_gui();
+}
+
+void MainWindow::selectGene()
 {
     _gene_index = 0;
     while ( !_gene_list->item(_gene_index)->isSelected() ) {
@@ -168,7 +185,7 @@ void MainWindow::select_gene()
     update_gui();
 }
 
-void MainWindow::select_go_term()
+void MainWindow::selectGoTerm()
 {
     _go_term_index = 0;
     while ( !_go_term_list->item(_go_term_index)->isSelected() ) {
@@ -190,11 +207,14 @@ void MainWindow::search()
         }
     }
 
+    emit genesSelected(_genes);
     update_gui();
 }
 
 void MainWindow::clear()
 {
     init_controls();
+
+    emit genesSelected(_genes);
     update_gui();
 }

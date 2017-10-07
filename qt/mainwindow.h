@@ -25,10 +25,14 @@ public:
     MainWindow(Database *db);
 
 public slots:
-    void select_gene();
-    void select_go_term();
+    void setSelectedGenes(const QVector<node_ref_t>& genes);
+    void selectGene();
+    void selectGoTerm();
     void search();
     void clear();
+
+signals:
+    void genesSelected(const QVector<node_ref_t>& genes);
 
 private:
     void init_controls();

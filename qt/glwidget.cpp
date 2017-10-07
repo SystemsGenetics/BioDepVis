@@ -43,7 +43,8 @@ static const char *FRAGMENT_SHADER_SOURCE =
 GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _db(db),
-      _show_alignment(false),
+      _alignment(false),
+      _select_multi(false),
       _rot(0, 0, 0),
       _zoom(0),
       _program(0)
@@ -84,6 +85,11 @@ void GLWidget::setRotY(float angle)
 void GLWidget::setRotZ(float angle)
 {
     _rot.setZ(angle);
+}
+
+void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
+{
+    _selected_nodes = nodes;
 }
 
 void GLWidget::setZoom(float zoom)
@@ -223,7 +229,7 @@ void GLWidget::paintGL()
     }
 
     // draw each alignment
-    if ( _show_alignment ) {
+    if ( _alignment ) {
         for ( AlignObject *obj : _alignments ) {
             QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
 
@@ -241,6 +247,44 @@ void GLWidget::paintGL()
     }
 
     _program->release();
+}
+
+void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    const float max_dist = 5.0f;
+    float x = event->x();
+    float y = height() - event->y();
+    QMatrix4x4 mv = _model * _view;
+    QVector3D start = QVector3D(x, y, 0.0f).unproject(mv, _proj, rect());
+    QVector3D end = QVector3D(x, y, 1.0f).unproject(mv, _proj, rect());
+    QVector3D dir = (end - start).normalized();
+
+    QVector<node_ref_t> nodes;
+    float min_dist = max_dist;
+
+    for ( int i = 0; i < _db->graphs().size(); i++ ) {
+        Graph *g = _db->graphs().values()[i];
+
+        for ( int j = 0; j < g->nodes().size(); j++ ) {
+            vec3_t v = g->coords()[j];
+            float dist = QVector3D(v.x, v.y, v.z).distanceToLine(start, dir);
+
+            if ( dist < max_dist ) {
+                if ( _select_multi ) {
+                    nodes.push_back(node_ref_t { g->id(), j });
+                }
+                else if ( dist < min_dist ) {
+                    min_dist = dist;
+
+                    nodes.clear();
+                    nodes.push_back(node_ref_t { g->id(), j });
+                }
+            }
+        }
+    }
+
+    emit nodesSelected(nodes);
+    event->accept();
 }
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
@@ -292,17 +336,14 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         }
         break;
     case Qt::Key_V:
-        _show_alignment = !_show_alignment;
+        _alignment = !_alignment;
+        break;
+    case Qt::Key_T:
+        _select_multi = !_select_multi;
         break;
     }
 
     update();
-    event->accept();
-}
-
-void GLWidget::mousePressEvent(QMouseEvent *event)
-{
-    _prev_pos = event->pos();
     event->accept();
 }
 
@@ -322,6 +363,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     _prev_pos = event->pos();
 
     update();
+    event->accept();
+}
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    _prev_pos = event->pos();
     event->accept();
 }
 
