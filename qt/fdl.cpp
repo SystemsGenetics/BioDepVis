@@ -3,12 +3,9 @@
 
 const float MAX_DISPLACEMENT_SQR = 10.0f;
 
-inline int ELEM(int *data, int cols, int i, int j)
-{
-    return data[i * cols + j];
-}
+#define ELEM(data, cols, i, j) (data)[(i) * (cols) + (j)]
 
-void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
 {
     const float K_r = 25.0f;
     const float K_s = 15.0f;
@@ -54,7 +51,7 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
     }
 }
 
-void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
 {
     const float K_r = 25.0f;
     const float K_s = 15.0f;

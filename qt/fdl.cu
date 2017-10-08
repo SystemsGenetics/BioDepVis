@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include "fdl.h"
 
+const int BLOCK_SIZE = 256;
 const int MAX_DISPLACEMENT_SQR = 10.0f;
 
 #define ELEM(data, cols, i, j) (data)[(i) * (cols) + (j)]
@@ -10,7 +11,7 @@ const int MAX_DISPLACEMENT_SQR = 10.0f;
 void checkError(cudaError_t err)
 {
 	if ( err != cudaSuccess ) {
-		fprintf(stderr, "CUDA Error: %s\n", cudaGetErrorString(err));
+		fprintf(stderr, "CUDA Runtime Error: %s\n", cudaGetErrorString(err));
 		exit(1);
 	}
 }
@@ -49,16 +50,15 @@ void gpu_sync()
 	checkError(cudaGetLastError());
 }
 
-__global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+__global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
 {
-	int id = threadIdx.x + blockIdx.x * blockDim.x;
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if ( id < n ) {
+	if ( i < n ) {
 		const float K_r = 25.0f;
 		const float K_s = 15.0f;
 		const float L = 1.2f;
 		const float dt = 0.004f;
-		int i = id;
 
 		for ( int j = 0; j < n; j++ ) {
 			if ( i == j ) {
@@ -98,16 +98,15 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, int *edge
 	}
 }
 
-__global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+__global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
 {
-	int id = threadIdx.x + blockIdx.x * blockDim.x;
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if ( id < n ) {
+	if ( i < n ) {
 		const float K_r = 25.0f;
 		const float K_s = 15.0f;
 		const float L = 1.2f;
 		const float dt = 0.004f;
-		int i = id;
 
 		for ( int j = 0; j < n; j++ ) {
 			if ( i == j ) {
@@ -154,12 +153,12 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, int *edge
 	}
 }
 
-void fdl_2d_gpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+void fdl_2d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
 {
-	fdl_kernel_2d<<<n / 256 + 1, 256>>>(n, coords, coords_d, edge_matrix);
+	fdl_kernel_2d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, coords, coords_d, edge_matrix);
 }
 
-void fdl_3d_gpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
+void fdl_3d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
 {
-	fdl_kernel_3d<<<n / 256 + 1, 256>>>(n, coords, coords_d, edge_matrix);
+	fdl_kernel_3d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, coords, coords_d, edge_matrix);
 }
