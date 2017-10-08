@@ -89,8 +89,6 @@ std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width,
 void loadTexture();
 void init(const char * f_in);
 void drawGraph(graph *g);
-void runForceDirected(graph *g);
-void runAlignmentLayout(Alignment * a);
 void drawAlignment(Alignment *align);
 void drawAlignmentROI(Alignment *align,int index);
 std::string lookupName(int graphIndex, int nodeIndex);

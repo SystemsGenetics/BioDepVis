@@ -25,17 +25,11 @@ int HEIGHT = 600;
 
 float searchRadius = 40;
 
-//  currentTime - previousTime is the time elapsed
-//  between every call of the Idle function
-int currentTime = 0, previousTime = 0;
 std::vector <nodeSelectedStruct> selectedVector;
 std::vector <nodeSelectedStruct> searchSelectedVector;
 
 GLvoid *font_style = GLUT_BITMAP_HELVETICA_10;
 GLvoid *font_style2 = GLUT_BITMAP_TIMES_ROMAN_24;
-
-int   wireframe = 0;
-int   segments = 8;
 
 bool animate = false;
 bool cluster = false;
@@ -52,7 +46,6 @@ std::vector <Alignment*> alignmentDatabase;
 
 Camera *camera;
 unsigned int width_particle=64, height_particle=64;
-unsigned char *data_particle;
 GLuint textures;
 
 //ROI Pointers
@@ -214,31 +207,6 @@ void drawGraph(graph *g)
 
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_POINT_SPRITE);
-}
-
-
-void runForceDirected(graph *g)
-{
-	if (animate == true)
-	{
-		if (!gpuEnabled)
-			forceDirectedLayout(g->coords, g->coinfo, g->nodes, g->edgeMatrix);
-		else
-		{
-			runForceDirectedGPU(g);
-		}
-	}
-}
-
-
-void runAlignmentLayout(Alignment * a)
-{
-	if (animate == true)
-	{
-		if (gpuEnabled){
-			runAlignmentForceGPU(a);
-		}
-	}
 }
 
 
@@ -730,34 +698,44 @@ void PerspDisplay()
 
 void idle()
 {
-	if (glutGetWindow() != persp_win)
+	if (glutGetWindow() != persp_win) {
 		glutSetWindow(persp_win);
-
-
-	for (int i = 0; i < graphDatabase.size(); i++)
-	{
-		graph *graphT = graphDatabase.at(i);
-		runForceDirected(graphT);
+		glutPostRedisplay();
 	}
 
-	for (int i = 0; i < alignmentDatabase.size(); i++)
-	{
-		Alignment *alignT = alignmentDatabase.at(i);
-		runAlignmentLayout(alignT);
-	}
-
-	if (gpuEnabled)
-	{
-		gpuDeviceSync();
-
+	if ( animate ) {
 		for (int i = 0; i < graphDatabase.size(); i++)
 		{
-			graph *graphT = graphDatabase.at(i);
-			copyForceDirectedGPU(graphT);
-		}
-	}
+			graph *g = graphDatabase.at(i);
 
-	glutPostRedisplay();
+			if (!gpuEnabled)
+				forceDirectedLayout(g->coords, g->coinfo, g->nodes, g->edgeMatrix);
+			else
+				runForceDirectedGPU(g);
+		}
+
+		for (int i = 0; i < alignmentDatabase.size(); i++)
+		{
+			Alignment *a = alignmentDatabase.at(i);
+
+			if (gpuEnabled){
+				runAlignmentForceGPU(a);
+			}
+		}
+
+		if (gpuEnabled)
+		{
+			gpuDeviceSync();
+
+			for (int i = 0; i < graphDatabase.size(); i++)
+			{
+				graph *graphT = graphDatabase.at(i);
+				copyForceDirectedGPU(graphT);
+			}
+		}
+
+		glutPostRedisplay();
+	}
 }
 
 
@@ -796,33 +774,9 @@ bool RayTest( const Vector3d start, const Vector3d end, Vector3d center,
 {
 
 	*pt = ClosestPoint(start, end, center, t);
-	//double len = Distance(*pt, m_pos);
 	double len = (*pt - center).norm();
 	double m_radius = 5;
 	return len < (m_radius + epsilon);
-}
-
-
-bool RayTestPoints(const Vector3d &start, const Vector3d &end,
-	unsigned int *id, double *t, double epsilon)
-{
-	//unsigned int pointID = m_count + 1;
-	bool foundCollision = false;
-	double minDistToStart = 10000000.0;
-	double dst;
-	Vector3d pt;
-
-	for (int i = 0; i < graphDatabase.size(); i++)
-	{
-		for (int j = 0; j < graphDatabase.at(i)->nodes;j++)
-		if (RayTest(start, end, graphDatabase.at(i)->coords[j*3 + 0], &pt, t, epsilon))
-		{
-
-			printf("Valid %d \n---\n", j);//, graphDatabase.at(i)->nodeListMap["A"]);
-		}
-	}
-
-	return true;
 }
 
 
@@ -843,14 +797,12 @@ void AddNodeToROI(int node, graph *tmpg)
 	float ny = tmpg->coords[node * 3 + 1];
 	float nz = tmpg->coords[node * 3 + 2];
 
-	//if(nx > cx1 && nx <  cx2 && ny > cy1 && ny <  cy2 && nz > cz1 && nz <  cz2 )
 	int index = coordsROI.size()/3;
 	coordsROI.push_back(nx);coordsROI.push_back(ny);coordsROI.push_back(nz);
 	colorROI.push_back(tmpg->color[node*4+0]);
 	colorROI.push_back(tmpg->color[node*4+1]);
 	colorROI.push_back(tmpg->color[node*4+2]);
 	colorROI.push_back(tmpg->color[node*4+3]+0.3);
-	//selectedNodeROI.push_back(j);selectedGraphROI.push_back(i);
 }
 
 
@@ -899,14 +851,11 @@ void GetPickRay(int mouseX, int mouseY)
 
 	double t;
 	float w;
-	//int graphSelected = -1;
-	//int nodeSelected = -1;
 
 	float min = 5.0f;
 
 	if (searchArea != true)
 		min = searchRadius;
-		//RayTestPoints(m_start, m_end, 0, &t, 0.0001f);
 
 	selectedVector.clear();
 	selectList->delete_all();
@@ -992,18 +941,12 @@ void GetPickRay(int mouseX, int mouseY)
 		cz23 = graphDatabase.at(graphSelected3)->coords[nodeSelected3 * 3 + 2] + (zscale3/2) ;
 	}
 
-	//std::vector<float> colorROI;
-	//std::vector<int> verticeEdgeListROI;
-	//std::vector<float> coordsROI;
-
 	coordsROI.clear();
 	colorROI.clear();
 	verticeEdgeListROI.clear();
 	alignEdgesROI.clear();
 	alignEdgesROI2.clear();
 	alignEdgesROI3.clear();
-	//selectedNodeROI.clear();
-	//selectedGraphROI.clear();
 
 	for (int i = 0; i < alignmentDatabase.size(); i++)
 	{
