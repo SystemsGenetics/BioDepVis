@@ -1,0 +1,67 @@
+{
+  "graph": {
+    "graph1": {
+      "id": 1,
+      "name": "Maize",
+      "fileLocation": "data/M.tab",
+      "clusterLocation": "data/M.tab.cluster",
+      "Ontology": "data/M.info",
+      "x": -200,
+      "y": 200,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    },
+     "graph2": {
+      "id": 2,
+      "name": "MaizeCons",
+      "fileLocation": "data/grow.M.tab.gna",
+      "clusterLocation": "data/M.grow.cluster",
+      "x": -200,
+      "y": -200,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    },
+    "graph3": {
+      "id": 3,
+      "name": "Rice",
+      "fileLocation": "data/R.tab",
+      "clusterLocation": "data/R.tab.cluster",
+      "Ontology": "data/R.info",
+      "x": 200,
+      "y": 200,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    },
+    "graph4": {
+      "id": 4,
+      "name": "RiceCons",
+      "fileLocation": "data/grow.R.tab.gna",
+      "clusterLocation": "data/R.grow.cluster",
+      "x": 200,
+      "y": -200,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    }
+  },
+  "alignment": {
+    "alignment1": {
+      "graphID1": 2,
+      "graphID2": 4,
+      "filelocation": "data/M-R.gna"
+    },
+    "alignment2": {
+      "graphID1": 1,
+      "graphID2": 2,
+      "filelocation": "data/M-M.gna"
+    },
+     "alignment3": {
+      "graphID1": 3,
+      "graphID2": 4,
+      "filelocation": "data/R-R.gna"
+    }
+  }
+}

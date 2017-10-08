@@ -1,0 +1,18 @@
+{
+  "graph": {
+    "graph1": {
+      "id": 1,
+      "name": "Maize",
+      "fileLocation": "data/M.tab",
+      "clusterLocation": "data/M.tab.cluster",
+      "Ontology": "data/M.info",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    }
+  },
+  "alignment": {
+  }
+}

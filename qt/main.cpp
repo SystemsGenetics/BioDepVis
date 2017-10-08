@@ -17,7 +17,7 @@ void print_usage()
         "Usage: ./biodep-vis [options]\n"
         "\n"
         "Options:\n"
-        "  --config FILE  configuration file [input.json]\n"
+        "  --config FILE  configuration file [config/test_M-R.json]\n"
         "  --ont FILE     ontology dictionary file [go-basic.obo]\n"
         "  --help         list help options\n"
     );
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     // parse command-line arguments
     args_t args = {
-        "input.json",
+        "config/test_M-R.json",
         "go-basic.obo"
     };
 
