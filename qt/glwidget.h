@@ -54,11 +54,13 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void timerEvent(QTimerEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
 private:
     Database *_db;
     bool _alignment;
+    bool _animate;
     bool _gpu;
     bool _module_color;
     bool _select_multi;

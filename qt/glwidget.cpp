@@ -1,9 +1,12 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QOpenGLShaderProgram>
+#include <QTimer>
 #include <QWheelEvent>
 #include "fdl.h"
 #include "glwidget.h"
+
+const int MAX_FPS = 30;
 
 const color_t GRAPH_EDGE_COLORS[] = {
     { 0.65f, 0.81f, 0.89f, 0.30f },
@@ -43,8 +46,9 @@ static const char *FRAGMENT_SHADER_SOURCE =
 GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _db(db),
-      _alignment(false),
-      _gpu(false),
+      _alignment(true),
+      _animate(false),
+      _gpu(true),
       _module_color(false),
       _select_multi(false),
       _rot(0, 0, 0),
@@ -52,6 +56,8 @@ GLWidget::GLWidget(Database *db, QWidget *parent)
       _program(0)
 {
     setFocusPolicy(Qt::ClickFocus);
+
+    startTimer(1000 / MAX_FPS);
 }
 
 GLWidget::~GLWidget()
@@ -152,6 +158,8 @@ void GLWidget::run_animation()
     for ( Alignment *a : _db->alignments() ) {
         a->update();
     }
+
+    update();
 }
 
 void GLWidget::initializeGL()
@@ -387,7 +395,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         _gpu = !_gpu;
         break;
     case Qt::Key_Space:
-        run_animation();
+        _animate = !_animate;
         break;
     case Qt::Key_C:
         _module_color = !_module_color;
@@ -464,6 +472,15 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     _prev_pos = event->pos();
+    event->accept();
+}
+
+void GLWidget::timerEvent(QTimerEvent *event)
+{
+    if ( _animate ) {
+        run_animation();
+    }
+
     event->accept();
 }
 
