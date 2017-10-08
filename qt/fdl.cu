@@ -55,10 +55,9 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if ( i < n ) {
-		const float K_r = 25.0f;
-		const float K_s = 15.0f;
-		const float L = 1.2f;
-		const float dt = 0.004f;
+		const float K_r = 0.2f;
+		const float K_s = 1.0f;
+		const float L = 2.2f;
 
 		for ( int j = 0; j < n; j++ ) {
 			if ( i == j ) {
@@ -82,8 +81,8 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int
 			}
 		}
 
-		float dx = coords_d[i].x * dt;
-		float dy = coords_d[i].y * dt;
+		float dx = coords_d[i].x;
+		float dy = coords_d[i].y;
 		float disp_sqr = dx * dx + dy * dy;
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
@@ -91,10 +90,10 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int
 			dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
-		coords[i].x += dx;
-		coords[i].y += dy;
-		coords_d[i].x *= 0.09f;
-		coords_d[i].y *= 0.09f;
+		coords[i].x += 0.84f * dx;
+		coords[i].y += 0.84f * dy;
+		coords_d[i].x *= 0.6f;
+		coords_d[i].y *= 0.6f;
 	}
 }
 
@@ -103,10 +102,9 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if ( i < n ) {
-		const float K_r = 25.0f;
-		const float K_s = 15.0f;
-		const float L = 1.2f;
-		const float dt = 0.004f;
+		const float K_r = 0.2f;
+		const float K_s = 1.0f;
+		const float L = 2.2f;
 
 		for ( int j = 0; j < n; j++ ) {
 			if ( i == j ) {
@@ -133,9 +131,9 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int
 			}
 		}
 
-		float dx = coords_d[i].x * dt;
-		float dy = coords_d[i].y * dt;
-		float dz = coords_d[i].z * dt;
+		float dx = coords_d[i].x;
+		float dy = coords_d[i].y;
+		float dz = coords_d[i].z;
 		float disp_sqr = dx * dx + dy * dy + dz * dz;
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
@@ -144,12 +142,12 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int
 			dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
-		coords[i].x += dx;
-		coords[i].y += dy;
-		coords[i].z += dz;
-		coords_d[i].x *= 0.09f;
-		coords_d[i].y *= 0.09f;
-		coords_d[i].z *= 0.09f;
+		coords[i].x += 0.84f * dx;
+		coords[i].y += 0.84f * dy;
+		coords[i].z += 0.84f * dz;
+		coords_d[i].x *= 0.6f;
+		coords_d[i].y *= 0.6f;
+		coords_d[i].z *= 0.6f;
 	}
 }
 
