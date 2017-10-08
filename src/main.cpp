@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 
 	optarg_t args = {
 		"go-basic.obo",
-		"input.json"
+		"config/test_M-R.json"
 	};
 
 	struct option long_options[] = {

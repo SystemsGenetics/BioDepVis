@@ -32,16 +32,16 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 		camera->SetCenterOfFocus(Vector3d(0, 0, 0));
 		break;
 	case 'w': case 'W':
-		camera->Pos.x += SHIFT;
+		camera->Aim.y += SHIFT;
 		break;
 	case 's': case 'S':
-		camera->Pos.x -= SHIFT;
+		camera->Aim.y -= SHIFT;
 		break;
 	case 'a': case 'A':
-		camera->Pos.y += SHIFT;
+		camera->Aim.x -= SHIFT;
 		break;
 	case 'd': case 'D':
-		camera->Pos.y -= SHIFT;
+		camera->Aim.x += SHIFT;
 		break;
 	case 'q': case 'Q':
 		camera->Pos.z += SHIFT;
@@ -49,17 +49,17 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 	case 'e': case 'E':
 		camera->Pos.z -= SHIFT;
 		break;
-	case 'j': case 'J':
-		camera->Aim.x -= SHIFT;
-		break;
-	case 'l': case 'L':
-		camera->Aim.x += SHIFT;
-		break;
 	case 'i': case 'I':
-		camera->Aim.y += SHIFT;
+		camera->Pos.y += SHIFT;
 		break;
 	case 'k': case 'K':
-		camera->Aim.y -= SHIFT;
+		camera->Pos.y -= SHIFT;
+		break;
+	case 'j': case 'J':
+		camera->Pos.x -= SHIFT;
+		break;
+	case 'l': case 'L':
+		camera->Pos.x += SHIFT;
 		break;
 	case 'p':
 		yscale+=2;

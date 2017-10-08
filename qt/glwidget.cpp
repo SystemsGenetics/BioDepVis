@@ -361,29 +361,17 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_R:
         init_camera();
         break;
-    case Qt::Key_I:
+    case Qt::Key_W:
         _view.translate(0, -SHIFT_TRANS, 0);
         break;
-    case Qt::Key_K:
+    case Qt::Key_S:
         _view.translate(0, +SHIFT_TRANS, 0);
         break;
-    case Qt::Key_J:
+    case Qt::Key_A:
         _view.translate(+SHIFT_TRANS, 0, 0);
         break;
-    case Qt::Key_L:
-        _view.translate(-SHIFT_TRANS, 0, 0);
-        break;
-    case Qt::Key_W:
-        setRotX(_rot.x() + SHIFT_ROT);
-        break;
-    case Qt::Key_S:
-        setRotX(_rot.x() - SHIFT_ROT);
-        break;
-    case Qt::Key_A:
-        setRotY(_rot.y() + SHIFT_ROT);
-        break;
     case Qt::Key_D:
-        setRotY(_rot.y() - SHIFT_ROT);
+        _view.translate(-SHIFT_TRANS, 0, 0);
         break;
     case Qt::Key_Q:
         setZoom(_zoom + SHIFT_ZOOM);
@@ -391,6 +379,23 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_E:
         setZoom(_zoom - SHIFT_ZOOM);
         break;
+    case Qt::Key_I:
+        setRotX(_rot.x() + SHIFT_ROT);
+        break;
+    case Qt::Key_K:
+        setRotX(_rot.x() - SHIFT_ROT);
+        break;
+    case Qt::Key_J:
+        setRotY(_rot.y() + SHIFT_ROT);
+        break;
+    case Qt::Key_L:
+        setRotY(_rot.y() - SHIFT_ROT);
+        break;
+    case Qt::Key_U:
+        setRotZ(_rot.z() + SHIFT_ROT);
+        break;
+    case Qt::Key_O:
+        setRotZ(_rot.z() - SHIFT_ROT);
     case Qt::Key_G:
         _gpu = !_gpu;
         break;

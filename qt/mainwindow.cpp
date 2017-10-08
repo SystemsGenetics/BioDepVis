@@ -92,11 +92,12 @@ void MainWindow::create_gui()
 
     QVector<QPair<QString, QString>> controls {
         { "R", "Reset View" },
-        { "I/K", "Pan Up/Down" },
-        { "J/L", "Pan Left/Right" },
-        { "W/S", "Rotate Up/Down" },
-        { "A/D", "Rotate Left/Right" },
+        { "W/S", "Pan Up/Down" },
+        { "A/D", "Pan Left/Right" },
         { "Q/E", "Zoom" },
+        { "I/K", "Rotate Up/Down" },
+        { "J/L", "Rotate Left/Right" },
+        { "U/O", "Rotate Z-axis" },
         { "G", "Toggle GPU" },
         { "Space", "Toggle force-directed layout" },
         { "C", "Toggle module coloring" },

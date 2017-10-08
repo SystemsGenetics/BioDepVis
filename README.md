@@ -101,19 +101,3 @@ python flvrec.py localhost <port>
 ```
 
 To stop recording, enter `Ctrl-C` and an FLV file will be saved.
-
-## Keyboard Commands
-
-- `R`: Reset view
-- `I/K`: Pan up/down
-- `J/L`: Pan left/right
-- `W/S`: Rotate up/down
-- `A/D`: Rotate left/right
-- `Q/E`: Zoom
-- `G`: Toggle GPU
-- `Space`: Toggle Force Directed Layout
-- `Z`: Toggle back-graph mode
-- `X`: Toggle ROI mode
-- `C`: Toggle module coloring
-- `V`: Toggle alignment mode (curved/2D)
-- `B`: Toggle multi-select
