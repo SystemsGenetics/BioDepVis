@@ -106,13 +106,9 @@ Graph::~Graph()
  */
 int Graph::find_node(const QString& name)
 {
-    for ( int i = 0; i < this->_nodes.size(); i++ ) {
-        if ( this->_nodes[i].name == name ) {
-            return i;
-        }
-    }
-
-    return -1;
+    return _node_map.contains(name)
+	? _node_map[name]
+	: -1;
 }
 
 /**
@@ -143,6 +139,11 @@ void Graph::load_nodes(const QString& filename)
         node.module_id = module_id;
 
         this->_nodes.push_back(node);
+    }
+
+    // initialize hashmap of node names for constant-time search
+    for ( int i = 0; i < _nodes.size(); i++ ) {
+        _node_map[_nodes[i].name] = i;
     }
 }
 

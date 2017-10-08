@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <QHash>
 #include <QString>
 #include <QVector>
 #include "matrix.h"
@@ -34,6 +35,7 @@ private:
     float _height;
 
     QVector<graph_node_t> _nodes;
+    QHash<QString, int> _node_map;
     QVector<graph_edge_t> _edges;
     QVector<color_t> _colors;
 
@@ -58,13 +60,13 @@ public:
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
-    const QVector<graph_node_t>& nodes() const { return this->_nodes; }
-    const QVector<graph_edge_t>& edges() const { return this->_edges; }
-    const QVector<color_t>& colors() const { return this->_colors; }
+    QVector<graph_node_t>& nodes() { return this->_nodes; }
+    QVector<graph_edge_t>& edges() { return this->_edges; }
+    QVector<color_t>& colors() { return this->_colors; }
 
     QVector<vec3_t>& coords() { return this->_coords; }
     QVector<vec3_t>& coords_d() { return this->_coords_d; }
-    const Matrix& edge_matrix() const { return this->_edge_matrix; }
+    Matrix& edge_matrix() { return this->_edge_matrix; }
 
     vec3_t * coords_gpu() { return this->_coords_gpu; }
     vec3_t * coords_d_gpu() { return this->_coords_d_gpu; }

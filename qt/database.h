@@ -26,9 +26,11 @@ private:
 public:
     Database() {};
 
-    QMap<int, Graph *>& graphs() { return this->_graphs; }
-    QVector<Alignment *>& alignments() { return this->_alignments; }
-    QHash<QString, ont_term_t> ontology() { return this->_ontology; }
+    QMap<int, Graph *>& graphs() { return _graphs; }
+    QVector<Alignment *>& alignments() { return _alignments; }
+    QHash<QString, ont_term_t> ontology() { return _ontology; }
+
+    graph_node_t& node(const node_ref_t& ref) { return _graphs[ref.graph_id]->nodes()[ref.node_id]; }
 
     void load_config(const QString& filename);
     void load_ontology(const QString& filename);

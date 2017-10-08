@@ -130,9 +130,7 @@ void MainWindow::update_gui()
         _gene_list->clear();
 
         for ( const node_ref_t& ref : _genes ) {
-            const graph_node_t& node = _db->graphs()[ref.graph_id]->nodes()[ref.node_id];
-
-            _gene_list->addItem(node.name);
+            _gene_list->addItem(_db->node(ref).name);
         }
 
         _gene_desc->setText("");
@@ -141,7 +139,7 @@ void MainWindow::update_gui()
         // update gene description
         const node_ref_t& ref = _genes[_gene_index];
 
-        _gene_desc->setText(_db->graphs()[ref.graph_id]->nodes()[ref.node_id].name);
+        _gene_desc->setText(_db->node(ref).name);
     }
 
     if ( _go_term_index == -1 ) {
@@ -182,7 +180,7 @@ void MainWindow::selectGene()
     // update go term list
     const node_ref_t& ref = _genes[_gene_index];
 
-    _go_terms = _db->graphs()[ref.graph_id]->nodes()[ref.node_id].go_terms;
+    _go_terms = _db->node(ref).go_terms;
     _go_term_index = -1;
 
     update_gui();
