@@ -18,24 +18,24 @@ LIBS += \
     -L/usr/local/cuda/lib64 -lcudart
 
 OBJECTS += \
-    fdl_cuda.o
+    obj/fdl_cuda.o
 
 SOURCES += \
-    alignment.cpp \
-    database.cpp \
-    fdl.cpp \
-    glwidget.cpp \
-    graph.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    matrix.cpp
+    qt/alignment.cpp \
+    qt/database.cpp \
+    qt/fdl.cpp \
+    qt/glwidget.cpp \
+    qt/graph.cpp \
+    qt/main.cpp \
+    qt/mainwindow.cpp \
+    qt/matrix.cpp
 
 HEADERS += \
-    alignment.h \
-    database.h \
-    fdl.h \
-    glwidget.h \
-    graph.h \
-    mainwindow.h \
-    matrix.h \
-    vector.h
+    qt/alignment.h \
+    qt/database.h \
+    qt/fdl.h \
+    qt/glwidget.h \
+    qt/mainwindow.h \
+    qt/graph.h \
+    qt/matrix.h \
+    qt/vector.h

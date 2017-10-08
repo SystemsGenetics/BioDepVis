@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# build CUDA code
+mkdir -p obj
+nvcc -c -std=c++11 -Wno-deprecated-gpu-targets -o obj/fdl_cuda.o qt/fdl.cu
+
+# build BioDepVis
+mkdir -p build
+cd build
+qmake .. && make && cp BioDepVis ../
+cd ../
