@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cmath>
 #include "fdl.h"
 
@@ -11,10 +10,10 @@ inline int ELEM(int *data, int cols, int i, int j)
 
 void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
 {
-    float K_r = 25.0f;
-    float K_s = 15.0f;
-    float L = 1.2f;
-    float dt = 0.004f;
+    const float K_r = 25.0f;
+    const float K_s = 15.0f;
+    const float L = 1.2f;
+    const float dt = 0.004f;
 
     for ( int i = 0; i < n; i++ ) {
         for ( int j = 0; j < n; j++ ) {
@@ -48,8 +47,6 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
             dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
         }
 
-        assert(!std::isnan(dx) && !std::isnan(dy));
-
         coords[i].x += dx;
         coords[i].y += dy;
         coords_d[i].x *= 0.09f;
@@ -59,10 +56,10 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
 
 void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
 {
-    float K_r = 25.0f;
-    float K_s = 15.0f;
-    float L = 1.2f;
-    float dt = 0.004f;
+    const float K_r = 25.0f;
+    const float K_s = 15.0f;
+    const float L = 1.2f;
+    const float dt = 0.004f;
 
     for ( int i = 0; i < n; i++ ) {
         for ( int j = 0; j < n; j++ ) {
@@ -100,8 +97,6 @@ void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, int *edge_matrix)
             dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
             dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
         }
-
-        assert(!std::isnan(dx) && !std::isnan(dy) && !std::isnan(dz));
 
         coords[i].x += dx;
         coords[i].y += dy;

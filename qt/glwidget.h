@@ -47,6 +47,7 @@ signals:
 
 protected:
     void init_camera();
+    void run_animation();
     void initializeGL() override;
     void paintGL() override;
     void keyPressEvent(QKeyEvent *event) override;

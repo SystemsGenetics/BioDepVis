@@ -12,5 +12,6 @@ void * gpu_malloc(int size);
 void gpu_free(void *ptr);
 void gpu_read(void *dst, void *src, int size);
 void gpu_write(void *dst, void *src, int size);
+void gpu_sync();
 
 #endif

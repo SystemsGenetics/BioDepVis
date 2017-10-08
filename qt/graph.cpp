@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include "fdl.h"
 #include "graph.h"
 
 Graph::Graph(
@@ -78,6 +79,24 @@ Graph::Graph(
         this->_edge_matrix.elem(i, j) = 1;
         this->_edge_matrix.elem(j, i) = 1;
     }
+
+    // initialize GPU data
+    int n = _nodes.size();
+
+    _coords_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
+    _coords_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
+    _edge_matrix_gpu = (int *)gpu_malloc(n * n * sizeof(int));
+
+    gpu_write(_coords_gpu, _coords.data(), n * sizeof(vec3_t));
+    gpu_write(_coords_d_gpu, _coords_d.data(), n * sizeof(vec3_t));
+    gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(int));
+}
+
+Graph::~Graph()
+{
+    gpu_free(_coords_gpu);
+    gpu_free(_coords_d_gpu);
+    gpu_free(_edge_matrix_gpu);
 }
 
 /**

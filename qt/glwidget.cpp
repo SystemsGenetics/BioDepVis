@@ -116,6 +116,44 @@ void GLWidget::init_camera()
     _view.translate(0, 0, -400);
 }
 
+void GLWidget::run_animation()
+{
+    for ( Graph *g : _db->graphs().values() ) {
+        if ( _gpu ) {
+            fdl_2d_gpu(
+                g->nodes().size(),
+                g->coords_gpu(),
+                g->coords_d_gpu(),
+                g->edge_matrix_gpu()
+            );
+        }
+        else {
+            fdl_2d_cpu(
+                g->nodes().size(),
+                g->coords().data(),
+                g->coords_d().data(),
+                g->edge_matrix().data()
+            );
+        }
+    }
+
+    if ( _gpu ) {
+        gpu_sync();
+
+        // copy graph data from GPU
+        for ( Graph *g : _db->graphs().values() ) {
+            int n = g->nodes().size();
+            gpu_read(g->coords().data(), g->coords_gpu(), n * sizeof(vec3_t));
+            gpu_read(g->coords_d().data(), g->coords_d_gpu(), n * sizeof(vec3_t));
+            gpu_read(g->edge_matrix().data(), g->edge_matrix_gpu(), n * n * sizeof(int));
+        }
+    }
+
+    for ( Alignment *a : _db->alignments() ) {
+        a->update();
+    }
+}
+
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -305,44 +343,6 @@ void GLWidget::paintGL()
     _program->release();
 }
 
-void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    const float max_dist = 5.0f;
-    float x = event->x();
-    float y = height() - event->y();
-    QMatrix4x4 mv = _model * _view;
-    QVector3D start = QVector3D(x, y, 0.0f).unproject(mv, _proj, rect());
-    QVector3D end = QVector3D(x, y, 1.0f).unproject(mv, _proj, rect());
-    QVector3D dir = (end - start).normalized();
-
-    QVector<node_ref_t> nodes;
-    float min_dist = max_dist;
-
-    for ( int i = 0; i < _db->graphs().size(); i++ ) {
-        Graph *g = _db->graphs().values()[i];
-
-        for ( int j = 0; j < g->nodes().size(); j++ ) {
-            vec3_t v = g->coords()[j];
-            float dist = QVector3D(v.x, v.y, v.z).distanceToLine(start, dir);
-
-            if ( dist < max_dist ) {
-                if ( _select_multi ) {
-                    nodes.push_back(node_ref_t { g->id(), j });
-                }
-                else if ( dist < min_dist ) {
-                    min_dist = dist;
-
-                    nodes.clear();
-                    nodes.push_back(node_ref_t { g->id(), j });
-                }
-            }
-        }
-    }
-
-    emit nodesSelected(nodes);
-    event->accept();
-}
-
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     const float SHIFT_ROT = 1;
@@ -387,21 +387,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         _gpu = !_gpu;
         break;
     case Qt::Key_Space:
-        for ( Graph *g : _db->graphs().values() ) {
-            if ( _gpu ) {
-            }
-            else {
-                fdl_2d_cpu(
-                    g->nodes().size(),
-                    g->coords().data(),
-                    g->coords_d().data(),
-                    g->edge_matrix().data()
-                );
-            }
-        }
-        for ( Alignment *a : _db->alignments() ) {
-            a->update();
-        }
+        run_animation();
         break;
     case Qt::Key_C:
         _module_color = !_module_color;
@@ -415,6 +401,44 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     }
 
     update();
+    event->accept();
+}
+
+void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    const float max_dist = 5.0f;
+    float x = event->x();
+    float y = height() - event->y();
+    QMatrix4x4 mv = _model * _view;
+    QVector3D start = QVector3D(x, y, 0.0f).unproject(mv, _proj, rect());
+    QVector3D end = QVector3D(x, y, 1.0f).unproject(mv, _proj, rect());
+    QVector3D dir = (end - start).normalized();
+
+    QVector<node_ref_t> nodes;
+    float min_dist = max_dist;
+
+    for ( int i = 0; i < _db->graphs().size(); i++ ) {
+        Graph *g = _db->graphs().values()[i];
+
+        for ( int j = 0; j < g->nodes().size(); j++ ) {
+            vec3_t v = g->coords()[j];
+            float dist = QVector3D(v.x, v.y, v.z).distanceToLine(start, dir);
+
+            if ( dist < max_dist ) {
+                if ( _select_multi ) {
+                    nodes.push_back(node_ref_t { g->id(), j });
+                }
+                else if ( dist < min_dist ) {
+                    min_dist = dist;
+
+                    nodes.clear();
+                    nodes.push_back(node_ref_t { g->id(), j });
+                }
+            }
+        }
+    }
+
+    emit nodesSelected(nodes);
     event->accept();
 }
 

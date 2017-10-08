@@ -34,11 +34,16 @@ private:
     float _height;
 
     QVector<graph_node_t> _nodes;
+    QVector<graph_edge_t> _edges;
+    QVector<color_t> _colors;
+
     QVector<vec3_t> _coords;
     QVector<vec3_t> _coords_d;
-    QVector<color_t> _colors;
-    QVector<graph_edge_t> _edges;
     Matrix _edge_matrix;
+
+    vec3_t *_coords_gpu;
+    vec3_t *_coords_d_gpu;
+    int *_edge_matrix_gpu;
 
 public:
     Graph(
@@ -49,17 +54,21 @@ public:
         float x, float y, float z, float w, float h
     );
     Graph() {};
-    ~Graph() {};
+    ~Graph();
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
     const QVector<graph_node_t>& nodes() const { return this->_nodes; }
     const QVector<graph_edge_t>& edges() const { return this->_edges; }
-    const Matrix& edge_matrix() const { return this->_edge_matrix; }
+    const QVector<color_t>& colors() const { return this->_colors; }
 
     QVector<vec3_t>& coords() { return this->_coords; }
     QVector<vec3_t>& coords_d() { return this->_coords_d; }
-    const QVector<color_t>& colors() const { return this->_colors; }
+    const Matrix& edge_matrix() const { return this->_edge_matrix; }
+
+    vec3_t * coords_gpu() { return this->_coords_gpu; }
+    vec3_t * coords_d_gpu() { return this->_coords_d_gpu; }
+    int * edge_matrix_gpu() const { return this->_edge_matrix_gpu; }
 
     int find_node(const QString& name);
 
