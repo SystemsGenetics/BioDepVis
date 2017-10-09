@@ -72,6 +72,9 @@ public:
     vec3_t * coords_d_gpu() { return this->_coords_d_gpu; }
     bool * edge_matrix_gpu() const { return this->_edge_matrix_gpu; }
 
+    void read_gpu();
+    void write_gpu();
+
     int find_node(const QString& name);
 
     void load_nodes(const QString& filename);

@@ -85,14 +85,11 @@ Graph::Graph(
 
     // initialize GPU data
     int n = _nodes.size();
-
     _coords_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
     _coords_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
     _edge_matrix_gpu = (bool *)gpu_malloc(n * n * sizeof(bool));
 
-    gpu_write(_coords_gpu, _coords.data(), n * sizeof(vec3_t));
-    gpu_write(_coords_d_gpu, _coords_d.data(), n * sizeof(vec3_t));
-    gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool));
+    write_gpu();
 }
 
 Graph::~Graph()
@@ -100,6 +97,22 @@ Graph::~Graph()
     gpu_free(_coords_gpu);
     gpu_free(_coords_d_gpu);
     gpu_free(_edge_matrix_gpu);
+}
+
+void Graph::read_gpu()
+{
+    int n = _nodes.size();
+    gpu_read(_coords.data(), _coords_gpu, n * sizeof(vec3_t));
+    gpu_read(_coords_d.data(), _coords_d_gpu, n * sizeof(vec3_t));
+    gpu_read(_edge_matrix.data(), _edge_matrix_gpu, n * n * sizeof(bool));
+}
+
+void Graph::write_gpu()
+{
+    int n = _nodes.size();
+    gpu_write(_coords_gpu, _coords.data(), n * sizeof(vec3_t));
+    gpu_write(_coords_d_gpu, _coords_d.data(), n * sizeof(vec3_t));
+    gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool));
 }
 
 /**

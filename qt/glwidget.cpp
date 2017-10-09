@@ -148,10 +148,7 @@ void GLWidget::run_animation()
 
         // copy graph data from GPU
         for ( Graph *g : _db->graphs().values() ) {
-            int n = g->nodes().size();
-            gpu_read(g->coords().data(), g->coords_gpu(), n * sizeof(vec3_t));
-            gpu_read(g->coords_d().data(), g->coords_d_gpu(), n * sizeof(vec3_t));
-            gpu_read(g->edge_matrix().data(), g->edge_matrix_gpu(), n * n * sizeof(bool));
+            g->read_gpu();
         }
     }
 
@@ -398,6 +395,13 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         setRotZ(_rot.z() - SHIFT_ROT);
     case Qt::Key_G:
         _gpu = !_gpu;
+
+        if ( _gpu ) {
+            // copy graph data to GPU
+            for ( Graph *g : _db->graphs().values() ) {
+                g->write_gpu();
+            }
+        }
         break;
     case Qt::Key_Space:
         _animate = !_animate;
