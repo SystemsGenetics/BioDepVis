@@ -7,25 +7,10 @@
 #include <QOpenGLWidget>
 #include <QOpenGLVertexArrayObject>
 #include "database.h"
+#include "glalignobject.h"
+#include "glgraphobject.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
-
-typedef struct {
-    Graph *g;
-    QVector<color_t> node_colors;
-    QVector<color_t> edge_colors;
-    QOpenGLVertexArrayObject vao;
-    QOpenGLBuffer vbo_coords;
-    QOpenGLBuffer vbo_colors;
-} GraphObject;
-
-typedef struct {
-    Alignment *a;
-    QVector<color_t> edge_colors;
-    QOpenGLVertexArrayObject vao;
-    QOpenGLBuffer vbo_coords;
-    QOpenGLBuffer vbo_colors;
-} AlignObject;
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -63,9 +48,9 @@ private:
     bool _gpu;
     bool _roi;
     bool _select_multi;
-    bool _show_alignment;
-    bool _show_graph;
-    bool _show_module;
+    bool _show_alignments;
+    bool _show_graphs;
+    bool _show_modules;
 
     QPoint _prev_pos;
     QVector3D _rot;
@@ -78,8 +63,8 @@ private:
     QMatrix4x4 _view;
     QMatrix4x4 _proj;
 
-    QVector<GraphObject *> _graphs;
-    QVector<AlignObject *> _alignments;
+    QVector<GLGraphObject *> _graphs;
+    QVector<GLAlignObject *> _alignments;
 };
 
 #endif

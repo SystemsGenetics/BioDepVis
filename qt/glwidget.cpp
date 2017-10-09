@@ -8,21 +8,6 @@
 
 const int MAX_FPS = 30;
 
-const color_t GRAPH_EDGE_COLORS[] = {
-    { 0.65f, 0.81f, 0.89f, 0.30f },
-    { 0.50f, 0.50f, 0.78f, 0.30f },
-    { 0.42f, 0.24f, 0.60f, 0.30f },
-    { 0.12f, 0.47f, 0.71f, 0.30f },
-    { 0.70f, 0.87f, 0.54f, 0.30f },
-    { 1.00f, 0.50f, 0.00f, 0.30f }
-};
-
-const color_t ALIGN_EDGE_COLORS[] = {
-    { 0.70f, 0.19f, 0.29f, 0.10f },
-    { 0.89f, 0.50f, 0.79f, 0.10f },
-    { 0.89f, 0.50f, 0.79f, 0.10f }
-};
-
 static const char *VERTEX_SHADER_SOURCE =
     "#version 150\n"
     "in vec4 position;\n"
@@ -50,9 +35,9 @@ GLWidget::GLWidget(Database *db, QWidget *parent)
       _gpu(true),
       _roi(false),
       _select_multi(false),
-      _show_alignment(true),
-      _show_graph(true),
-      _show_module(false),
+      _show_alignments(true),
+      _show_graphs(true),
+      _show_modules(false),
       _rot(0, 0, 0),
       _zoom(0),
       _program(0)
@@ -66,15 +51,11 @@ GLWidget::~GLWidget()
 {
     makeCurrent();
 
-    for ( GraphObject *obj : _graphs ) {
-        obj->vbo_coords.destroy();
-        obj->vbo_colors.destroy();
+    for ( GLGraphObject *obj : _graphs ) {
         delete obj;
     }
 
-    for ( AlignObject *obj : _alignments ) {
-        obj->vbo_coords.destroy();
-        obj->vbo_colors.destroy();
+    for ( GLAlignObject *obj : _alignments ) {
         delete obj;
     }
 
@@ -178,85 +159,17 @@ void GLWidget::initializeGL()
     _ref_mvp_matrix = _program->uniformLocation("mvpMatrix");
 
     // initialize scene object for each graph
-    for ( int i = 0; i < _db->graphs().size(); i++ ) {
-        Graph *g = _db->graphs().values()[i];
-        GraphObject *obj = new GraphObject();
-        obj->g = g;
-
-        // initialize node colors
-        obj->node_colors.reserve(g->nodes().size());
-        for ( int j = 0; j < g->nodes().size(); j++ ) {
-            obj->node_colors.push_back(color_t { 0, 0, 0, 1 });
-        }
-
-        // initialize edge colors
-        obj->edge_colors.reserve(g->edges().size());
-        for ( int j = 0; j < g->edges().size(); j++ ) {
-            obj->edge_colors.push_back(GRAPH_EDGE_COLORS[i]);
-        }
-
-        // initialize vertex array object
-        obj->vao.create();
-
-        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
-
-        // initialize position buffer
-        obj->vbo_coords.create();
-        obj->vbo_coords.bind();
-        obj->vbo_coords.allocate(g->nodes().size() * sizeof(vec3_t));
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        obj->vbo_coords.release();
-
-        // initialize color buffer
-        int num_colors = qMax(g->nodes().size(), g->edges().size());
-
-        obj->vbo_colors.create();
-        obj->vbo_colors.bind();
-        obj->vbo_colors.allocate(num_colors * sizeof(color_t));
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        obj->vbo_colors.release();
+    for ( Graph *g : _db->graphs().values() ) {
+        GLGraphObject *obj = new GLGraphObject(g);
+        obj->initialize();
 
         _graphs.push_back(obj);
     }
 
     // initialize scene object for each alignment
-    for ( int i = 0; i < _db->alignments().size(); i++ ) {
-        Alignment *a = _db->alignments()[i];
-        AlignObject *obj = new AlignObject();
-        obj->a = a;
-
-        // initialize edge colors
-        obj->edge_colors.reserve(a->edges().size());
-        for ( int j = 0; j < a->edges().size(); j++ ) {
-            obj->edge_colors.push_back(ALIGN_EDGE_COLORS[i]);
-        }
-
-        // initialize vertex array object
-        obj->vao.create();
-
-        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
-
-        // initialize position buffer
-        obj->vbo_coords.create();
-        obj->vbo_coords.bind();
-        obj->vbo_coords.allocate(a->edges().size() * sizeof(align_edge_t));
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        obj->vbo_coords.release();
-
-        // initialize color buffer
-        obj->vbo_colors.create();
-        obj->vbo_colors.bind();
-        obj->vbo_colors.allocate(a->edges().size() * sizeof(color_t));
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        obj->vbo_colors.release();
+    for ( Alignment *a : _db->alignments() ) {
+        GLAlignObject *obj = new GLAlignObject(a);
+        obj->initialize();
 
         _alignments.push_back(obj);
     }
@@ -293,59 +206,16 @@ void GLWidget::paintGL()
     _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
 
     // draw each graph
-    if ( _show_graph ) {
-        for ( GraphObject *obj : _graphs ) {
-            QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
-
-            // write node positions
-            obj->vbo_coords.bind();
-            obj->vbo_coords.write(0, obj->g->coords().data(), obj->g->nodes().size() * sizeof(vec3_t));
-            obj->vbo_coords.release();
-
-            // write node colors
-            const color_t *color_data = _show_module
-                ? obj->g->colors().data()
-                : obj->node_colors.data();
-
-            obj->vbo_colors.bind();
-            obj->vbo_colors.write(0, color_data, obj->g->nodes().size() * sizeof(color_t));
-            obj->vbo_colors.release();
-
-            // draw nodes
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            glDrawArrays(GL_POINTS, 0, obj->g->coords().size());
-
-            // write edge colors
-            obj->vbo_colors.bind();
-            obj->vbo_colors.write(0, obj->edge_colors.data(), obj->g->edges().size() * sizeof(color_t));
-            obj->vbo_colors.release();
-
-            // draw edges
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glLineWidth(0.001f);
-            glDrawElements(GL_LINES, obj->g->edges().size(), GL_UNSIGNED_INT, obj->g->edges().data());
+    if ( _show_graphs ) {
+        for ( GLGraphObject *obj : _graphs ) {
+            obj->paint(_show_modules);
         }
     }
 
     // draw each alignment
-    if ( _show_alignment ) {
-        for ( AlignObject *obj : _alignments ) {
-            QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
-
-            // write edge positions
-            obj->vbo_coords.bind();
-            obj->vbo_coords.write(0, obj->a->vertices().data(), obj->a->edges().size() * sizeof(align_edge_t));
-            obj->vbo_coords.release();
-
-            // write edge colors
-            obj->vbo_colors.bind();
-            obj->vbo_colors.write(0, obj->edge_colors.data(), obj->a->edges().size() * sizeof(color_t));
-            obj->vbo_colors.release();
-
-            // draw edges
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glLineWidth(0.1f);
-            glDrawArrays(GL_LINES, 0, obj->a->edges().size());
+    if ( _show_alignments ) {
+        for ( GLAlignObject *obj : _alignments ) {
+            obj->paint();
         }
     }
 
@@ -411,13 +281,13 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         _animate = !_animate;
         break;
     case Qt::Key_Z:
-        _show_graph = !_show_graph;
+        _show_graphs = !_show_graphs;
         break;
     case Qt::Key_X:
-        _show_alignment = !_show_alignment;
+        _show_alignments = !_show_alignments;
         break;
     case Qt::Key_C:
-        _show_module = !_show_module;
+        _show_modules = !_show_modules;
         break;
     case Qt::Key_V:
         _roi = !_roi;

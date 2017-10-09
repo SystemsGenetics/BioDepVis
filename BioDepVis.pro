@@ -24,6 +24,8 @@ SOURCES += \
     qt/alignment.cpp \
     qt/database.cpp \
     qt/fdl.cpp \
+    qt/glalignobject.cpp \
+    qt/glgraphobject.cpp \
     qt/glwidget.cpp \
     qt/graph.cpp \
     qt/main.cpp \
@@ -34,6 +36,9 @@ HEADERS += \
     qt/alignment.h \
     qt/database.h \
     qt/fdl.h \
+    qt/glalignobject.h \
+    qt/glgraphobject.h \
+    qt/globject.h \
     qt/glwidget.h \
     qt/mainwindow.h \
     qt/graph.h \
