@@ -49,7 +49,7 @@ void GLAlignObject::initialize()
 	// initialize color buffer
 	_vbo_colors.create();
 	_vbo_colors.bind();
-	_vbo_colors.allocate(_align->edges().size() * sizeof(color_t));
+	_vbo_colors.allocate(_edge_colors.data(), _align->edges().size() * sizeof(color_t));
 
 	f->glEnableVertexAttribArray(1);
 	f->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -65,11 +65,6 @@ void GLAlignObject::paint()
 	_vbo_coords.bind();
 	_vbo_coords.write(0, _align->vertices().data(), _align->edges().size() * sizeof(align_edge_t));
 	_vbo_coords.release();
-
-	// write edge colors
-	_vbo_colors.bind();
-	_vbo_colors.write(0, _edge_colors.data(), _align->edges().size() * sizeof(color_t));
-	_vbo_colors.release();
 
 	// draw edges
 	f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
