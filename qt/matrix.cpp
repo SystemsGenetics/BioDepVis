@@ -6,7 +6,7 @@ Matrix::Matrix(int rows, int cols)
 {
 	this->_rows = rows;
 	this->_cols = cols;
-	this->_data = new int[rows * cols];
+	this->_data = new matrix_elem_t[rows * cols];
 }
 
 Matrix::Matrix()
@@ -31,7 +31,7 @@ void Matrix::init_zeros()
 {
 	Matrix& M = *this;
 
-	memset(M._data, 0, M._rows * M._cols * sizeof(int));
+	memset(M._data, 0, M._rows * M._cols * sizeof(matrix_elem_t));
 }
 
 void swap(Matrix& A, Matrix& B)

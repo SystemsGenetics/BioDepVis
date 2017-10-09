@@ -151,7 +151,7 @@ void GLWidget::run_animation()
             int n = g->nodes().size();
             gpu_read(g->coords().data(), g->coords_gpu(), n * sizeof(vec3_t));
             gpu_read(g->coords_d().data(), g->coords_d_gpu(), n * sizeof(vec3_t));
-            gpu_read(g->edge_matrix().data(), g->edge_matrix_gpu(), n * n * sizeof(int));
+            gpu_read(g->edge_matrix().data(), g->edge_matrix_gpu(), n * n * sizeof(bool));
         }
     }
 

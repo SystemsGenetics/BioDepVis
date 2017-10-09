@@ -45,7 +45,7 @@ private:
 
     vec3_t *_coords_gpu;
     vec3_t *_coords_d_gpu;
-    int *_edge_matrix_gpu;
+    bool *_edge_matrix_gpu;
 
 public:
     Graph(
@@ -70,7 +70,7 @@ public:
 
     vec3_t * coords_gpu() { return this->_coords_gpu; }
     vec3_t * coords_d_gpu() { return this->_coords_d_gpu; }
-    int * edge_matrix_gpu() const { return this->_edge_matrix_gpu; }
+    bool * edge_matrix_gpu() const { return this->_edge_matrix_gpu; }
 
     int find_node(const QString& name);
 

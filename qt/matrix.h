@@ -1,11 +1,13 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+typedef bool matrix_elem_t;
+
 class Matrix {
 private:
 	int _rows;
 	int _cols;
-	int *_data;
+	matrix_elem_t *_data;
 
 public:
 	Matrix(int rows, int cols);
@@ -18,8 +20,8 @@ public:
 	// getter functions
 	int rows() const { return this->_rows; }
 	int cols() const { return this->_cols; }
-	int * data() const { return this->_data; }
-	int& elem(int i, int j) const { return _data[i * _cols + j]; }
+	matrix_elem_t * data() const { return this->_data; }
+	matrix_elem_t& elem(int i, int j) const { return _data[i * _cols + j]; }
 
 	// operators
 	Matrix& operator=(Matrix B) { swap(*this, B); return *this; }

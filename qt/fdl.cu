@@ -50,7 +50,7 @@ void gpu_sync()
 	checkError(cudaGetLastError());
 }
 
-__global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
+__global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -69,7 +69,7 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int
 			float dist = sqrtf(dx * dx + dy * dy);
 
 			if ( dist != 0 ) {
-				float force = (ELEM(edge_matrix, n, i, j) != 0)
+				float force = ELEM(edge_matrix, n, i, j)
 					? K_s * (L - dist) / dist
 					: K_r / (dist * dist * dist);
 
@@ -97,7 +97,7 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const int
 	}
 }
 
-__global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
+__global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -117,7 +117,7 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int
 			float dist = sqrtf(dx * dx + dy * dy + dz * dz);
 
 			if ( dist != 0 ) {
-				float force = (ELEM(edge_matrix, n, i, j) != 0)
+				float force = ELEM(edge_matrix, n, i, j)
 					? K_s * (L - dist) / dist
 					: K_r / (dist * dist * dist);
 
@@ -151,12 +151,12 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const int
 	}
 }
 
-void fdl_2d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
+void fdl_2d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
 	fdl_kernel_2d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, coords, coords_d, edge_matrix);
 }
 
-void fdl_3d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
+void fdl_3d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
 	fdl_kernel_3d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, coords, coords_d, edge_matrix);
 }

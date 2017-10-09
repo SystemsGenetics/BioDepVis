@@ -1,0 +1,28 @@
+{
+  "graph": {
+    "graph1": {
+      "id": 1,
+      "name": "Email",
+      "fileLocation": "data/email.tab",
+      "clusterLocation": "data/email.tab.cluster",
+      "x": -100,
+      "y": 0,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    },
+    "graph2": {
+      "id": 2,
+      "name": "P2P",
+      "fileLocation": "data/p2p.tab",
+      "clusterLocation": "data/p2p.tab.cluster",
+      "x": 100,
+      "y": 0,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    }
+  },
+  "alignment": {
+  }
+}

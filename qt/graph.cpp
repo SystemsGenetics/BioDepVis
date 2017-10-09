@@ -20,7 +20,10 @@ Graph::Graph(
 
     load_nodes(nodefile);
     load_edges(edgefile);
-    load_ontology(ontfile);
+
+    if ( ontfile != "" ) {
+        load_ontology(ontfile);
+    }
 
     // initialize coords
     this->_coords.reserve(this->_nodes.size());
@@ -85,11 +88,11 @@ Graph::Graph(
 
     _coords_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
     _coords_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
-    _edge_matrix_gpu = (int *)gpu_malloc(n * n * sizeof(int));
+    _edge_matrix_gpu = (bool *)gpu_malloc(n * n * sizeof(bool));
 
     gpu_write(_coords_gpu, _coords.data(), n * sizeof(vec3_t));
     gpu_write(_coords_d_gpu, _coords_d.data(), n * sizeof(vec3_t));
-    gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(int));
+    gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool));
 }
 
 Graph::~Graph()
@@ -138,12 +141,13 @@ void Graph::load_nodes(const QString& filename)
         node.name = name;
         node.module_id = module_id;
 
-        this->_nodes.push_back(node);
-    }
-
-    // initialize hashmap of node names for constant-time search
-    for ( int i = 0; i < _nodes.size(); i++ ) {
-        _node_map[_nodes[i].name] = i;
+        if ( !_node_map.contains(name) ) {
+            _nodes.push_back(node);
+            _node_map.insert(node.name, _nodes.size() - 1);
+        }
+        else {
+            qWarning() << "warning: duplicate node" << name;
+        }
     }
 }
 

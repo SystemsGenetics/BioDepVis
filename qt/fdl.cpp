@@ -5,7 +5,7 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 #define ELEM(data, cols, i, j) (data)[(i) * (cols) + (j)]
 
-void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
+void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
     const float K_r = 25.0f;
     const float K_s = 15.0f;
@@ -23,7 +23,7 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
             float dist = sqrtf(dx * dx + dy * dy);
 
             if ( dist != 0 ) {
-                float force = (ELEM(edge_matrix, n, i, j) != 0)
+                float force = ELEM(edge_matrix, n, i, j)
                     ? K_s * (L - dist) / dist
                     : K_r / (dist * dist * dist);
 
@@ -51,7 +51,7 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
     }
 }
 
-void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
+void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
     const float K_r = 25.0f;
     const float K_s = 15.0f;
@@ -70,7 +70,7 @@ void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const int *edge_matrix)
             float dist = sqrtf(dx * dx + dy * dy + dz * dz);
 
             if ( dist != 0 ) {
-                float force = (ELEM(edge_matrix, n, i, j) != 0)
+                float force = ELEM(edge_matrix, n, i, j)
                     ? K_s * (L - dist) / dist
                     : K_r / (dist * dist * dist);
 

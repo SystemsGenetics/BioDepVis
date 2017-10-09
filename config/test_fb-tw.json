@@ -1,0 +1,28 @@
+{
+  "graph": {
+    "graph1": {
+      "id": 1,
+      "name": "Facebook",
+      "fileLocation": "data/facebook.tab",
+      "clusterLocation": "data/facebook.tab.cluster",
+      "x": -100,
+      "y": 0,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    },
+    "graph1": {
+      "id": 1,
+      "name": "Twitter",
+      "fileLocation": "data/twitter.tab",
+      "clusterLocation": "data/twitter.tab.cluster",
+      "x": 100,
+      "y": 0,
+      "z": 0,
+      "w": 200,
+      "h": 200
+    }
+  },
+  "alignment": {
+  }
+}
