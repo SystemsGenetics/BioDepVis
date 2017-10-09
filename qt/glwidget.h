@@ -59,11 +59,13 @@ protected:
 
 private:
     Database *_db;
-    bool _alignment;
     bool _animate;
     bool _gpu;
-    bool _module_color;
+    bool _roi;
     bool _select_multi;
+    bool _show_alignment;
+    bool _show_graph;
+    bool _show_module;
 
     QPoint _prev_pos;
     QVector3D _rot;

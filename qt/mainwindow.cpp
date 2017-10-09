@@ -100,8 +100,10 @@ void MainWindow::create_gui()
         { "U/O", "Rotate Z-axis" },
         { "G", "Toggle GPU" },
         { "Space", "Toggle force-directed layout" },
+        { "Z", "Toggle graph" },
+        { "X", "Toggle alignment" },
         { "C", "Toggle module coloring" },
-        { "V", "Toggle alignment" },
+        { "V", "Toggle ROI mode" },
         { "B", "Toggle multi-select" }
     };
 

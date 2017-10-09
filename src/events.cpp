@@ -101,13 +101,13 @@ void keyboardEventHandler(unsigned char key, int x, int y)
 		backGraphMode = !backGraphMode;
 		break;
 	case 'x': case 'X':
-		roiMODE = !roiMODE;
+		showalignment = !showalignment;
 		break;
 	case 'c': case 'C':
 		cluster = !cluster;
 		break;
 	case 'v': case 'V':
-		showalignment = !showalignment;
+		roiMODE = !roiMODE;
 		break;
 	case 'b': case 'B':
 		searchArea = !searchArea;

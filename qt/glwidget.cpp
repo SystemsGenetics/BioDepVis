@@ -46,11 +46,13 @@ static const char *FRAGMENT_SHADER_SOURCE =
 GLWidget::GLWidget(Database *db, QWidget *parent)
     : QOpenGLWidget(parent),
       _db(db),
-      _alignment(true),
       _animate(false),
       _gpu(true),
-      _module_color(false),
+      _roi(false),
       _select_multi(false),
+      _show_alignment(true),
+      _show_graph(true),
+      _show_module(false),
       _rot(0, 0, 0),
       _zoom(0),
       _program(0)
@@ -291,40 +293,42 @@ void GLWidget::paintGL()
     _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
 
     // draw each graph
-    for ( GraphObject *obj : _graphs ) {
-        QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
+    if ( _show_graph ) {
+        for ( GraphObject *obj : _graphs ) {
+            QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
 
-        // write node positions
-        obj->vbo_coords.bind();
-        obj->vbo_coords.write(0, obj->g->coords().data(), obj->g->nodes().size() * sizeof(vec3_t));
-        obj->vbo_coords.release();
+            // write node positions
+            obj->vbo_coords.bind();
+            obj->vbo_coords.write(0, obj->g->coords().data(), obj->g->nodes().size() * sizeof(vec3_t));
+            obj->vbo_coords.release();
 
-        // write node colors
-        const color_t *color_data = _module_color
-            ? obj->g->colors().data()
-            : obj->node_colors.data();
+            // write node colors
+            const color_t *color_data = _show_module
+                ? obj->g->colors().data()
+                : obj->node_colors.data();
 
-        obj->vbo_colors.bind();
-        obj->vbo_colors.write(0, color_data, obj->g->nodes().size() * sizeof(color_t));
-        obj->vbo_colors.release();
+            obj->vbo_colors.bind();
+            obj->vbo_colors.write(0, color_data, obj->g->nodes().size() * sizeof(color_t));
+            obj->vbo_colors.release();
 
-        // draw nodes
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        glDrawArrays(GL_POINTS, 0, obj->g->coords().size());
+            // draw nodes
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            glDrawArrays(GL_POINTS, 0, obj->g->coords().size());
 
-        // write edge colors
-        obj->vbo_colors.bind();
-        obj->vbo_colors.write(0, obj->edge_colors.data(), obj->g->edges().size() * sizeof(color_t));
-        obj->vbo_colors.release();
+            // write edge colors
+            obj->vbo_colors.bind();
+            obj->vbo_colors.write(0, obj->edge_colors.data(), obj->g->edges().size() * sizeof(color_t));
+            obj->vbo_colors.release();
 
-        // draw edges
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glLineWidth(0.001f);
-        glDrawElements(GL_LINES, obj->g->edges().size(), GL_UNSIGNED_INT, obj->g->edges().data());
+            // draw edges
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glLineWidth(0.001f);
+            glDrawElements(GL_LINES, obj->g->edges().size(), GL_UNSIGNED_INT, obj->g->edges().data());
+        }
     }
 
     // draw each alignment
-    if ( _alignment ) {
+    if ( _show_alignment ) {
         for ( AlignObject *obj : _alignments ) {
             QOpenGLVertexArrayObject::Binder vaoBinder(&obj->vao);
 
@@ -406,11 +410,17 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:
         _animate = !_animate;
         break;
+    case Qt::Key_Z:
+        _show_graph = !_show_graph;
+        break;
+    case Qt::Key_X:
+        _show_alignment = !_show_alignment;
+        break;
     case Qt::Key_C:
-        _module_color = !_module_color;
+        _show_module = !_show_module;
         break;
     case Qt::Key_V:
-        _alignment = !_alignment;
+        _roi = !_roi;
         break;
     case Qt::Key_B:
         _select_multi = !_select_multi;
