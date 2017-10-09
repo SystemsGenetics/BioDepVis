@@ -60,7 +60,6 @@ void Alignment::readFile(char *filename)
 			printf("%s <--> %s-error\n", n1, n2);
 		}
     }
-    std::cout<<"--Total Alignment Edges : "<<edges<<g1_vertices.size()<<","<<g2_vertices.size()<<std::endl;
 
     int count = 0;
     for(count = 0;count < edges;count++)
@@ -68,15 +67,6 @@ void Alignment::readFile(char *filename)
         edgeAlignMatrix[g1_vertices.at(count) * cols + g2_vertices.at(count)] = 1.0f;
 
     }
-
-
-    count = 0;
-   for(int i = 0;i<rows;i++)
-       for(int j=0;j<cols;j++)
-           if(edgeAlignMatrix[i * cols + j] == 1.0f)
-               count++;
-       printf("---><--Edge Count Verified : %d vs %d\n",edges, count);
-
 
     vertices = new float[edges * 2*3];
 }

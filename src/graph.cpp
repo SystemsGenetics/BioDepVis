@@ -22,7 +22,7 @@ strncpy(name, graphname, strlen(graphname));
 name[strlen(graphname)] = '\0';
 addName(name, x, y, z, w, h);
 
-printf(" Reading %s Filename : %s\n",graphname, filename);
+printf("%d %s\n", iid, graphname);
 readGraph(filename);
 allocate(x,y,w,h,z);
 clusterization(filenamecluster);
@@ -100,7 +100,6 @@ displayName = true;
          edges++;
      }
      std::cout<<"--Total Edges : "<<edges<<std::endl;
-     fflush(stdout);
  }
 
  void graph::cleanup()
@@ -237,8 +236,6 @@ void graph::convertEdgeMatrixToVerticeList()
             }
         }
     }
-    printf("Count = %d vs %d\n",count  ,edges);
-    fflush(stdout);
 }
 
 void graph::UpdateOntologyInfo(std::string name, std::string golistString, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr)

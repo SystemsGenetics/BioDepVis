@@ -214,9 +214,6 @@ void drawAlignment(Alignment *align)
 {
 	glDepthMask(GL_FALSE);
 
-	if (animate == true)
-		align->update();
-
 	if (showalignment == true)
 	{
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -270,9 +267,6 @@ void drawAlignment(Alignment *align)
 void drawAlignmentROI(Alignment *align,int index)
 {
 	glDepthMask(GL_FALSE);
-
-	if (animate == true)
-		align->update();
 
 	if (showalignment == true)
 	{
@@ -330,8 +324,6 @@ void drawAlignmentROI(Alignment *align,int index)
 				glEnd();
 				}
 			}
-
-			printf("Total Edges : %d\n", (int)alignEdgesROI.size());
 		}
 
 		if(index == 1)
@@ -721,6 +713,8 @@ void idle()
 			if (gpuEnabled){
 				runAlignmentForceGPU(a);
 			}
+
+			a->update();
 		}
 
 		if (gpuEnabled)
@@ -871,7 +865,6 @@ void GetPickRay(int mouseX, int mouseY)
 			if (d < min)
 				{
 					nodeSelectedStruct tmp;
-					printf("Valid %d = %f\n", j, d);
 					tmp.nodeSelected = j;
 					tmp.graphSelected = i;
 
@@ -893,8 +886,6 @@ void GetPickRay(int mouseX, int mouseY)
 
 		selectList->update_size();
 		selectList->update_and_draw_text();
-
-		printf("Search Length : %d Less than %f \n----\n", (int)selectedVector.size(), min);
 	}
 
 	if (selectedVector.size() > 0)
@@ -908,9 +899,6 @@ void GetPickRay(int mouseX, int mouseY)
 
 		if(graphSelected == 2)
 			nodeSelected3 = nodeSelected;
-
-		printf("Node Selected : %d at %f %f %f\n",nodeSelected, graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0],
-			graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1], graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 2]);
 
 		cx1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 0] - (xscale/2) ;
 		cy1 = graphDatabase.at(graphSelected)->coords[nodeSelected * 3 + 1] - (yscale/2) ;
@@ -975,6 +963,4 @@ void GetPickRay(int mouseX, int mouseY)
 			}
 		}
 	}
-
-	printf("Found : Coordinates %d Edges %d\n", (int)coordsROI.size(), (int)verticeEdgeListROI.size());
 }
