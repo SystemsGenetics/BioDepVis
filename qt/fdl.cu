@@ -80,6 +80,7 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 				coords_d[j].y += force * dy;
 			}
 		}
+		__syncthreads();
 
 		float dx = coords_d[i].x;
 		float dy = coords_d[i].y;
@@ -130,6 +131,7 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 				coords_d[j].z += force * dz;
 			}
 		}
+		__syncthreads();
 
 		float dx = coords_d[i].x;
 		float dy = coords_d[i].y;
