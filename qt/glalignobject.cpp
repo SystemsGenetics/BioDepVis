@@ -25,8 +25,10 @@ void GLAlignObject::initialize()
 	static int color_idx = 0;
 
 	// initialize edge colors
-	_edge_colors.reserve(_align->edges().size());
-	for ( int i = 0; i < _align->edges().size(); i++ ) {
+	int num_positions = _align->edges().size() * 2;
+
+	_edge_colors.reserve(num_positions);
+	for ( int i = 0; i < num_positions; i++ ) {
 		_edge_colors.push_back(EDGE_COLORS[color_idx]);
 	}
 
@@ -40,7 +42,7 @@ void GLAlignObject::initialize()
 	// initialize position buffer
 	_vbo_positions.create();
 	_vbo_positions.bind();
-	_vbo_positions.allocate(_align->edges().size() * sizeof(align_edge_t));
+	_vbo_positions.allocate(num_positions * sizeof(vec3_t));
 
 	f->glEnableVertexAttribArray(0);
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -49,7 +51,7 @@ void GLAlignObject::initialize()
 	// initialize color buffer
 	_vbo_colors.create();
 	_vbo_colors.bind();
-	_vbo_colors.allocate(_edge_colors.data(), _align->edges().size() * sizeof(color_t));
+	_vbo_colors.allocate(_edge_colors.data(), num_positions * sizeof(color_t));
 
 	f->glEnableVertexAttribArray(1);
 	f->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -61,13 +63,15 @@ void GLAlignObject::paint()
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
+	int num_positions = _align->edges().size() * 2;
+
 	// write edge positions
 	_vbo_positions.bind();
-	_vbo_positions.write(0, _align->vertices().data(), _align->edges().size() * sizeof(align_edge_t));
+	_vbo_positions.write(0, _align->vertices().data(), num_positions * sizeof(vec3_t));
 	_vbo_positions.release();
 
 	// draw edges
 	f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	f->glLineWidth(0.1f);
-	f->glDrawArrays(GL_LINES, 0, _align->edges().size());
+	f->glDrawArrays(GL_LINES, 0, num_positions);
 }

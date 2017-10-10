@@ -8,6 +8,7 @@
 #include <QOpenGLVertexArrayObject>
 #include "database.h"
 #include "glalignobject.h"
+#include "glboxobject.h"
 #include "glgraphobject.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
@@ -65,6 +66,7 @@ private:
 
     QVector<GLGraphObject *> _graphs;
     QVector<GLAlignObject *> _alignments;
+    GLBoxObject *_boxes;
 };
 
 #endif

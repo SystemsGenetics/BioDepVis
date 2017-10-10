@@ -29,14 +29,18 @@ void GLGraphObject::initialize()
 	static int color_idx = 0;
 
 	// initialize node colors
-	_node_colors.reserve(_graph->nodes().size());
-	for ( int i = 0; i < _graph->nodes().size(); i++ ) {
+	int num_nodes = _graph->nodes().size();
+
+	_node_colors.reserve(num_nodes);
+	for ( int i = 0; i < num_nodes; i++ ) {
 		_node_colors.push_back(NODE_COLOR);
 	}
 
 	// initialize edge colors
-	_edge_colors.reserve(_graph->edges().size());
-	for ( int i = 0; i < _graph->edges().size(); i++ ) {
+	int num_edges = _graph->edges().size();
+
+	_edge_colors.reserve(num_edges);
+	for ( int i = 0; i < num_edges; i++ ) {
 		_edge_colors.push_back(EDGE_COLORS[color_idx]);
 	}
 
@@ -50,14 +54,14 @@ void GLGraphObject::initialize()
 	// initialize position buffer
 	_vbo_positions.create();
 	_vbo_positions.bind();
-	_vbo_positions.allocate(_graph->nodes().size() * sizeof(vec3_t));
+	_vbo_positions.allocate(num_nodes * sizeof(vec3_t));
 
 	f->glEnableVertexAttribArray(0);
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	_vbo_positions.release();
 
 	// initialize color buffer
-	int num_colors = qMax(_graph->nodes().size(), _graph->edges().size());
+	int num_colors = qMax(num_nodes, num_edges);
 
 	_vbo_colors.create();
 	_vbo_colors.bind();
@@ -73,9 +77,12 @@ void GLGraphObject::paint(bool show_modules)
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
+	int num_nodes = _graph->nodes().size();
+	int num_edges = _graph->edges().size();
+
 	// write node positions
 	_vbo_positions.bind();
-	_vbo_positions.write(0, _graph->coords().data(), _graph->nodes().size() * sizeof(vec3_t));
+	_vbo_positions.write(0, _graph->coords().data(), num_nodes * sizeof(vec3_t));
 	_vbo_positions.release();
 
 	// write node colors
@@ -84,20 +91,20 @@ void GLGraphObject::paint(bool show_modules)
 		: _node_colors.data();
 
 	_vbo_colors.bind();
-	_vbo_colors.write(0, color_data, _graph->nodes().size() * sizeof(color_t));
+	_vbo_colors.write(0, color_data, num_nodes * sizeof(color_t));
 	_vbo_colors.release();
 
 	// draw nodes
 	f->glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	f->glDrawArrays(GL_POINTS, 0, _graph->coords().size());
+	f->glDrawArrays(GL_POINTS, 0, num_nodes);
 
 	// write edge colors
 	_vbo_colors.bind();
-	_vbo_colors.write(0, _edge_colors.data(), _graph->edges().size() * sizeof(color_t));
+	_vbo_colors.write(0, _edge_colors.data(), num_edges * sizeof(color_t));
 	_vbo_colors.release();
 
 	// draw edges
 	f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	f->glLineWidth(0.001f);
-	f->glDrawElements(GL_LINES, _graph->edges().size(), GL_UNSIGNED_INT, _graph->edges().data());
+	f->glDrawElements(GL_LINES, num_edges, GL_UNSIGNED_INT, _graph->edges().data());
 }

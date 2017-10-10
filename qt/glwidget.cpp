@@ -6,7 +6,7 @@
 #include "fdl.h"
 #include "glwidget.h"
 
-const int MAX_FPS = 30;
+const int MAX_FPS = 60;
 
 static const char *VERTEX_SHADER_SOURCE =
     "#version 150\n"
@@ -59,8 +59,8 @@ GLWidget::~GLWidget()
         delete obj;
     }
 
+    delete _boxes;
     delete _program;
-    _program = 0;
 
     doneCurrent();
 }
@@ -80,6 +80,9 @@ void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
 {
     _selected_nodes = nodes;
+
+    _boxes->update(_db, _selected_nodes);
+    update();
 }
 
 void GLWidget::translate(float deltaX, float deltaY, float deltaZ)
@@ -148,6 +151,7 @@ void GLWidget::run_animation()
         a->update();
     }
 
+    _boxes->update(_db, _selected_nodes);
     update();
 }
 
@@ -155,6 +159,8 @@ void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     glClearColor(1, 1, 1, 0);
+    glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     _program = new QOpenGLShaderProgram;
@@ -183,6 +189,10 @@ void GLWidget::initializeGL()
         _alignments.push_back(obj);
     }
 
+    // initialize scene object for boxes
+    _boxes = new GLBoxObject();
+    _boxes->initialize();
+
     // initialize camera
     init_camera();
 
@@ -192,9 +202,6 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
 
     // set MVP matrix in shader program
     _program->bind();
@@ -213,6 +220,9 @@ void GLWidget::paintGL()
             obj->paint();
         }
     }
+
+    // draw boxes for selected nodes
+    _boxes->paint();
 
     _program->release();
 }
