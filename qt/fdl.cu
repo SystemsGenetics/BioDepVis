@@ -90,10 +90,10 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 			dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
-		coords[i].x += 0.84f * dx;
-		coords[i].y += 0.84f * dy;
-		coords_d[i].x *= 0.6f;
-		coords_d[i].y *= 0.6f;
+		coords[i].x += dx;
+		coords[i].y += dy;
+		coords_d[i].x *= 0.1f;
+		coords_d[i].y *= 0.1f;
 	}
 }
 
@@ -142,12 +142,12 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 			dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
-		coords[i].x += 0.84f * dx;
-		coords[i].y += 0.84f * dy;
-		coords[i].z += 0.84f * dz;
-		coords_d[i].x *= 0.6f;
-		coords_d[i].y *= 0.6f;
-		coords_d[i].z *= 0.6f;
+		coords[i].x += dx;
+		coords[i].y += dy;
+		coords[i].z += dz;
+		coords_d[i].x *= 0.1f;
+		coords_d[i].y *= 0.1f;
+		coords_d[i].z *= 0.1f;
 	}
 }
 

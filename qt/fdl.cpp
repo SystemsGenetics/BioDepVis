@@ -7,10 +7,9 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
-    const float K_r = 25.0f;
-    const float K_s = 15.0f;
-    const float L = 1.2f;
-    const float dt = 0.004f;
+    const float K_r = 0.2f;
+    const float K_s = 1.0f;
+    const float L = 2.2f;
 
     for ( int i = 0; i < n; i++ ) {
         for ( int j = 0; j < n; j++ ) {
@@ -35,8 +34,8 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix
             }
         }
 
-        float dx = coords_d[i].x * dt;
-        float dy = coords_d[i].y * dt;
+        float dx = coords_d[i].x;
+        float dy = coords_d[i].y;
         float disp_sqr = dx * dx + dy * dy;
 
         if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
@@ -46,17 +45,16 @@ void fdl_2d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix
 
         coords[i].x += dx;
         coords[i].y += dy;
-        coords_d[i].x *= 0.09f;
-        coords_d[i].y *= 0.09f;
+        coords_d[i].x *= 0.1f;
+        coords_d[i].y *= 0.1f;
     }
 }
 
 void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
 {
-    const float K_r = 25.0f;
-    const float K_s = 15.0f;
-    const float L = 1.2f;
-    const float dt = 0.004f;
+    const float K_r = 0.2f;
+    const float K_s = 1.0f;
+    const float L = 2.2f;
 
     for ( int i = 0; i < n; i++ ) {
         for ( int j = 0; j < n; j++ ) {
@@ -84,9 +82,9 @@ void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix
             }
         }
 
-        float dx = coords_d[i].x * dt;
-        float dy = coords_d[i].y * dt;
-        float dz = coords_d[i].z * dt;
+        float dx = coords_d[i].x;
+        float dy = coords_d[i].y;
+        float dz = coords_d[i].z;
         float disp_sqr = dx * dx + dy * dy + dz * dz;
 
         if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
@@ -98,8 +96,8 @@ void fdl_3d_cpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix
         coords[i].x += dx;
         coords[i].y += dy;
         coords[i].z += dz;
-        coords_d[i].x *= 0.09f;
-        coords_d[i].y *= 0.09f;
-        coords_d[i].z *= 0.09f;
+        coords_d[i].x *= 0.1f;
+        coords_d[i].y *= 0.1f;
+        coords_d[i].z *= 0.1f;
     }
 }
