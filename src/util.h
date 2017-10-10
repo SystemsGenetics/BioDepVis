@@ -69,6 +69,7 @@ extern std::vector <nodeSelectedStruct> selectedVector;
 extern std::vector <nodeSelectedStruct> searchSelectedVector;
 extern std::vector <nodeSelectedStruct> *SelectedGoPtr;
 extern std::vector <graph*> graphDatabase;
+extern std::vector <Alignment*> alignmentDatabase;
 
 // ontolgoy database used in several files
 extern std::unordered_map<std::string, ontStruct> ontologyDB;
@@ -87,7 +88,7 @@ void gpuDeviceSync();
 // function prototypes
 std::vector<unsigned char> loadPNGSimple2(const char* filename, unsigned *width, unsigned *height);
 void loadTexture();
-void init(const char * f_in);
+void init();
 void drawGraph(graph *g);
 void drawAlignment(Alignment *align);
 void drawAlignmentROI(Alignment *align,int index);

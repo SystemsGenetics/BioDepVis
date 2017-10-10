@@ -60,6 +60,9 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	// read config file
+	parser(&graphDatabase, &alignmentDatabase, &ontologyDB, args.json_file.c_str());
+
 	// read the ontology file
 	readOntFile(&ontologyDB, args.ont_file.c_str());
 
@@ -93,8 +96,8 @@ int main(int argc, char **argv) {
 
 	#endif
 
-	// initialize the camera and such, pass in the json file to be read
-	init(args.json_file.c_str());
+	// initialize the camera
+	init();
 
 	// set up opengl callback functions
 	glutDisplayFunc(PerspDisplay);

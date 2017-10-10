@@ -121,11 +121,10 @@ void loadTexture()
 }
 
 
-void init(const char * f_in)
+void init()
 {
 	// set up camera
 	// parameters are eye point, aim point, up vector
-	parser(&graphDatabase, &alignmentDatabase, &ontologyDB, f_in);
 	camera = new Camera(Vector3d(0, 10, 400), Vector3d(0, 0, 0),
 		Vector3d(0, 1, 0));
 
