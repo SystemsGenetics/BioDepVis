@@ -1,6 +1,7 @@
 #include <QOpenGLFunctions>
 #include "glgraphobject.h"
 
+const color_t NODE_COLOR = { 0, 0, 0, 1 };
 const color_t EDGE_COLORS[] = {
 	{ 0.65f, 0.81f, 0.89f, 0.30f },
 	{ 0.50f, 0.50f, 0.78f, 0.30f },
@@ -18,7 +19,7 @@ GLGraphObject::GLGraphObject(Graph *graph)
 
 GLGraphObject::~GLGraphObject()
 {
-	_vbo_coords.destroy();
+	_vbo_positions.destroy();
 	_vbo_colors.destroy();
 }
 
@@ -30,7 +31,7 @@ void GLGraphObject::initialize()
 	// initialize node colors
 	_node_colors.reserve(_graph->nodes().size());
 	for ( int i = 0; i < _graph->nodes().size(); i++ ) {
-		_node_colors.push_back(color_t { 0, 0, 0, 1 });
+		_node_colors.push_back(NODE_COLOR);
 	}
 
 	// initialize edge colors
@@ -47,13 +48,13 @@ void GLGraphObject::initialize()
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
 	// initialize position buffer
-	_vbo_coords.create();
-	_vbo_coords.bind();
-	_vbo_coords.allocate(_graph->nodes().size() * sizeof(vec3_t));
+	_vbo_positions.create();
+	_vbo_positions.bind();
+	_vbo_positions.allocate(_graph->nodes().size() * sizeof(vec3_t));
 
 	f->glEnableVertexAttribArray(0);
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	_vbo_coords.release();
+	_vbo_positions.release();
 
 	// initialize color buffer
 	int num_colors = qMax(_graph->nodes().size(), _graph->edges().size());
@@ -73,9 +74,9 @@ void GLGraphObject::paint(bool show_modules)
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
 	// write node positions
-	_vbo_coords.bind();
-	_vbo_coords.write(0, _graph->coords().data(), _graph->nodes().size() * sizeof(vec3_t));
-	_vbo_coords.release();
+	_vbo_positions.bind();
+	_vbo_positions.write(0, _graph->coords().data(), _graph->nodes().size() * sizeof(vec3_t));
+	_vbo_positions.release();
 
 	// write node colors
 	const color_t *color_data = show_modules

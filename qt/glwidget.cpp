@@ -65,19 +65,16 @@ GLWidget::~GLWidget()
     doneCurrent();
 }
 
-void GLWidget::setRotX(float angle)
+void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 {
-    _rot.setX(angle);
-}
+    _rot.setX(_rot.x() + deltaX);
+    _rot.setY(_rot.y() + deltaY);
+    _rot.setZ(_rot.z() + deltaZ);
 
-void GLWidget::setRotY(float angle)
-{
-    _rot.setY(angle);
-}
-
-void GLWidget::setRotZ(float angle)
-{
-    _rot.setZ(angle);
+    _model.setToIdentity();
+    _model.rotate(_rot.x(), 1, 0, 0);
+    _model.rotate(_rot.y(), 0, 1, 0);
+    _model.rotate(_rot.z(), 0, 0, 1);
 }
 
 void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
@@ -85,24 +82,36 @@ void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
     _selected_nodes = nodes;
 }
 
-void GLWidget::setZoom(float zoom)
+void GLWidget::translate(float deltaX, float deltaY, float deltaZ)
 {
-    _zoom = qMin(qMax(1.0f, zoom), 180.0f);
+    _view.translate(deltaX, deltaY, deltaZ);
+}
+
+void GLWidget::zoom(float delta)
+{
+    _zoom = qMin(qMax(1.0f, _zoom + delta), 180.0f);
+
+    _proj.setToIdentity();
+    _proj.perspective(
+        _zoom,
+        float(width()) / height(),
+        0.0001f, 1000.0f
+    );
 }
 
 void GLWidget::init_camera()
 {
-    // initialize rotation angle
-    _rot.setX(0);
-    _rot.setY(0);
-    _rot.setZ(0);
-
-    // initialize zoom
-    _zoom = 60.0f;
+    // initialize model matrix
+    _rot = QVector3D(0, 0, 0);
+    rotate(0, 0, 0);
 
     // initialize view matrix (camera)
     _view.setToIdentity();
-    _view.translate(0, 0, -400);
+    translate(0, 0, -400);
+
+    // initialize projection matrix
+    _zoom = 60.0f;
+    zoom(0);
 }
 
 void GLWidget::run_animation()
@@ -187,20 +196,6 @@ void GLWidget::paintGL()
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    // compute model matrix
-    _model.setToIdentity();
-    _model.rotate(_rot.x(), 1, 0, 0);
-    _model.rotate(_rot.y(), 0, 1, 0);
-    _model.rotate(_rot.z(), 0, 0, 1);
-
-    // compute projection matrix
-    _proj.setToIdentity();
-    _proj.perspective(
-        _zoom,
-        float(width()) / height(),
-        0.0001f, 1000.0f
-    );
-
     // set MVP matrix in shader program
     _program->bind();
     _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
@@ -222,51 +217,56 @@ void GLWidget::paintGL()
     _program->release();
 }
 
+void GLWidget::resizeGL(int w, int h)
+{
+    zoom(0);
+}
+
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    const float SHIFT_ROT = 1;
-    const float SHIFT_TRANS = 10;
-    const float SHIFT_ZOOM = 1;
+    const float ROT_DELTA = 1;
+    const float TRANS_DELTA = 10;
+    const float ZOOM_DELTA = 1;
 
     switch ( event->key() ) {
     case Qt::Key_R:
         init_camera();
         break;
     case Qt::Key_W:
-        _view.translate(0, -SHIFT_TRANS, 0);
+        translate(0, -TRANS_DELTA, 0);
         break;
     case Qt::Key_S:
-        _view.translate(0, +SHIFT_TRANS, 0);
+        translate(0, +TRANS_DELTA, 0);
         break;
     case Qt::Key_A:
-        _view.translate(+SHIFT_TRANS, 0, 0);
+        translate(+TRANS_DELTA, 0, 0);
         break;
     case Qt::Key_D:
-        _view.translate(-SHIFT_TRANS, 0, 0);
+        translate(-TRANS_DELTA, 0, 0);
         break;
     case Qt::Key_Q:
-        setZoom(_zoom + SHIFT_ZOOM);
+        zoom(+ZOOM_DELTA);
         break;
     case Qt::Key_E:
-        setZoom(_zoom - SHIFT_ZOOM);
+        zoom(-ZOOM_DELTA);
         break;
     case Qt::Key_I:
-        setRotX(_rot.x() + SHIFT_ROT);
+        rotate(+ROT_DELTA, 0, 0);
         break;
     case Qt::Key_K:
-        setRotX(_rot.x() - SHIFT_ROT);
+        rotate(-ROT_DELTA, 0, 0);
         break;
     case Qt::Key_J:
-        setRotY(_rot.y() + SHIFT_ROT);
+        rotate(0, +ROT_DELTA, 0);
         break;
     case Qt::Key_L:
-        setRotY(_rot.y() - SHIFT_ROT);
+        rotate(0, -ROT_DELTA, 0);
         break;
     case Qt::Key_U:
-        setRotZ(_rot.z() + SHIFT_ROT);
+        rotate(0, 0, +ROT_DELTA);
         break;
     case Qt::Key_O:
-        setRotZ(_rot.z() - SHIFT_ROT);
+        rotate(0, 0, -ROT_DELTA);
     case Qt::Key_G:
         _gpu = !_gpu;
 
@@ -306,7 +306,7 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
     const float max_dist = 5.0f;
     float x = event->x();
     float y = height() - event->y();
-    QMatrix4x4 mv = _model * _view;
+    QMatrix4x4 mv = _view * _model;
     QVector3D start = QVector3D(x, y, 0.0f).unproject(mv, _proj, rect());
     QVector3D end = QVector3D(x, y, 1.0f).unproject(mv, _proj, rect());
     QVector3D dir = (end - start).normalized();
@@ -345,12 +345,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int dy = event->y() - _prev_pos.y();
 
     if ( event->buttons() & Qt::LeftButton ) {
-        setRotX(_rot.x() + 0.5f * dy);
-        setRotY(_rot.y() + 0.5f * dx);
+        rotate(0.5f * dy, 0.5f * dx, 0);
     }
     else if ( event->buttons() & Qt::RightButton ) {
-        setRotX(_rot.x() + 0.5f * dy);
-        setRotZ(_rot.z() + 0.5f * dx);
+        rotate(0.5f * dy, 0, 0.5f * dx);
     }
     _prev_pos = event->pos();
 
@@ -379,10 +377,10 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     QPoint degrees = event->angleDelta();
 
     if ( !pixels.isNull() ) {
-        setZoom(_zoom - pixels.y() / 10.0f);
+        zoom(-pixels.y() / 10.0f);
     }
     else if ( !degrees.isNull() ) {
-        setZoom(_zoom - degrees.y() / 10.0f);
+        zoom(-degrees.y() / 10.0f);
     }
 
     update();

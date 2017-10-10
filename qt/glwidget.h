@@ -21,11 +21,10 @@ public:
     ~GLWidget();
 
 public slots:
-    void setRotX(float angle);
-    void setRotY(float angle);
-    void setRotZ(float angle);
+    void rotate(float deltaX, float deltaY, float deltaZ);
     void setSelectedNodes(const QVector<node_ref_t>& nodes);
-    void setZoom(float zoom);
+    void translate(float deltaX, float deltaY, float deltaZ);
+    void zoom(float delta);
 
 signals:
     void nodesSelected(const QVector<node_ref_t>& nodes);
@@ -35,6 +34,7 @@ protected:
     void run_animation();
     void initializeGL() override;
     void paintGL() override;
+    void resizeGL(int w, int h) override;
     void keyPressEvent(QKeyEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

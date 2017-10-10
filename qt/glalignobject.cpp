@@ -15,7 +15,7 @@ GLAlignObject::GLAlignObject(Alignment *align)
 
 GLAlignObject::~GLAlignObject()
 {
-	_vbo_coords.destroy();
+	_vbo_positions.destroy();
 	_vbo_colors.destroy();
 }
 
@@ -38,13 +38,13 @@ void GLAlignObject::initialize()
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
 	// initialize position buffer
-	_vbo_coords.create();
-	_vbo_coords.bind();
-	_vbo_coords.allocate(_align->edges().size() * sizeof(align_edge_t));
+	_vbo_positions.create();
+	_vbo_positions.bind();
+	_vbo_positions.allocate(_align->edges().size() * sizeof(align_edge_t));
 
 	f->glEnableVertexAttribArray(0);
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	_vbo_coords.release();
+	_vbo_positions.release();
 
 	// initialize color buffer
 	_vbo_colors.create();
@@ -62,9 +62,9 @@ void GLAlignObject::paint()
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
 	// write edge positions
-	_vbo_coords.bind();
-	_vbo_coords.write(0, _align->vertices().data(), _align->edges().size() * sizeof(align_edge_t));
-	_vbo_coords.release();
+	_vbo_positions.bind();
+	_vbo_positions.write(0, _align->vertices().data(), _align->edges().size() * sizeof(align_edge_t));
+	_vbo_positions.release();
 
 	// draw edges
 	f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
