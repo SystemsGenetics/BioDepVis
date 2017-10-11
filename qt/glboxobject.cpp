@@ -1,10 +1,12 @@
-#include <QDebug>
 #include <QOpenGLFunctions>
 #include "glboxobject.h"
 
-const color_t BOX_COLOR = { 1, 0, 0, 1 };
-const float BOX_WIDTH = 5.0f;
 const int VERTICES_PER_BOX = 24;
+
+GLBoxObject::GLBoxObject(Database *db)
+{
+	this->_db = db;
+}
 
 GLBoxObject::~GLBoxObject()
 {
@@ -43,78 +45,98 @@ void GLBoxObject::paint()
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
+	// write positions
+	_vbo_positions.bind();
+	_vbo_positions.allocate(_positions.data(), _positions.size() * sizeof(vec3_t));
+	_vbo_positions.release();
+
 	// draw boxes
 	f->glBlendFunc(GL_ONE, GL_ZERO);
 	f->glLineWidth(1.0f);
 	f->glDrawArrays(GL_LINES, 0, _positions.size());
 }
 
-void GLBoxObject::update(Database *db, const QVector<node_ref_t>& nodes)
+void GLBoxObject::append(const QVector<node_ref_t>& nodes, float L, const color_t& color)
 {
-	qDebug() << nodes.size();
+	// update nodes and sizes
+	_nodes.append(nodes);
 
-	// create boxes
-	int num_positions = nodes.size() * VERTICES_PER_BOX;
+	_sizes.reserve(_nodes.size());
+	for ( int i = 0; i < _nodes.size(); i++ ) {
+		_sizes.push_back(L);
+	}
 
-	_positions.clear();
-	_positions.reserve(num_positions);
+	// allocate positions for boxes
+	int num_positions = _nodes.size() * VERTICES_PER_BOX;
 
-	_colors.clear();
+	_positions.resize(num_positions);
+
+	// allocate, initialize colors for boxes
 	_colors.reserve(num_positions);
 
-	for ( const node_ref_t& ref : nodes ) {
-		const vec3_t& center = db->graphs()[ref.graph_id]->coords()[ref.node_id];
-
-		create_box(center, BOX_WIDTH, BOX_COLOR);
+	for ( int i = 0; i < nodes.size() * VERTICES_PER_BOX; i++ ) {
+		_colors.push_back(color);
 	}
 
 	QOpenGLVertexArrayObject::Binder vaoBinder(&_vao);
 
 	// allocate position buffer
 	_vbo_positions.bind();
-	_vbo_positions.allocate(_positions.data(), num_positions * sizeof(vec3_t));
+	_vbo_positions.allocate(_positions.size() * sizeof(vec3_t));
 	_vbo_positions.release();
 
-	// allocate color buffer
+	// allocate, update color buffer
 	_vbo_colors.bind();
-	_vbo_colors.allocate(_colors.data(), num_positions * sizeof(color_t));
+	_vbo_colors.allocate(_colors.data(), _colors.size() * sizeof(color_t));
 	_vbo_colors.release();
 }
 
-void GLBoxObject::create_box(const vec3_t& C, float W, const color_t& color)
+void GLBoxObject::clear()
 {
-	qDebug() << C.x << C.y << C.z;
+	_nodes.clear();
+	_sizes.clear();
+	_positions.clear();
+	_colors.clear();
+}
 
-	// append positions
-	_positions.push_back(vec3_t { C.x - W/2, C.y + W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y + W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y + W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y - W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y - W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y - W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y - W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y + W/2, C.z - W/2 });
+void GLBoxObject::update()
+{
+	for ( int i = 0; i < _nodes.size(); i++ ) {
+		const node_ref_t& ref = _nodes[i];
+		const vec3_t& center = _db->graphs()[ref.graph_id]->coords()[ref.node_id];
 
-	_positions.push_back(vec3_t { C.x - W/2, C.y + W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y + W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y + W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y - W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y - W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y - W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y - W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y + W/2, C.z + W/2 });
-
-	_positions.push_back(vec3_t { C.x - W/2, C.y + W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y + W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y + W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y + W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y - W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x + W/2, C.y - W/2, C.z + W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y - W/2, C.z - W/2 });
-	_positions.push_back(vec3_t { C.x - W/2, C.y - W/2, C.z + W/2 });
-
-	// append colors
-	for ( int i = 0; i < VERTICES_PER_BOX; i++ ) {
-		_colors.push_back(color);
+		update_cube(i, center, _sizes[i]);
 	}
+}
+
+void GLBoxObject::update_cube(int i, const vec3_t& C, float L)
+{
+	int j = i * VERTICES_PER_BOX;
+
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z - L/2 });
+
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z + L/2 });
+
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z + L/2 });
 }

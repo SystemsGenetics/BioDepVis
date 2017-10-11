@@ -81,7 +81,9 @@ void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
 {
     _selected_nodes = nodes;
 
-    _boxes->update(_db, _selected_nodes);
+    _boxes->clear();
+    _boxes->append(_selected_nodes, 5.0f, color_t { 1, 0, 0, 1 });
+    _boxes->update();
     update();
 }
 
@@ -151,7 +153,7 @@ void GLWidget::run_animation()
         a->update();
     }
 
-    _boxes->update(_db, _selected_nodes);
+    _boxes->update();
     update();
 }
 
@@ -190,7 +192,7 @@ void GLWidget::initializeGL()
     }
 
     // initialize scene object for boxes
-    _boxes = new GLBoxObject();
+    _boxes = new GLBoxObject(_db);
     _boxes->initialize();
 
     // initialize camera
