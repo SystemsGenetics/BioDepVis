@@ -203,6 +203,10 @@ void MainWindow::search()
 {
     QString term = _search->text();
 
+    if ( term.isEmpty() ) {
+        return;
+    }
+
     init_controls();
 
     for ( const ont_term_t& ont : _db->ontology().values() ) {
