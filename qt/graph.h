@@ -39,12 +39,12 @@ private:
     QVector<graph_edge_t> _edges;
     QVector<color_t> _colors;
 
-    QVector<vec3_t> _coords;
-    QVector<vec3_t> _coords_d;
+    QVector<vec3_t> _positions;
+    QVector<vec3_t> _positions_d;
     Matrix _edge_matrix;
 
-    vec3_t *_coords_gpu;
-    vec3_t *_coords_d_gpu;
+    vec3_t *_positions_gpu;
+    vec3_t *_positions_d_gpu;
     bool *_edge_matrix_gpu;
 
 public:
@@ -64,12 +64,12 @@ public:
     QVector<graph_edge_t>& edges() { return this->_edges; }
     QVector<color_t>& colors() { return this->_colors; }
 
-    QVector<vec3_t>& coords() { return this->_coords; }
-    QVector<vec3_t>& coords_d() { return this->_coords_d; }
+    QVector<vec3_t>& positions() { return this->_positions; }
+    QVector<vec3_t>& positions_d() { return this->_positions_d; }
     Matrix& edge_matrix() { return this->_edge_matrix; }
 
-    vec3_t * coords_gpu() { return this->_coords_gpu; }
-    vec3_t * coords_d_gpu() { return this->_coords_d_gpu; }
+    vec3_t * positions_gpu() { return this->_positions_gpu; }
+    vec3_t * positions_d_gpu() { return this->_positions_d_gpu; }
     bool * edge_matrix_gpu() const { return this->_edge_matrix_gpu; }
 
     void read_gpu();

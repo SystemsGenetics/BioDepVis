@@ -50,7 +50,7 @@ void gpu_sync()
 	checkError(cudaGetLastError());
 }
 
-__global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
+__global__ void fdl_kernel_2d(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -64,8 +64,8 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 				continue;
 			}
 
-			float dx = coords[j].x - coords[i].x;
-			float dy = coords[j].y - coords[i].y;
+			float dx = positions[j].x - positions[i].x;
+			float dy = positions[j].y - positions[i].y;
 			float dist = sqrtf(dx * dx + dy * dy);
 
 			if ( dist != 0 ) {
@@ -73,17 +73,17 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 					? K_s * (L - dist) / dist
 					: K_r / (dist * dist * dist);
 
-				coords_d[i].x -= force * dx;
-				coords_d[i].y -= force * dy;
+				positions_d[i].x -= force * dx;
+				positions_d[i].y -= force * dy;
 
-				coords_d[j].x += force * dx;
-				coords_d[j].y += force * dy;
+				positions_d[j].x += force * dx;
+				positions_d[j].y += force * dy;
 			}
 		}
 		__syncthreads();
 
-		float dx = coords_d[i].x;
-		float dy = coords_d[i].y;
+		float dx = positions_d[i].x;
+		float dy = positions_d[i].y;
 		float disp_sqr = dx * dx + dy * dy;
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
@@ -91,14 +91,14 @@ __global__ void fdl_kernel_2d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 			dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
-		coords[i].x += dx;
-		coords[i].y += dy;
-		coords_d[i].x *= 0.1f;
-		coords_d[i].y *= 0.1f;
+		positions[i].x += dx;
+		positions[i].y += dy;
+		positions_d[i].x *= 0.1f;
+		positions_d[i].y *= 0.1f;
 	}
 }
 
-__global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
+__global__ void fdl_kernel_3d(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -112,9 +112,9 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 				continue;
 			}
 
-			float dx = coords[j].x - coords[i].x;
-			float dy = coords[j].y - coords[i].y;
-			float dz = coords[j].z - coords[i].z;
+			float dx = positions[j].x - positions[i].x;
+			float dy = positions[j].y - positions[i].y;
+			float dz = positions[j].z - positions[i].z;
 			float dist = sqrtf(dx * dx + dy * dy + dz * dz);
 
 			if ( dist != 0 ) {
@@ -122,20 +122,20 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 					? K_s * (L - dist) / dist
 					: K_r / (dist * dist * dist);
 
-				coords_d[i].x -= force * dx;
-				coords_d[i].y -= force * dy;
-				coords_d[i].z -= force * dz;
+				positions_d[i].x -= force * dx;
+				positions_d[i].y -= force * dy;
+				positions_d[i].z -= force * dz;
 
-				coords_d[j].x += force * dx;
-				coords_d[j].y += force * dy;
-				coords_d[j].z += force * dz;
+				positions_d[j].x += force * dx;
+				positions_d[j].y += force * dy;
+				positions_d[j].z += force * dz;
 			}
 		}
 		__syncthreads();
 
-		float dx = coords_d[i].x;
-		float dy = coords_d[i].y;
-		float dz = coords_d[i].z;
+		float dx = positions_d[i].x;
+		float dy = positions_d[i].y;
+		float dz = positions_d[i].z;
 		float disp_sqr = dx * dx + dy * dy + dz * dz;
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR ) {
@@ -144,21 +144,21 @@ __global__ void fdl_kernel_3d(int n, vec3_t *coords, vec3_t *coords_d, const boo
 			dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
-		coords[i].x += dx;
-		coords[i].y += dy;
-		coords[i].z += dz;
-		coords_d[i].x *= 0.1f;
-		coords_d[i].y *= 0.1f;
-		coords_d[i].z *= 0.1f;
+		positions[i].x += dx;
+		positions[i].y += dy;
+		positions[i].z += dz;
+		positions_d[i].x *= 0.1f;
+		positions_d[i].y *= 0.1f;
+		positions_d[i].z *= 0.1f;
 	}
 }
 
-void fdl_2d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
+void fdl_2d_gpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
 {
-	fdl_kernel_2d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, coords, coords_d, edge_matrix);
+	fdl_kernel_2d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, positions, positions_d, edge_matrix);
 }
 
-void fdl_3d_gpu(int n, vec3_t *coords, vec3_t *coords_d, const bool *edge_matrix)
+void fdl_3d_gpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
 {
-	fdl_kernel_3d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, coords, coords_d, edge_matrix);
+	fdl_kernel_3d<<<(n + BLOCK_SIZE - 1) / BLOCK_SIZE, BLOCK_SIZE>>>(n, positions, positions_d, edge_matrix);
 }

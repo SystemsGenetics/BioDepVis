@@ -25,22 +25,22 @@ Graph::Graph(
         load_ontology(ontfile);
     }
 
-    // initialize coords
-    this->_coords.reserve(this->_nodes.size());
+    // initialize positions
+    this->_positions.reserve(this->_nodes.size());
 
     for ( int i = 0; i < this->_nodes.size(); i++ ) {
-        this->_coords.push_back({
+        this->_positions.push_back({
             x - w / 2 + w * qrand() / RAND_MAX,
             y - h / 2 + h * qrand() / RAND_MAX,
             z
         });
     }
 
-    // initialize delta coords
-    this->_coords_d.reserve(this->_nodes.size());
+    // initialize delta positions
+    this->_positions_d.reserve(this->_nodes.size());
 
     for ( int i = 0; i < this->_nodes.size(); i++ ) {
-        this->_coords_d.push_back({ 0, 0, 0 });
+        this->_positions_d.push_back({ 0, 0, 0 });
     }
 
     // determine number of modules
@@ -85,8 +85,8 @@ Graph::Graph(
 
     // initialize GPU data
     int n = _nodes.size();
-    _coords_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
-    _coords_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
+    _positions_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
+    _positions_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
     _edge_matrix_gpu = (bool *)gpu_malloc(n * n * sizeof(bool));
 
     write_gpu();
@@ -94,24 +94,24 @@ Graph::Graph(
 
 Graph::~Graph()
 {
-    gpu_free(_coords_gpu);
-    gpu_free(_coords_d_gpu);
+    gpu_free(_positions_gpu);
+    gpu_free(_positions_d_gpu);
     gpu_free(_edge_matrix_gpu);
 }
 
 void Graph::read_gpu()
 {
     int n = _nodes.size();
-    gpu_read(_coords.data(), _coords_gpu, n * sizeof(vec3_t));
-    gpu_read(_coords_d.data(), _coords_d_gpu, n * sizeof(vec3_t));
+    gpu_read(_positions.data(), _positions_gpu, n * sizeof(vec3_t));
+    gpu_read(_positions_d.data(), _positions_d_gpu, n * sizeof(vec3_t));
     gpu_read(_edge_matrix.data(), _edge_matrix_gpu, n * n * sizeof(bool));
 }
 
 void Graph::write_gpu()
 {
     int n = _nodes.size();
-    gpu_write(_coords_gpu, _coords.data(), n * sizeof(vec3_t));
-    gpu_write(_coords_d_gpu, _coords_d.data(), n * sizeof(vec3_t));
+    gpu_write(_positions_gpu, _positions.data(), n * sizeof(vec3_t));
+    gpu_write(_positions_d_gpu, _positions_d.data(), n * sizeof(vec3_t));
     gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool));
 }
 

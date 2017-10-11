@@ -81,8 +81,8 @@ void Alignment::update()
         int i = this->_edges[k].node1;
         int j = this->_edges[k].node2;
 
-        this->_vertices[k].v1 = this->_graph1->coords()[i];
-        this->_vertices[k].v2 = this->_graph2->coords()[j];
+        this->_vertices[k].v1 = this->_graph1->positions()[i];
+        this->_vertices[k].v2 = this->_graph2->positions()[j];
     }
 }
 

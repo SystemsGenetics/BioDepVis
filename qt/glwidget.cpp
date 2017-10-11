@@ -125,16 +125,16 @@ void GLWidget::run_animation()
         if ( _gpu ) {
             fdl_2d_gpu(
                 g->nodes().size(),
-                g->coords_gpu(),
-                g->coords_d_gpu(),
+                g->positions_gpu(),
+                g->positions_d_gpu(),
                 g->edge_matrix_gpu()
             );
         }
         else {
             fdl_2d_cpu(
                 g->nodes().size(),
-                g->coords().data(),
-                g->coords_d().data(),
+                g->positions().data(),
+                g->positions_d().data(),
                 g->edge_matrix().data()
             );
         }
@@ -330,7 +330,7 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
         Graph *g = _db->graphs().values()[i];
 
         for ( int j = 0; j < g->nodes().size(); j++ ) {
-            vec3_t v = g->coords()[j];
+            vec3_t v = g->positions()[j];
             float dist = QVector3D(v.x, v.y, v.z).distanceToLine(start, dir);
 
             if ( dist < max_dist ) {

@@ -103,7 +103,7 @@ void GLBoxObject::update()
 {
 	for ( int i = 0; i < _nodes.size(); i++ ) {
 		const node_ref_t& ref = _nodes[i];
-		const vec3_t& center = _db->graphs()[ref.graph_id]->coords()[ref.node_id];
+		const vec3_t& center = _db->graphs()[ref.graph_id]->positions()[ref.node_id];
 
 		update_cube(i, center, _sizes[i]);
 	}

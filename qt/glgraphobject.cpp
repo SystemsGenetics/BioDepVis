@@ -82,7 +82,7 @@ void GLGraphObject::paint(bool show_modules)
 
 	// write node positions
 	_vbo_positions.bind();
-	_vbo_positions.write(0, _graph->coords().data(), num_nodes * sizeof(vec3_t));
+	_vbo_positions.write(0, _graph->positions().data(), num_nodes * sizeof(vec3_t));
 	_vbo_positions.release();
 
 	// write node colors
