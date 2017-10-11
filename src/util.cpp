@@ -745,40 +745,13 @@ void cleanup()
 }
 
 
-Vector3d ClosestPoint(const Vector3d A, const Vector3d B,
-	const Vector3d P, double *t)
-{
-	Vector3d AB = B - A;
-	double ab_square = AB * AB;
-	Vector3d AP = P - A;
-	double ap_dot_ab = AP * AB;
-	// t is a projection param when we project vector AP onto AB
-	*t = ap_dot_ab / ab_square;
-	// calculate the closest point
-	Vector3d Q = A + AB * (*t);
-	return Q;
-}
-
-
-bool RayTest( const Vector3d start, const Vector3d end, Vector3d center,
-	Vector3d *pt, double *t, double epsilon)
-{
-
-	*pt = ClosestPoint(start, end, center, t);
-	double len = (*pt - center).norm();
-	double m_radius = 5;
-	return len < (m_radius + epsilon);
-}
-
-
 float PointToLineDistance(const Vector3d &a, const Vector3d &b, const Vector3d &point)
 {
-	Vector3d lineDirection = (b - a).normalize(); Vector3d pointDirection = point - a;
-	float t = pointDirection * lineDirection;
-	Vector3d projection = a + (lineDirection * t);
+	Vector3d line_dir = (b - a).normalize();
+	Vector3d point_dir = point - a;
+	Vector3d projection = a + (line_dir * (point_dir * line_dir));
 
-	float ShortestDistance = (projection - point).norm();
-	return ShortestDistance;
+	return (projection - point).norm();
 }
 
 
@@ -840,13 +813,7 @@ void GetPickRay(int mouseX, int mouseY)
 	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
 		viewport, &m_end.x, &m_end.y, &m_end.z);
 
-	double t;
-	float w;
-
-	float min = 5.0f;
-
-	if (searchArea != true)
-		min = searchRadius;
+	float min = searchArea ? 5.0f : searchRadius;
 
 	selectedVector.clear();
 	selectList->delete_all();
@@ -860,26 +827,26 @@ void GetPickRay(int mouseX, int mouseY)
 			float d = PointToLineDistance(m_start, m_end, Vector3d(graphDatabase.at(i)->coords[j * 3 + 0], graphDatabase.at(i)->coords[j * 3 + 1], graphDatabase.at(i)->coords[j * 3 + 2]));
 
 			if (d < min)
+			{
+				nodeSelectedStruct tmp;
+				tmp.nodeSelected = j;
+				tmp.graphSelected = i;
+
+				if (searchArea != true)
 				{
-					nodeSelectedStruct tmp;
-					tmp.nodeSelected = j;
-					tmp.graphSelected = i;
-
-					if (searchArea != true)
-					{
-						min = d;
-						selectedVector.clear();
-						selectList->delete_all();
-					}
-
-					selectedVector.push_back(tmp);
-
-					char tmpc[256];
-					std::string nodename = lookupName(tmp.graphSelected, tmp.nodeSelected);
-					sprintf(tmpc, "%s",nodename.c_str());
-					selectList->add_item(selectedVector.size()-1, tmpc);
+					min = d;
+					selectedVector.clear();
+					selectList->delete_all();
 				}
+
+				selectedVector.push_back(tmp);
+
+				char tmpc[256];
+				std::string nodename = lookupName(tmp.graphSelected, tmp.nodeSelected);
+				sprintf(tmpc, "%s",nodename.c_str());
+				selectList->add_item(selectedVector.size()-1, tmpc);
 			}
+		}
 
 		selectList->update_size();
 		selectList->update_and_draw_text();
