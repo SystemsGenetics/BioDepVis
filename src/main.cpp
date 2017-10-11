@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 	glutMouseFunc(mouseEventHandler);
 	glutMotionFunc(motionEventHandler);
 	glutKeyboardFunc(keyboardEventHandler);
-	glutIdleFunc(idle);
+	glutTimerFunc(1000 / MAX_FPS, timerFunc, 0);
 
 	// MainGLUI
 	glui = GLUI_Master.create_glui("Ontology Lookup Window", GLUI_SUBWINDOW_RIGHT, (glutGet(GLUT_SCREEN_WIDTH) - (WIDTH*2)) / 2, (glutGet(GLUT_SCREEN_HEIGHT) - HEIGHT) / 2); /* name, flags,x, and y */
@@ -140,11 +140,6 @@ int main(int argc, char **argv) {
 	searchBox->set_w(420);
 	searchBox->set_h(40);
 	glui->set_main_gfx_window(persp_win);
-
-
-	/* We register the idle callback with GLUI, *not* with GLUT */
-	GLUI_Master.set_glutIdleFunc(idle);
-
 
 	glutMainLoop();
 	return(0);

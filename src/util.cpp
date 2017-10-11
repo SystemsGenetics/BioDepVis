@@ -19,9 +19,9 @@ GLUI_List *selectList;
 std::unordered_map<std::string, ontStruct> ontologyDB;
 
 int persp_win;
-
 int WIDTH = 1000;
 int HEIGHT = 600;
+int MAX_FPS = 60;
 
 float searchRadius = 40;
 
@@ -687,13 +687,8 @@ void PerspDisplay()
 }
 
 
-void idle()
+void timerFunc(int value)
 {
-	if (glutGetWindow() != persp_win) {
-		glutSetWindow(persp_win);
-		glutPostRedisplay();
-	}
-
 	if ( animate ) {
 		for (int i = 0; i < graphDatabase.size(); i++)
 		{
@@ -727,8 +722,11 @@ void idle()
 			}
 		}
 
+		glutSetWindow(persp_win);
 		glutPostRedisplay();
 	}
+
+	glutTimerFunc(1000 / MAX_FPS, timerFunc, value);
 }
 
 

@@ -75,9 +75,9 @@ extern std::vector <Alignment*> alignmentDatabase;
 extern std::unordered_map<std::string, ontStruct> ontologyDB;
 
 extern int persp_win;
-
 extern int WIDTH;
 extern int HEIGHT;
+extern int MAX_FPS;
 
 void runForceDirectedGPU(graph *g);
 void runAlignmentForceGPU(Alignment *);
@@ -99,7 +99,7 @@ void drawROIBox(int graphSelectedIndex, int nodeSelectedIndex,int xs,int ys,int 
 void drawROIGraph();
 void drawGraphROIBack(graph *g);
 void PerspDisplay();
-void idle();
+void timerFunc(int value);
 void cleanup();
 Vector3d ClosestPoint(const Vector3d A, const Vector3d B, const Vector3d P, double *t);
 bool RayTest( const Vector3d start, const Vector3d end, Vector3d center, Vector3d *pt, double *t, double epsilon);
