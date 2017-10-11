@@ -82,7 +82,7 @@ void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
     _selected_nodes = nodes;
 
     _boxes->clear();
-    _boxes->append(_selected_nodes, 1.0f, color_t { 0, 0, 0, 1 });
+    _boxes->append(_selected_nodes, 3.0f, color_t { 1, 0, 0, 1 });
     _boxes->update();
     update();
 }
