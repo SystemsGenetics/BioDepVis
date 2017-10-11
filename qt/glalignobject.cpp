@@ -2,9 +2,9 @@
 #include "glalignobject.h"
 
 const color_t EDGE_COLORS[] = {
-	{ 0.70f, 0.19f, 0.29f, 0.10f },
-	{ 0.89f, 0.50f, 0.79f, 0.10f },
-	{ 0.89f, 0.50f, 0.79f, 0.10f }
+	{ 0.70f, 0.19f, 0.29f, 0.05f },
+	{ 0.89f, 0.50f, 0.79f, 0.05f },
+	{ 0.89f, 0.50f, 0.79f, 0.05f }
 };
 const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(color_t);
 

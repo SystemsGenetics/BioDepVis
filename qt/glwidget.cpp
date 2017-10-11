@@ -82,7 +82,7 @@ void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
     _selected_nodes = nodes;
 
     _boxes->clear();
-    _boxes->append(_selected_nodes, 5.0f, color_t { 1, 0, 0, 1 });
+    _boxes->append(_selected_nodes, 1.0f, color_t { 0, 0, 0, 1 });
     _boxes->update();
     update();
 }
@@ -161,6 +161,7 @@ void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     glClearColor(1, 1, 1, 0);
+    glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
@@ -209,17 +210,17 @@ void GLWidget::paintGL()
     _program->bind();
     _program->setUniformValue(_ref_mvp_matrix, _proj * _view * _model);
 
-    // draw each graph
-    if ( _show_graphs ) {
-        for ( GLGraphObject *obj : _graphs ) {
-            obj->paint(_show_modules);
-        }
-    }
-
     // draw each alignment
     if ( _show_alignments ) {
         for ( GLAlignObject *obj : _alignments ) {
             obj->paint();
+        }
+    }
+
+    // draw each graph
+    if ( _show_graphs ) {
+        for ( GLGraphObject *obj : _graphs ) {
+            obj->paint(_show_modules);
         }
     }
 
@@ -315,7 +316,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
 void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    const float max_dist = 5.0f;
+    float max_dist = _select_multi ? 5.0f : 40.0f;
     float x = event->x();
     float y = height() - event->y();
     QMatrix4x4 mv = _view * _model;

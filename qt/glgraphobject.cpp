@@ -3,12 +3,12 @@
 
 const color_t NODE_COLOR = { 0, 0, 0, 1 };
 const color_t EDGE_COLORS[] = {
-	{ 0.65f, 0.81f, 0.89f, 0.30f },
-	{ 0.50f, 0.50f, 0.78f, 0.30f },
-	{ 0.42f, 0.24f, 0.60f, 0.30f },
-	{ 0.12f, 0.47f, 0.71f, 0.30f },
-	{ 0.70f, 0.87f, 0.54f, 0.30f },
-	{ 1.00f, 0.50f, 0.00f, 0.30f }
+	{ 0.65f, 0.81f, 0.89f, 0.10f },
+	{ 0.50f, 0.50f, 0.78f, 0.10f },
+	{ 0.42f, 0.24f, 0.60f, 0.10f },
+	{ 0.12f, 0.47f, 0.71f, 0.10f },
+	{ 0.70f, 0.87f, 0.54f, 0.10f },
+	{ 1.00f, 0.50f, 0.00f, 0.10f }
 };
 const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(color_t);
 
@@ -85,6 +85,16 @@ void GLGraphObject::paint(bool show_modules)
 	_vbo_positions.write(0, _graph->positions().data(), num_nodes * sizeof(vec3_t));
 	_vbo_positions.release();
 
+	// write edge colors
+	_vbo_colors.bind();
+	_vbo_colors.write(0, _edge_colors.data(), num_edges * sizeof(color_t));
+	_vbo_colors.release();
+
+	// draw edges
+	f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	f->glLineWidth(0.001f);
+	f->glDrawElements(GL_LINES, num_edges, GL_UNSIGNED_INT, _graph->edges().data());
+
 	// write node colors
 	const color_t *color_data = show_modules
 		? _graph->colors().data()
@@ -97,14 +107,4 @@ void GLGraphObject::paint(bool show_modules)
 	// draw nodes
 	f->glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	f->glDrawArrays(GL_POINTS, 0, num_nodes);
-
-	// write edge colors
-	_vbo_colors.bind();
-	_vbo_colors.write(0, _edge_colors.data(), num_edges * sizeof(color_t));
-	_vbo_colors.release();
-
-	// draw edges
-	f->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	f->glLineWidth(0.001f);
-	f->glDrawElements(GL_LINES, num_edges, GL_UNSIGNED_INT, _graph->edges().data());
 }
