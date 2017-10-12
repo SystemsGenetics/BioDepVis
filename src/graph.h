@@ -1,84 +1,87 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <vector>
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unordered_map>
+#include <QHash>
+#include <QString>
+#include <QVector>
+#include "matrix.h"
+#include "vector.h"
 
-struct nodeSelectedStruct
+typedef struct {
+    float r;
+    float g;
+    float b;
+    float a;
+} color_t;
+
+typedef struct {
+    QString name;
+    int module_id;
+    QStringList go_terms;
+} graph_node_t;
+
+typedef struct {
+    int node1;
+    int node2;
+} graph_edge_t;
+
+class Graph
 {
-    int nodeSelected;
-    int graphSelected;
-};
+private:
+    int _id;
+    QString _name;
+    vec3_t _center;
+    float _width;
+    float _height;
 
-struct ontStruct{
-    std::string id;
-    std::string name;
-    std::string def;
-    int index;
-    std::vector<nodeSelectedStruct> connectedNodes;
-};
+    QVector<graph_node_t> _nodes;
+    QHash<QString, int> _node_map;
+    QVector<graph_edge_t> _edges;
+    QVector<color_t> _colors;
 
-#define INFOCOUNT 5
-void forceDirectedLayout(float *,float *,int nodes, float *matrix);
+    QVector<vec3_t> _positions;
+    QVector<vec3_t> _positions_d;
+    Matrix _edge_matrix;
 
-class graph
-{
+    vec3_t *_positions_gpu;
+    vec3_t *_positions_d_gpu;
+    bool *_edge_matrix_gpu;
+
 public:
-    void allocate(int,int,int,int,int);
-    void randAllocate(int);
-    void allocateEdgeColor(float,float,float,float);
-    void clusterization(char *);
-    void convertEdgeMatrixToVerticeList();
-    void readGraph(char *);
-	void cleanup();
-	void readOntology(char *, std::unordered_map<std::string, ontStruct> *);
-	void UpdateOntologyInfo(std::string, std::string, std::unordered_map<std::string, ontStruct> *);
+    Graph(
+        int id, const QString& name,
+        const QString& nodefile,
+        const QString& edgefile,
+        const QString& ontfile,
+        float x, float y, float z, float w, float h
+    );
+    Graph() {};
+    ~Graph();
 
+    int id() const { return this->_id; }
+    const QString& name() const { return this->_name; }
+    QVector<graph_node_t>& nodes() { return this->_nodes; }
+    QVector<graph_edge_t>& edges() { return this->_edges; }
+    QVector<color_t>& colors() { return this->_colors; }
 
-    float *coords;
-    float *coinfo; //dx,dy,dz,radius
-    float *color;
+    QVector<vec3_t>& positions() { return this->_positions; }
+    QVector<vec3_t>& positions_d() { return this->_positions_d; }
+    Matrix& edge_matrix() { return this->_edge_matrix; }
 
+    vec3_t * positions_gpu() { return this->_positions_gpu; }
+    vec3_t * positions_d_gpu() { return this->_positions_d_gpu; }
+    bool * edge_matrix_gpu() const { return this->_edge_matrix_gpu; }
 
-    float *edgeMatrix;
+    void read_gpu();
+    void write_gpu();
 
-    float *coords_d;
-    float *coinfo_d; //dx,dy,dz,radius
-    float *edgeMatrix_d;
+    int find_node(const QString& name);
 
+    void load_nodes(const QString& filename);
+    void load_edges(const QString& filename);
+    void load_ontology(const QString& filename);
 
-    int *verticeEdgeList;
-    int nodes;
-    int edges;
-    float er,eg,eb,ea;
-    float nr,ng,nb,na;
-	std::unordered_map<std::string,int> nodeListMap;
-
-
-    int centerx;
-    int centery;
-    int centerz;
-    int width;
-    int height;
-    char name[256];
-    bool displayName;
-	std::vector <std::string> *goTerm;
-
-
-
-    void addName(char *,int,int,int,int,int);
-	graph(int, char *, char *, char *, char *, int, int, int, int, int, std::unordered_map<std::string, ontStruct> *);
-	int id;
-
+    void print() const;
 };
 
 #endif // GRAPH

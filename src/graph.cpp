@@ -1,305 +1,243 @@
+#include <QColor>
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
+#include "fdl.h"
 #include "graph.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "color.h"
-#include <string>
-#include <istream>
-#include <iostream>
-#include <vector>
-#include <string>
 
-#define CLUSTERSIZE 360.0f
-#define NODEALPHA 0.6f
-
-void gpuSetup(graph *);
-void gpuFree(void *);
-
-graph::graph(int iid, char *graphname, char *filename, char *filenamecluster, char *ontFile, int x, int y, int z, int w, int h, std::unordered_map<std::string, ontStruct> *ontologyDBPtr)
+Graph::Graph(
+    int id, const QString& name,
+    const QString& nodefile,
+    const QString& edgefile,
+    const QString& ontfile,
+    float x, float y, float z, float w, float h)
 {
-	id = iid;
-displayName = false;
-strncpy(name, graphname, strlen(graphname));
-name[strlen(graphname)] = '\0';
-addName(name, x, y, z, w, h);
+    this->_id = id;
+    this->_name = name;
+    this->_center = { x, y, z };
+    this->_width = w;
+    this->_height = h;
 
-printf("%d %s\n", iid, graphname);
-readGraph(filename);
-allocate(x,y,w,h,z);
-clusterization(filenamecluster);
-convertEdgeMatrixToVerticeList();
-readOntology(ontFile,ontologyDBPtr);
+    load_nodes(nodefile);
+    load_edges(edgefile);
 
-gpuSetup(this);
-}
-
-void graph::addName(char *graphname,int x,int y,int z,int w,int h)
-{
-centerx = x;
-centery = y;
-centerz = z;
-width = w;
-height = h;
-displayName = true;
-}
-
- void graph::readGraph(char* filename)
- {
-     er=1.0f;eg=1.0f;eb=1.0f;ea=1.0f;
-	 nr = 0.0f; ng = 0.0f; nb = 0.0f, na = NODEALPHA;
-     FILE *fp;
-     fp = fopen(filename,"r");
-     if(fp == NULL)
-     {
-         printf("File not found :%s\n Exit\n",filename);
-         exit(0);
-     }
-     char n1[256],n2[256];
-	 int ctr = 0,ctr2 = 0;
-     while(fscanf(fp,"%s\t%s\n",n1,n2) == 2)
-     {
-         std::string node1 = n1;
-         std::string node2 = n2;
-
-		 std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(node1);
-		 if (found == nodeListMap.end())
-		 {
-			 std::pair<std::string, int> item(node1, ctr);
-			 nodeListMap.insert(item);
-			 ctr++;
-
-		 }
-
-		 std::unordered_map<std::string, int>::const_iterator found2 = nodeListMap.find(node2);
-		 if (found2 == nodeListMap.end())
-		 {
-			 std::pair<std::string, int> item(node2, ctr);
-			 nodeListMap.insert(item);
-			 ctr++;
-		 }
-     }
-	 std::cout << "--Total Nodes : " << nodeListMap.size() << std::endl;
-
-	 nodes = nodeListMap.size();
-	 goTerm = new std::vector<std::string>[nodes];
-     edgeMatrix = new float[nodes * nodes];
-     edges=0;
-     fclose(fp);
-     FILE *fp2;
-     fp2 = fopen(filename,"r");
-     while(fscanf(fp2,"%s\t%s\n",n1,n2) == 2)
-     {
-         std::string node1 = n1;
-         std::string node2 = n2;
-
-		 std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(node1);
-		 std::unordered_map<std::string, int>::const_iterator found2 = nodeListMap.find(node2);
-
-		 edgeMatrix[(found->second)*nodes + (found2->second)] = 1;
-		 edgeMatrix[(found2->second)*nodes + (found->second)] = 1;
-
-         edges++;
-     }
-     std::cout<<"--Total Edges : "<<edges<<std::endl;
- }
-
- void graph::cleanup()
- {
-	 free(edgeMatrix);
-	 free(coinfo);
-	 free(coords);
-	 free(color);
-
-	 gpuFree(coords_d);
-	 gpuFree(coinfo_d); //dx,dy,dz,radius
-	 gpuFree(edgeMatrix_d);
- }
-
-void graph::allocate(int xc,int yc,int w,int h,int z)
-{
-    srand(2);
-    coords = new float[nodes * 3];
-    for(int i = 0; i < nodes;i++)
-    {
-        coords[i *3 + 0] = rand() % w + -(w/2) + xc;
-        coords[i *3 + 1] = rand() % h + -(h/2) + yc;
-        coords[i *3 + 2] = z;
+    if ( ontfile != "" ) {
+        load_ontology(ontfile);
     }
 
-    coinfo = new float[nodes * INFOCOUNT];
-    for(int i = 0; i < nodes;i++)
-    {
-    coinfo[i * INFOCOUNT + 0] = 0.0; //dx
-    coinfo[i * INFOCOUNT + 1] = 0.0; //dy
-    coinfo[i * INFOCOUNT + 2] = 0.0; //dz
-    coinfo[i * INFOCOUNT + 3] = 1.0; //radius
+    // initialize positions
+    this->_positions.reserve(this->_nodes.size());
+
+    for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        this->_positions.push_back({
+            x - w / 2 + w * qrand() / RAND_MAX,
+            y - h / 2 + h * qrand() / RAND_MAX,
+            z
+        });
     }
+
+    // initialize delta positions
+    this->_positions_d.reserve(this->_nodes.size());
+
+    for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        this->_positions_d.push_back({ 0, 0, 0 });
+    }
+
+    // determine number of modules
+    int num_modules = 0;
+
+    for ( const graph_node_t& node : this->_nodes ) {
+        if ( num_modules < node.module_id ) {
+            num_modules = node.module_id;
+        }
+    }
+
+    // initialize colors
+    this->_colors.reserve(this->_nodes.size());
+
+    for ( const graph_node_t& node : this->_nodes ) {
+        QColor c = QColor::fromHsvF(
+            (float) node.module_id / num_modules,
+            0.8f,
+            0.8f,
+            1.0f
+        );
+
+        this->_colors.push_back({
+            (float) c.redF(),
+            (float) c.greenF(),
+            (float) c.blueF(),
+            (float) c.alphaF()
+        });
+    }
+
+    // initialize edge matrix
+    this->_edge_matrix = Matrix(this->_nodes.size(), this->_nodes.size());
+    this->_edge_matrix.init_zeros();
+
+    for ( const graph_edge_t& edge : this->_edges ) {
+        int i = edge.node1;
+        int j = edge.node2;
+
+        this->_edge_matrix.elem(i, j) = 1;
+        this->_edge_matrix.elem(j, i) = 1;
+    }
+
+    // initialize GPU data
+    int n = _nodes.size();
+    _positions_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
+    _positions_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
+    _edge_matrix_gpu = (bool *)gpu_malloc(n * n * sizeof(bool));
+
+    write_gpu();
 }
 
-void graph::clusterization(char *filename)
+Graph::~Graph()
 {
-    color = new float[nodes * 4];
-    char n1[256],cluster[256];
-    FILE *fp2;
-    fp2 = fopen(filename,"r");
-    if(fp2 == NULL)
-    {
-        printf("Cannot Open Filename :%s\n",filename);
+    gpu_free(_positions_gpu);
+    gpu_free(_positions_d_gpu);
+    gpu_free(_edge_matrix_gpu);
+}
+
+void Graph::read_gpu()
+{
+    int n = _nodes.size();
+    gpu_read(_positions.data(), _positions_gpu, n * sizeof(vec3_t));
+    gpu_read(_positions_d.data(), _positions_d_gpu, n * sizeof(vec3_t));
+    gpu_read(_edge_matrix.data(), _edge_matrix_gpu, n * n * sizeof(bool));
+}
+
+void Graph::write_gpu()
+{
+    int n = _nodes.size();
+    gpu_write(_positions_gpu, _positions.data(), n * sizeof(vec3_t));
+    gpu_write(_positions_d_gpu, _positions_d.data(), n * sizeof(vec3_t));
+    gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool));
+}
+
+/**
+ * Find a node by name.
+ *
+ * @param name
+ */
+int Graph::find_node(const QString& name)
+{
+    return _node_map.contains(name)
+	? _node_map[name]
+	: -1;
+}
+
+/**
+ * Load the node list from a file.
+ *
+ * @param filename
+ */
+void Graph::load_nodes(const QString& filename)
+{
+    qInfo() << "- loading nodes...";
+
+    QFile file(filename);
+
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        qWarning("warning: unable to open node file");
         return;
     }
-    while(fscanf(fp2,"%s\t%s\n",n1,cluster) == 2)
-    {
-        std::string node1 = n1;
-        int clusterid = atoi(cluster);
 
-		std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(node1);
-		coinfo[(found->second) * INFOCOUNT + 4] = clusterid;
-    }
-    fflush(stdout);
-    fclose(fp2);
+    QTextStream in(&file);
 
-    for(int i = 0;i < nodes;i++)
-    {
-    int cluster = coinfo[i * INFOCOUNT + 4];
+    while ( !in.atEnd() ) {
+        QStringList list = in.readLine().split("\t");
+        QString name = list[0];
+        int module_id = list[1].toInt();
 
-	float hval = cluster /  360.0f * CLUSTERSIZE;
-	float sval = 1.0f- cluster / CLUSTERSIZE * 1.0f; sval = 0.8f;
-	float vval = 1.0f - cluster / CLUSTERSIZE * 1.0f; //vval = 0.8f;
-    float r,g,b;
-    HSVtoRGB(&r,&g,&b,hval,sval,vval);
-    if(cluster < CLUSTERSIZE){
-    color[i*4+0]=r;
-    color[i*4+1]=g ;
-    color[i*4+2]=b;
-    color[i*4+3]=NODEALPHA;
-    }
-    else
-    {
-        color[i*4+0]=1.0f;
-        color[i*4+1]=1.0f;
-        color[i*4+2]=1.0f;
-		color[i * 4 + 3] = NODEALPHA;
-    }
+        graph_node_t node;
+        node.name = name;
+        node.module_id = module_id;
 
-    }
-}
-
-void graph::allocateEdgeColor(float r, float g, float b, float a )
-{
-    er=r;
-    eg=g;
-    eb=b;
-    ea=a;
-}
-
-void graph::randAllocate(int tnodes)
-{
-    nodes = tnodes;
-    srand(1);
-    coords = new float[nodes * 3];
-    coinfo = new float[nodes * 5];
-    for(int i = 0; i < nodes;i++)
-    {
-        coords[i *3 + 0] = rand() % nodes/2 + (-nodes/2);
-        coords[i *3 + 1] = rand() % nodes/2 + (-nodes/2);
-        coords[i *3 + 2] = 0;
-    }
-    edgeMatrix = new float[nodes * nodes];
-    edges=0;
-    for(int i = 0;i< nodes;i++)
-    {
-        for(int j =i+1;j < nodes;j++)
-        {
-            edgeMatrix[ i * nodes + j] = 0;
-            edgeMatrix[ j * nodes + i] = 0;
-            if(rand()%1000 > 990 && i != j)
-            {
-                edgeMatrix[ i * nodes + j] = 1;
-                edgeMatrix[ j * nodes + i] = 1;
-                edges++;
-            }
+        if ( !_node_map.contains(name) ) {
+            _nodes.push_back(node);
+            _node_map.insert(node.name, _nodes.size() - 1);
+        }
+        else {
+            qWarning() << "warning: duplicate node" << name;
         }
     }
 }
 
-void graph::convertEdgeMatrixToVerticeList()
+/**
+ * Load the edge list from a file.
+ *
+ * @param filename
+ */
+void Graph::load_edges(const QString& filename)
 {
-    verticeEdgeList = new int[edges * 2];
-    int count = 0;
-    for(int i = 0;i < nodes;i++)
-    {
-    for(int j=i+1;j<nodes;j++)
-        {
-            if(edgeMatrix[i * nodes + j] == 1){
-            verticeEdgeList[count * 2 + 0] = i;
-            verticeEdgeList[count * 2 + 1] = j;
-            count++;
-            }
+    qInfo() << "- loading edges...";
+
+    QFile file(filename);
+
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        qWarning("warning: unable to open edge file");
+        return;
+    }
+
+    QTextStream in(&file);
+
+    while ( !in.atEnd() ) {
+        QStringList list = in.readLine().split("\t");
+        QString node1 = list[0];
+        QString node2 = list[1];
+
+        int i = this->find_node(node1);
+        int j = this->find_node(node2);
+
+        if ( i != -1 && j != -1 ) {
+            this->_edges.push_back({ i, j });
+        }
+        else {
+            qWarning() << "warning: could not find nodes " << node1 << node2;
         }
     }
 }
 
-void graph::UpdateOntologyInfo(std::string name, std::string golistString, std::unordered_map<std::string, ontStruct> *ontologyDatabasePtr)
+/**
+ * Load the ontology terms list from a file.
+ *
+ * @param filename
+ */
+void Graph::load_ontology(const QString& filename)
 {
-	std::vector<std::string> goList;
-	std::stringstream ss(golistString);
+    qInfo() << "- loading ontology...";
 
-	std::string term;
+    QFile file(filename);
 
-	while (std::getline(ss, term, ',')) {
-		goList.push_back(term);
-	}
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        qWarning("warning: unable to open ontology file");
+        return;
+    }
 
-	std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
+    QTextStream in(&file);
 
-	if (found == nodeListMap.end())
-	{
-		return;//should return error
-	}
+    while ( !in.atEnd() ) {
+        QStringList fields = in.readLine().split("\t");
+        QString name = fields[1];
+        QStringList go_terms = fields[9].split(",");
 
-	for (int i = 0; i < goList.size(); i++)
-		if (std::find(goTerm[found->second].begin(), goTerm[found->second].end(), goList.at(i)) != goTerm[found->second].end()) {
-			/* v contains x */
+        int nodeIndex = this->find_node(name);
 
-		}
-		else {
-			/* v does not contain x */
-			nodeSelectedStruct tmp;
-			tmp.graphSelected = id-1; tmp.nodeSelected = found->second;
-			goTerm[found->second].push_back(goList.at(i));
-			std::unordered_map<std::string, ontStruct>::const_iterator foundOnt = ontologyDatabasePtr->find(goList.at(i));
-			if (foundOnt != ontologyDatabasePtr->end())
-			ontologyDatabasePtr->at(goList.at(i)).connectedNodes.push_back(tmp);
-
-		}
+        if ( nodeIndex != -1 ) {
+            this->_nodes[nodeIndex].go_terms = go_terms;
+        }
+    }
 }
 
-void graph::readOntology(char *filename, std::unordered_map<std::string, ontStruct> *ontologyDBPtr)
+void Graph::print() const
 {
-	typedef std::vector<std::vector<std::string> > Rows;
-	Rows rows;
-	std::ifstream input(filename);
-	char const row_delim = '\n';
-	char const field_delim = '\t';
-	for (std::string row; getline(input, row, row_delim);) {
-		rows.push_back(Rows::value_type());
-		std::istringstream ss(row);
-		int index = 0;
-		std::string  name;
-		std::string goterm;
-		for (std::string field; getline(ss, field, field_delim);) {
-			rows.back().push_back(field);
+    qInfo() << this->_id << this->_name;
 
-			if (index == 1)
-				name = field;
-			if (index == 9){
-				goterm = field;
-				std::unordered_map<std::string, int>::const_iterator found = nodeListMap.find(name);
-				if (found != nodeListMap.end() && goterm!= "")
-					UpdateOntologyInfo(name, goterm,ontologyDBPtr);
-				break;
-			}
-
-			index++;
-		}
-	}
+    // for ( int i = 0; i < this->_nodes.size(); i++ ) {
+    //     qDebug()
+    //         << this->_nodes[i].name
+    //         << this->_nodes[i].module_id
+    //         << this->_nodes[i].go_terms.join(' ');
+    // }
 }

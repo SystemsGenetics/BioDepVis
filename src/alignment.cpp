@@ -1,88 +1,96 @@
 #include "alignment.h"
-#include "graph.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
-void gpuAlignSetup(Alignment *);
-void gpuFree(void *);
-
-Alignment::Alignment(char *filename,graph *graph1,graph *graph2)
+Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
 {
-    rows = graph1->nodes;
-    cols = graph2->nodes;
-    g1 = graph1;
-    g2 = graph2;
-    edgeAlignMatrix = new float[rows * cols];
+    this->_graph1 = graph1;
+    this->_graph2 = graph2;
 
-    if(edgeAlignMatrix == NULL)
-    {
-        printf("Matrix cant be created");
-        exit(0);
+    load_edges(filename);
 
+    // initialize edge matrix
+    this->_edge_matrix = Matrix(graph1->nodes().size(), graph2->nodes().size());
+    this->_edge_matrix.init_zeros();
+
+    for ( const graph_edge_t& edge : this->_edges ) {
+        int i = edge.node1;
+        int j = edge.node2;
+
+        this->_edge_matrix.elem(i, j) = 1;
     }
-    edges=0;
 
-    readFile(filename);
-    gpuAlignSetup(this);
+    // initialize vertices
+    this->_vertices.resize(this->_edges.size());
 
     update();
 }
 
-void Alignment::cleanup()
+Alignment::Alignment()
 {
-	free(edgeAlignMatrix);
-	gpuFree(edgeAlignMatrix_d);
+    this->_graph1 = nullptr;
+    this->_graph2 = nullptr;
 }
 
-void Alignment::readFile(char *filename)
+/**
+ * Load the algnment edge list from a file.
+ *
+ * @param filename
+ */
+void Alignment::load_edges(const QString& filename)
 {
-    FILE *fp2;
-    fp2 = fopen(filename,"r");
-    char n1[256],n2[256];
- std::string  node1;
- std::string node2;
-    while(fscanf(fp2,"%s\t%s\n",n1,n2) == 2 )
-    {
-       node1 = n1;
-       node2 = n2;
+    qInfo() << "- loading edges...";
 
-		std::unordered_map<std::string, int>::const_iterator found = g1->nodeListMap.find(node1);
-		std::unordered_map<std::string, int>::const_iterator found2 =g2->nodeListMap.find(node2);
+    QFile file(filename);
 
-		if ((found->second) >= 0 && (found2->second) >= 0)
-		{
-			g1_vertices.push_back((found->second));
-			g2_vertices.push_back((found2->second));
-			edges++;
-		}
-		else
-		{
-			printf("%s <--> %s-error\n", n1, n2);
-		}
+    if ( !file.open(QIODevice::ReadOnly) ) {
+        qWarning("warning: unable to open edge file");
+        return;
     }
 
-    int count = 0;
-    for(count = 0;count < edges;count++)
-    {
-        edgeAlignMatrix[g1_vertices.at(count) * cols + g2_vertices.at(count)] = 1.0f;
+    QTextStream in(&file);
 
+    while ( !in.atEnd() ) {
+        QStringList list = in.readLine().split("\t");
+        QString node1 = list[0];
+        QString node2 = list[1];
+
+        int i = this->_graph1->find_node(node1);
+        int j = this->_graph2->find_node(node2);
+
+        if ( i == -1 ) {
+            qWarning() << "warning: could not find node " << node1;
+        }
+        if ( j == -1 ) {
+            qWarning() << "warning: could not find node " << node2;
+        }
+        if ( i != -1 && j != -1 ) {
+            this->_edges.push_back({ i, j });
+        }
     }
-
-    vertices = new float[edges * 2*3];
 }
 
+/**
+ * Update the vertices of each alignment edge to
+ * the positions of the corresponding graph nodes.
+ */
 void Alignment::update()
 {
-    int k;
-    for( k=0;k < edges;k++)
-    {
-        int ik = g1_vertices.at(k);
-        int jk = g1_vertices.at(k);
-        vertices[k*6+0] = this->g1->coords[ik * 3 + 0];
-        vertices[k*6+1] = this->g1->coords[ik * 3 + 1];
-        vertices[k*6+2] = this->g1->coords[ik * 3 + 2];
-        vertices[k*6+3] = this->g2->coords[jk * 3 + 0];
-        vertices[k*6+4] = this->g2->coords[jk * 3 + 1];
-        vertices[k*6+5] = this->g2->coords[jk * 3 + 2];
+    for ( int k = 0; k < this->_edges.size(); k++ ) {
+        int i = this->_edges[k].node1;
+        int j = this->_edges[k].node2;
+
+        this->_vertices[k].v1 = this->_graph1->positions()[i];
+        this->_vertices[k].v2 = this->_graph2->positions()[j];
     }
+}
+
+void Alignment::print() const
+{
+    qInfo() << this->_graph1->name() << this->_graph2->name();
+
+    // for ( const graph_edge_t& edge : this->_edges ) {
+    //     qDebug() << edge.node1 << edge.node2;
+    // }
 }

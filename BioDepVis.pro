@@ -21,28 +21,28 @@ OBJECTS += \
     obj/fdl_cuda.o
 
 SOURCES += \
-    qt/alignment.cpp \
-    qt/database.cpp \
-    qt/fdl.cpp \
-    qt/glalignobject.cpp \
-    qt/glboxobject.cpp \
-    qt/glgraphobject.cpp \
-    qt/glwidget.cpp \
-    qt/graph.cpp \
-    qt/main.cpp \
-    qt/mainwindow.cpp \
-    qt/matrix.cpp
+    src/alignment.cpp \
+    src/database.cpp \
+    src/fdl.cpp \
+    src/glalignobject.cpp \
+    src/glboxobject.cpp \
+    src/glgraphobject.cpp \
+    src/glwidget.cpp \
+    src/graph.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/matrix.cpp
 
 HEADERS += \
-    qt/alignment.h \
-    qt/database.h \
-    qt/fdl.h \
-    qt/glalignobject.h \
-    qt/glboxobject.h \
-    qt/glgraphobject.h \
-    qt/globject.h \
-    qt/glwidget.h \
-    qt/mainwindow.h \
-    qt/graph.h \
-    qt/matrix.h \
-    qt/vector.h
+    src/alignment.h \
+    src/database.h \
+    src/fdl.h \
+    src/glalignobject.h \
+    src/glboxobject.h \
+    src/glgraphobject.h \
+    src/globject.h \
+    src/glwidget.h \
+    src/mainwindow.h \
+    src/graph.h \
+    src/matrix.h \
+    src/vector.h

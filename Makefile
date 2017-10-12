@@ -1,48 +1,24 @@
-CXX  = g++
 NVCC = nvcc
+NVCCFLAGS = -std=c++11 -Wno-deprecated-gpu-targets
 
-CUDADIR ?= /usr/local/cuda
-GLUIDIR ?= glui-2.37
-
-CXXFLAGS = -std=c++11 -I $(GLUIDIR)/include -g
-
-LIBS = -lGL -lGLU -lglut \
-	   -L $(CUDADIR)/lib64 -lcudart \
-	   -L $(GLUIDIR)/lib -lglui
-
+BUILD = build
+OBJ = obj
 SRC = src
-OBJDIR = obj
-OBJS = \
-	$(OBJDIR)/alignment.o \
-	$(OBJDIR)/Camera.o \
-	$(OBJDIR)/cuda_code.o \
-	$(OBJDIR)/events.o \
-	$(OBJDIR)/graph.o \
-	$(OBJDIR)/jsoncpp.o \
-	$(OBJDIR)/lodepng.o \
-	$(OBJDIR)/main.o \
-	$(OBJDIR)/Matrix.o \
-	$(OBJDIR)/miscgl.o \
-	$(OBJDIR)/Ont.o \
-	$(OBJDIR)/parse.o \
-	$(OBJDIR)/util.o \
-	$(OBJDIR)/Utility.o \
-	$(OBJDIR)/Vector.o
-BINS = biodep-vis
+BINS = BioDepVis
 
 all: $(BINS)
 
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
+$(BUILD):
+	mkdir -p $(BUILD)
 
-$(OBJDIR)/%.o: $(SRC)/%.cu | $(OBJDIR)
-	$(NVCC) -c $(CXXFLAGS) -o $@ $<
+$(OBJ):
+	mkdir -p $(OBJ)
 
-$(OBJDIR)/%.o: $(SRC)/%.cpp | $(OBJDIR)
-	$(CXX) -c $(CXXFLAGS) -o $@ $<
+$(OBJ)/fdl_cuda.o: $(SRC)/fdl.cu | $(OBJ)
+	$(NVCC) -c $(NVCCFLAGS) -o $@ $<
 
-biodep-vis: $(OBJS)
-	$(CXX) -o $@ $^ $(LIBS)
+BioDepVis: $(OBJ)/fdl_cuda.o | $(BUILD)
+	cd $(BUILD) && qmake .. && make && cp $@ ../
 
 clean:
-	rm -rf $(OBJDIR) $(BINS)
+	rm -rf $(BUILD) $(OBJ) $(BINS)
