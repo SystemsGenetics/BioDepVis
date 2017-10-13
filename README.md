@@ -36,7 +36,7 @@ Install [VirtualGL](https://virtualgl.org/) and [TurboVNC](https://turbovnc.org/
 
 Login to the remote machine through SSH and start a VNC server:
 ```
-/opt/TurboVNC/bin/vncserver -geometry 1920x1080
+LANG=C /opt/TurboVNC/bin/vncserver
 ```
 
 Start a VNC client on your local machine and connect to the remote VNC server at `<hostname>:1`. For the TurboVNC client:
@@ -63,7 +63,7 @@ Login to a GPU node on Palmetto and start a VNC server:
 ssh -X <username>@login.palmetto.clemson.edu
 qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
 
-/opt/TurboVNC/bin/vncserver -geometry 1920x1080
+LANG=C /opt/TurboVNC/bin/vncserver
 ```
 
 Look for `TurboVNC: <node>:<port>` in the output. For example: `node0263:1`.
