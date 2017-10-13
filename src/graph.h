@@ -18,12 +18,12 @@ typedef struct {
     QString name;
     int module_id;
     QStringList go_terms;
-} graph_node_t;
+} node_t;
 
 typedef struct {
     int node1;
     int node2;
-} graph_edge_t;
+} edge_idx_t;
 
 class Graph
 {
@@ -34,9 +34,9 @@ private:
     float _width;
     float _height;
 
-    QVector<graph_node_t> _nodes;
+    QVector<node_t> _nodes;
     QHash<QString, int> _node_map;
-    QVector<graph_edge_t> _edges;
+    QVector<edge_idx_t> _edges;
     QVector<color_t> _colors;
 
     QVector<vec3_t> _positions;
@@ -55,13 +55,13 @@ public:
         const QString& ontfile,
         float x, float y, float z, float w, float h
     );
-    Graph() {};
+    Graph();
     ~Graph();
 
     int id() const { return this->_id; }
     const QString& name() const { return this->_name; }
-    QVector<graph_node_t>& nodes() { return this->_nodes; }
-    QVector<graph_edge_t>& edges() { return this->_edges; }
+    QVector<node_t>& nodes() { return this->_nodes; }
+    QVector<edge_idx_t>& edges() { return this->_edges; }
     QVector<color_t>& colors() { return this->_colors; }
 
     QVector<vec3_t>& positions() { return this->_positions; }
@@ -77,9 +77,13 @@ public:
 
     int find_node(const QString& name);
 
+    void init_node_map();
     void load_nodes(const QString& filename);
     void load_edges(const QString& filename);
     void load_ontology(const QString& filename);
+
+    void save_nodes(const QString& filename);
+    void save_edges(const QString& filename);
 
     void print() const;
 };

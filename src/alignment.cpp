@@ -14,7 +14,7 @@ Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2)
     this->_edge_matrix = Matrix(graph1->nodes().size(), graph2->nodes().size());
     this->_edge_matrix.init_zeros();
 
-    for ( const graph_edge_t& edge : this->_edges ) {
+    for ( const edge_idx_t& edge : this->_edges ) {
         int i = edge.node1;
         int j = edge.node2;
 
@@ -40,7 +40,7 @@ Alignment::Alignment()
  */
 void Alignment::load_edges(const QString& filename)
 {
-    qInfo() << "- loading edges...";
+    qInfo() << "- Loading edges...";
 
     QFile file(filename);
 
@@ -69,6 +69,115 @@ void Alignment::load_edges(const QString& filename)
             this->_edges.push_back({ i, j });
         }
     }
+
+    qInfo() << "- Loaded" << _edges.size() << "edges.";
+}
+
+/**
+ * Save the algnment edge list to a file.
+ *
+ * @param filename
+ */
+void Alignment::save_edges(const QString& filename)
+{
+    qInfo() << "- Saving edges...";
+
+    QFile file(filename);
+
+    if ( !file.open(QIODevice::WriteOnly) ) {
+        qWarning("warning: unable to open edge file");
+        return;
+    }
+
+    QTextStream out(&file);
+
+    for ( const edge_idx_t& edge : _edges ) {
+        out << _graph1->nodes()[edge.node1].name
+            << "\t"
+            << _graph2->nodes()[edge.node2].name
+            << "\n";
+    }
+
+    qInfo() << "- Saved" << _edges.size() << "edges.";
+}
+
+/**
+ * Extract the conserved subgraphs from an alignment of two graphs.
+ *
+ * Each conserved subgraph consists of only the nodes that have
+ * an alignment edge. The graph edges between these nodes are also
+ * extracted.
+ */
+void Alignment::extract_subgraphs()
+{
+    qInfo() << "Extracting subgraphs...";
+
+    Graph *g1 = new Graph();
+    Graph *g2 = new Graph();
+    Alignment *a1 = new Alignment();
+    Alignment *a2 = new Alignment();
+
+    // extract nodes
+    g1->nodes().reserve(_edges.size());
+    g2->nodes().reserve(_edges.size());
+
+    for ( const edge_idx_t& edge : _edges ) {
+        g1->nodes().push_back(_graph1->nodes()[edge.node1]);
+        g2->nodes().push_back(_graph2->nodes()[edge.node2]);
+    }
+
+    g1->init_node_map();
+    g2->init_node_map();
+
+    // extract edges
+    for ( const edge_idx_t& edge : _graph1->edges() ) {
+        int i = g1->find_node(_graph1->nodes()[edge.node1].name);
+        int j = g1->find_node(_graph1->nodes()[edge.node2].name);
+
+        if ( i != -1 && j != -1 ) {
+            g1->edges().push_back(edge_idx_t { i, j });
+        }
+    }
+
+    for ( const edge_idx_t& edge : _graph2->edges() ) {
+        int i = g2->find_node(_graph2->nodes()[edge.node1].name);
+        int j = g2->find_node(_graph2->nodes()[edge.node2].name);
+
+        if ( i != -1 && j != -1 ) {
+            g2->edges().push_back(edge_idx_t { i, j });
+        }
+    }
+
+    // extract alignment edges
+    a1->_graph1 = a1->_graph2 = g1;
+    a2->_graph1 = a2->_graph2 = g2;
+
+    a1->_edges.reserve(_edges.size());
+    a2->_edges.reserve(_edges.size());
+
+    for ( const edge_idx_t& edge : _edges ) {
+        int i = g1->find_node(_graph1->nodes()[edge.node1].name);
+        int j = g2->find_node(_graph2->nodes()[edge.node2].name);
+
+        a1->_edges.push_back(edge_idx_t { i, i });
+        a2->_edges.push_back(edge_idx_t { j, j });
+    }
+
+    // save graphs and alignments
+    g1->save_nodes(_graph1->name() + "-cons_nodes.txt");
+    g1->save_edges(_graph1->name() + "-cons_edges.txt");
+
+    g2->save_nodes(_graph2->name() + "-cons_nodes.txt");
+    g2->save_edges(_graph2->name() + "-cons_edges.txt");
+
+    a1->save_edges(_graph1->name() + "-" + _graph1->name() + ".gna");
+    a2->save_edges(_graph2->name() + "-" + _graph2->name() + ".gna");
+
+    // cleanup
+    delete g1;
+    delete g2;
+    delete a1;
+    delete a2;
 }
 
 /**
@@ -90,7 +199,7 @@ void Alignment::print() const
 {
     qInfo() << this->_graph1->name() << this->_graph2->name();
 
-    // for ( const graph_edge_t& edge : this->_edges ) {
-    //     qDebug() << edge.node1 << edge.node2;
-    // }
+    for ( const edge_idx_t& edge : this->_edges ) {
+        qDebug() << edge.node1 << edge.node2;
+    }
 }

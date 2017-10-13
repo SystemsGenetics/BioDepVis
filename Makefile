@@ -17,7 +17,7 @@ $(OBJ):
 $(OBJ)/fdl_cuda.o: $(SRC)/fdl.cu | $(OBJ)
 	$(NVCC) -c $(NVCCFLAGS) -o $@ $<
 
-BioDepVis: $(OBJ)/fdl_cuda.o | $(BUILD)
+BioDepVis: $(OBJ)/fdl_cuda.o $(SRC)/*.h $(SRC)/*.cpp  | $(BUILD)
 	cd $(BUILD) && qmake .. && make && cp $@ ../
 
 clean:

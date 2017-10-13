@@ -30,6 +30,7 @@ public slots:
     void selectGoTerm();
     void search();
     void clear();
+    void extractSubgraphs();
 
 signals:
     void genesSelected(const QVector<node_ref_t>& genes);

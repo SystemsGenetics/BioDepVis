@@ -6,15 +6,15 @@
 typedef struct {
     vec3_t v1;
     vec3_t v2;
-} align_edge_t;
+} edge_vtx_t;
 
 class Alignment
 {
 private:
     Graph *_graph1;
     Graph *_graph2;
-    QVector<graph_edge_t> _edges;
-    QVector<align_edge_t> _vertices;
+    QVector<edge_idx_t> _edges;
+    QVector<edge_vtx_t> _vertices;
     Matrix _edge_matrix;
 
 public:
@@ -22,10 +22,13 @@ public:
     Alignment();
     ~Alignment() {};
 
-    const QVector<graph_edge_t>& edges() const { return this->_edges; }
-    const QVector<align_edge_t>& vertices() const { return this->_vertices; }
+    const QVector<edge_idx_t>& edges() const { return this->_edges; }
+    const QVector<edge_vtx_t>& vertices() const { return this->_vertices; }
 
     void load_edges(const QString& filename);
+    void save_edges(const QString& filename);
+    void extract_subgraphs();
+
     void update();
 
     void print() const;

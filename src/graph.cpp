@@ -46,7 +46,7 @@ Graph::Graph(
     // determine number of modules
     int num_modules = 0;
 
-    for ( const graph_node_t& node : this->_nodes ) {
+    for ( const node_t& node : this->_nodes ) {
         if ( num_modules < node.module_id ) {
             num_modules = node.module_id;
         }
@@ -55,7 +55,7 @@ Graph::Graph(
     // initialize colors
     this->_colors.reserve(this->_nodes.size());
 
-    for ( const graph_node_t& node : this->_nodes ) {
+    for ( const node_t& node : this->_nodes ) {
         QColor c = QColor::fromHsvF(
             (float) node.module_id / num_modules,
             0.8f,
@@ -75,7 +75,7 @@ Graph::Graph(
     this->_edge_matrix = Matrix(this->_nodes.size(), this->_nodes.size());
     this->_edge_matrix.init_zeros();
 
-    for ( const graph_edge_t& edge : this->_edges ) {
+    for ( const edge_idx_t& edge : this->_edges ) {
         int i = edge.node1;
         int j = edge.node2;
 
@@ -90,6 +90,13 @@ Graph::Graph(
     _edge_matrix_gpu = (bool *)gpu_malloc(n * n * sizeof(bool));
 
     write_gpu();
+}
+
+Graph::Graph()
+{
+    _positions_gpu = nullptr;
+    _positions_d_gpu = nullptr;
+    _edge_matrix_gpu = nullptr;
 }
 
 Graph::~Graph()
@@ -127,6 +134,22 @@ int Graph::find_node(const QString& name)
 	: -1;
 }
 
+void Graph::init_node_map()
+{
+    _node_map.clear();
+
+    for ( int i = 0; i < _nodes.size(); i++ ) {
+        const node_t& node = _nodes[i];
+
+        if ( !_node_map.contains(node.name) ) {
+            _node_map.insert(node.name, i);
+        }
+        else {
+            qWarning() << "warning: duplicate node" << node.name;
+        }
+    }
+}
+
 /**
  * Load the node list from a file.
  *
@@ -134,7 +157,7 @@ int Graph::find_node(const QString& name)
  */
 void Graph::load_nodes(const QString& filename)
 {
-    qInfo() << "- loading nodes...";
+    qInfo() << "- Loading nodes...";
 
     QFile file(filename);
 
@@ -150,7 +173,7 @@ void Graph::load_nodes(const QString& filename)
         QString name = list[0];
         int module_id = list[1].toInt();
 
-        graph_node_t node;
+        node_t node;
         node.name = name;
         node.module_id = module_id;
 
@@ -162,6 +185,8 @@ void Graph::load_nodes(const QString& filename)
             qWarning() << "warning: duplicate node" << name;
         }
     }
+
+    qInfo() << "- Loaded" << _nodes.size() << "nodes.";
 }
 
 /**
@@ -171,7 +196,7 @@ void Graph::load_nodes(const QString& filename)
  */
 void Graph::load_edges(const QString& filename)
 {
-    qInfo() << "- loading edges...";
+    qInfo() << "- Loading edges...";
 
     QFile file(filename);
 
@@ -197,6 +222,8 @@ void Graph::load_edges(const QString& filename)
             qWarning() << "warning: could not find nodes " << node1 << node2;
         }
     }
+
+    qInfo() << "- Loaded" << _edges.size() << "edges.";
 }
 
 /**
@@ -206,8 +233,6 @@ void Graph::load_edges(const QString& filename)
  */
 void Graph::load_ontology(const QString& filename)
 {
-    qInfo() << "- loading ontology...";
-
     QFile file(filename);
 
     if ( !file.open(QIODevice::ReadOnly) ) {
@@ -230,14 +255,70 @@ void Graph::load_ontology(const QString& filename)
     }
 }
 
+/**
+ * Save the node list to a file.
+ *
+ * @param filename
+ */
+void Graph::save_nodes(const QString& filename)
+{
+    qInfo() << "- Saving nodes...";
+
+    QFile file(filename);
+
+    if ( !file.open(QIODevice::WriteOnly) ) {
+        qWarning("warning: unable to open node file");
+        return;
+    }
+
+    QTextStream out(&file);
+
+    for ( const node_t& node : _nodes ) {
+        out << node.name
+            << "\t" << node.module_id
+            << "\t" << node.go_terms.join(',')
+            << "\n";
+    }
+
+    qInfo() << "- Saved" << _nodes.size() << "nodes.";
+}
+
+/**
+ * Save the edge list to a file.
+ *
+ * @param filename
+ */
+void Graph::save_edges(const QString& filename)
+{
+    qInfo() << "- Saving edges...";
+
+    QFile file(filename);
+
+    if ( !file.open(QIODevice::WriteOnly) ) {
+        qWarning("warning: unable to open edge file");
+        return;
+    }
+
+    QTextStream out(&file);
+
+    for ( const edge_idx_t& edge : _edges ) {
+        out << _nodes[edge.node1].name
+            << "\t"
+            << _nodes[edge.node2].name
+            << "\n";
+    }
+
+    qInfo() << "- Saved" << _edges.size() << "edges.";
+}
+
 void Graph::print() const
 {
     qInfo() << this->_id << this->_name;
 
-    // for ( int i = 0; i < this->_nodes.size(); i++ ) {
-    //     qDebug()
-    //         << this->_nodes[i].name
-    //         << this->_nodes[i].module_id
-    //         << this->_nodes[i].go_terms.join(' ');
-    // }
+    for ( int i = 0; i < this->_nodes.size(); i++ ) {
+        qDebug()
+            << this->_nodes[i].name
+            << this->_nodes[i].module_id
+            << this->_nodes[i].go_terms.join(' ');
+    }
 }

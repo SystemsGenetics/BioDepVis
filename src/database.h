@@ -30,7 +30,7 @@ public:
     QVector<Alignment *>& alignments() { return _alignments; }
     QHash<QString, ont_term_t> ontology() { return _ontology; }
 
-    graph_node_t& node(const node_ref_t& ref) { return _graphs[ref.graph_id]->nodes()[ref.node_id]; }
+    node_t& node(const node_ref_t& ref) { return _graphs[ref.graph_id]->nodes()[ref.node_id]; }
 
     void load_config(const QString& filename);
     void load_ontology(const QString& filename);

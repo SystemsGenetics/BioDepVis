@@ -44,8 +44,6 @@ void Database::load_config(const QString& filename)
             obj["h"].toDouble()
         );
 
-        qInfo() << "Loaded" << g->nodes().size() << "nodes," << g->edges().size() << "edges.";
-
         this->_graphs.insert(g->id(), g);
     }
 
@@ -110,7 +108,7 @@ void Database::load_ontology(const QString& filename)
 
     // populate ontology terms with connected nodes
     for ( Graph *g : this->_graphs.values() ) {
-        const QVector<graph_node_t>& nodes = g->nodes();
+        const QVector<node_t>& nodes = g->nodes();
 
         for ( int i = 0; i < nodes.size(); i++ ) {
             for ( const QString& term : nodes[i].go_terms ) {

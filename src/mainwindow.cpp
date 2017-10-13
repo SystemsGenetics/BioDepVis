@@ -59,6 +59,9 @@ void MainWindow::create_gui()
     QPushButton *clearButton = new QPushButton("Clear");
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
 
+    QPushButton *extractButton = new QPushButton("Extract Subgraphs");
+    connect(extractButton, SIGNAL(clicked()), this, SLOT(extractSubgraphs()));
+
     searchLayout->addWidget(geneListLabel);
     searchLayout->addWidget(this->_gene_list);
     searchLayout->addWidget(geneDescLabel);
@@ -73,6 +76,7 @@ void MainWindow::create_gui()
     searchLayout->addWidget(this->_search);
     searchLayout->addWidget(searchButton);
     searchLayout->addWidget(clearButton);
+    searchLayout->addWidget(extractButton);
 
     // visualizer
     QGroupBox *visGroup = new QGroupBox("Visualizer");
@@ -224,4 +228,11 @@ void MainWindow::clear()
 
     emit genesSelected(_genes);
     update_gui();
+}
+
+void MainWindow::extractSubgraphs()
+{
+    for ( Alignment *a : _db->alignments() ) {
+        a->extract_subgraphs();
+    }
 }
