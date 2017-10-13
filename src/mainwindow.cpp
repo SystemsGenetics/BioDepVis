@@ -103,7 +103,6 @@ void MainWindow::create_gui()
         { "Z", "Toggle graph" },
         { "X", "Toggle alignment" },
         { "C", "Toggle module coloring" },
-        { "V", "Toggle ROI mode" },
         { "B", "Toggle multi-select" }
     };
 

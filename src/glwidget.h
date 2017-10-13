@@ -47,7 +47,6 @@ private:
     Database *_db;
     bool _animate;
     bool _gpu;
-    bool _roi;
     bool _select_multi;
     bool _show_alignments;
     bool _show_graphs;

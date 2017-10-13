@@ -33,7 +33,6 @@ GLWidget::GLWidget(Database *db, QWidget *parent)
       _db(db),
       _animate(false),
       _gpu(true),
-      _roi(false),
       _select_multi(false),
       _show_alignments(true),
       _show_graphs(true),
@@ -301,9 +300,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_C:
         _show_modules = !_show_modules;
-        break;
-    case Qt::Key_V:
-        _roi = !_roi;
         break;
     case Qt::Key_B:
         _select_multi = !_select_multi;
