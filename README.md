@@ -1,19 +1,24 @@
 # BioDep-Vis
 
+A visualizer for gene-coexpression networks (GCNs) and alignments between them.
+
 Watch our video demo showcasing some of the features at https://clemson.app.box.com/v/BioDepVis
 
 ## Dependencies
 
-You should have the following packages installed on your system:
-- CUDA 5.0 or greater
-- gcc 4.8 or greater
+BioDepVis requires CUDA, gcc, and Qt.
 
-On Palmetto, these packages are available as modules:
+#### Ubuntu
 ```
-module load cuda-toolkit/7.5.18 gcc/4.8.1
+# CUDA drivers can be downloaded and installed from NVIDIA's website
+
+sudo apt-get install gcc qt5-default
 ```
 
-Run `install-libglui.sh` to download and extract GLUI.
+#### Palmetto
+```
+module load cuda-toolkit/8.0.44 gcc/4.8.1 Qt/5.9.2
+```
 
 ## Usage
 
@@ -21,14 +26,10 @@ To build and run the executable:
 ```
 make
 
-./biodep-vis --ont_file go-basic.obo --json_file input.json
+./BioDepVis --config [config-file] --ont [ont-file]
 ```
 
-The program reads a json file and ontology file as input. We have provided both a sample json and ontology file for testing.
-
-The json file must consist of two data types, graphs and alignments. The graph component requires tab seperated files as input and an assigned index for each graph. The alignment component requires a graph id as the input along with tab seperated alignment graph as output. When providing the graphs, the file must also contain coordinates for the graphs in 3d space.
-
-Optionally, you can provide a cluster file and an ontology file. See `data/M.tab.cluster` and `data/Maize_info.txt` for examples.
+The default values for these input files are `config/test_M-R.json` and `go-basic.obo`, which are provided in this repo. This configuration will load two gene networks, Maize and Rice, and their alignment, and the ontology database provided by `go-basic.obo`. The `config` folder contains several other example graph/alignment configurations. Use these example files to create your own configurations.
 
 ## Stream from a remote machine
 
@@ -46,7 +47,7 @@ Start a VNC client on your local machine and connect to the remote VNC server at
 
 Start BioDep-Vis on the remote machine:
 ```
-vglrun -c proxy ./biodep-vis --ont_file FILE --json_file FILE
+vglrun ./BioDepVis [...]
 ```
 
 To stop the VNC server:
@@ -76,12 +77,7 @@ ssh -L 10000:<node>.palmetto.clemson.edu:<5900 + port> <username>@login.palmetto
 ssh -L 10000:node0263.palmetto.clemson.edu:5901 ksapra@login.palmetto.clemson.edu
 ```
 
-Start a VNC client on your local machine and connect to `localhost:10000`.
-
-Start BioDep-Vis on the GPU node:
-```
-vglrun -c proxy ./biodep-vis --ont_file FILE --json_file FILE
-```
+Start a VNC client on your local machine and connect to `localhost:10000`. A remote desktop will appear, from which point you can launch BioDepVis as before with `vglrun`.
 
 ## Record VNC Session
 
@@ -101,3 +97,7 @@ python flvrec.py localhost <port>
 ```
 
 To stop recording, enter `Ctrl-C` and an FLV file will be saved.
+
+## Launch from CCT
+
+The Complexity Connector Tool (CCT) is a graphical interface for creating config files for BioDepVis, instead of writing the JSON files yourself. With CCT you can create or load a configuration and then launch BioDepVis right from the interface! You can even have multiple instances of BioDepVis running at once! Refer to the CCT docs for installation and usage instructions.
