@@ -32,6 +32,14 @@ BINS = biodep-vis
 
 all: $(BINS)
 
+install-glui:
+	wget -q https://github.com/libglui/glui/archive/2.37.zip -O glui-2.37.zip
+	unzip -q glui-2.37.zip
+
+	+$(MAKE) -s -C $(GLUIDIR)
+
+	rm -rf glui-2.37.zip
+
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
