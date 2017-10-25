@@ -24,6 +24,9 @@ module load cuda-toolkit/8.0.44 gcc/4.8.1 Qt/5.9.2
 
 To build and run the executable:
 ```
+export CUDADIR=/software/cuda-toolkit/8.0.44
+export PATH=$PATH:$CUDADIR
+
 make
 
 ./BioDepVis --config [config-file] --ont [ont-file]
