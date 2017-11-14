@@ -120,6 +120,14 @@ void GLWidget::init_camera()
 
 void GLWidget::run_animation()
 {
+    static bool running = false;
+
+    if ( running ) {
+        return;
+    }
+
+    running = true;
+
     for ( Graph *g : _db->graphs().values() ) {
         if ( _gpu ) {
             fdl_2d_gpu(
@@ -154,6 +162,8 @@ void GLWidget::run_animation()
 
     _boxes->update();
     update();
+
+    running = false;
 }
 
 void GLWidget::initializeGL()
