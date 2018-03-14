@@ -239,7 +239,7 @@ void GLWidget::paintGL()
     _program->release();
 }
 
-void GLWidget::resizeGL(int w, int h)
+void GLWidget::resizeGL(int /*w*/, int /*h*/)
 {
     zoom(0);
 }

@@ -21,7 +21,7 @@ CUDADIR = /usr/local/cuda
 }
 
 LIBS += \
-    -L${{CUDADIR}}/lib64 -lcudart
+    -L$$CUDADIR/lib64 -lcudart
 
 OBJECTS += \
     obj/fdl_cuda.o
