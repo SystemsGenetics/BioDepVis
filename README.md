@@ -17,17 +17,14 @@ sudo apt-get install gcc qt5-default
 
 #### Palmetto
 ```
-module load cuda-toolkit/8.0.44 gcc/4.8.1 Qt/5.9.2
+module load cuda-toolkit/9.2 gcc/5.4.0 Qt/5.9.2
 ```
 
 ## Usage
 
 To build and run the executable:
 ```
-export CUDADIR=/software/cuda-toolkit/8.0.44
-export PATH=$PATH:$CUDADIR
-
-make
+make CUDADIR=$CUDA_ROOT
 
 ./BioDepVis --config [config-file] --ont [ont-file]
 ```
@@ -67,7 +64,7 @@ Login to a GPU node on Palmetto and start a VNC server:
 ssh -X <username>@login.palmetto.clemson.edu
 qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
 
-LANG=C /opt/TurboVNC/bin/vncserver
+LANG=C vncserver
 ```
 
 Look for `TurboVNC: <node>:<port>` in the output. For example: `node0263:1`.
