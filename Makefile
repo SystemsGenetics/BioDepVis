@@ -1,4 +1,4 @@
-INSTALL_PREFIX ?= /usr/local/bin
+INSTALL_PREFIX ?= /usr/local
 
 MAKE = make
 NVCC = nvcc
@@ -24,8 +24,9 @@ BioDepVis: $(OBJ)/fdl_cuda.o $(SRC)/*.h $(SRC)/*.cpp  | $(BUILD)
 	cd $(BUILD) && qmake ..
 	+$(MAKE) -C $(BUILD)
 
-install:
-	cp $(BUILD)/BioDepVis $(INSTALL_PREFIX)
+install: all
+	mkdir -p $(INSTALL_PREFIX)/bin
+	cp $(BUILD)/BioDepVis $(INSTALL_PREFIX)/bin
 
 clean:
 	rm -rf $(BUILD) $(OBJ)
