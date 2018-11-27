@@ -57,12 +57,12 @@ To stop the VNC server:
 
 ## Stream from Palmetto
 
-Palmetto should already have VirtualGL and TurboVNC installed. However, because compute nodes cannot be accessed directly via SSH but only through the login node, you must tunnel the VNC server through the login node on a second SSH session.
+Palmetto should already have VirtualGL and TurboVNC installed. However, because compute nodes cannot be accessed directly via SSH but only through the login node, you must tunnel the VNC server through the login node on a second SSH session. As before, you will need to install a VNC client on your local machine. Binary packages for TurboVNC can be found [here](https://sourceforge.net/projects/turbovnc/files/2.2).
 
 Login to a GPU node on Palmetto and start a VNC server:
 ```
 ssh -X <username>@login.palmetto.clemson.edu
-qsub -I -l select=1:ngpus=1:ncpus=16:mem=32gb,walltime=02:00:00
+qsub -I -l select=1:ngpus=2:ncpus=4:mem=32gb,walltime=02:00:00
 
 LANG=C vncserver
 ```
