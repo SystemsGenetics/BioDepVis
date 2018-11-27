@@ -1,6 +1,8 @@
 #include <QOpenGLFunctions>
 #include "glgraphobject.h"
 
+
+
 const color_t NODE_COLOR = { 0, 0, 0, 1 };
 const color_t EDGE_COLORS[] = {
 	{ 0.65f, 0.81f, 0.89f, 0.10f },
@@ -12,16 +14,22 @@ const color_t EDGE_COLORS[] = {
 };
 const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(color_t);
 
-GLGraphObject::GLGraphObject(Graph *graph)
+
+
+GLGraphObject::GLGraphObject(Graph *graph):
+	_graph(graph)
 {
-	_graph = graph;
 }
+
+
 
 GLGraphObject::~GLGraphObject()
 {
 	_vbo_positions.destroy();
 	_vbo_colors.destroy();
 }
+
+
 
 void GLGraphObject::initialize()
 {
@@ -32,7 +40,8 @@ void GLGraphObject::initialize()
 	int num_nodes = _graph->nodes().size();
 
 	_node_colors.reserve(num_nodes);
-	for ( int i = 0; i < num_nodes; i++ ) {
+	for ( int i = 0; i < num_nodes; i++ )
+	{
 		_node_colors.push_back(NODE_COLOR);
 	}
 
@@ -40,7 +49,8 @@ void GLGraphObject::initialize()
 	int num_edges = _graph->edges().size();
 
 	_edge_colors.reserve(num_edges);
-	for ( int i = 0; i < num_edges; i++ ) {
+	for ( int i = 0; i < num_edges; i++ )
+	{
 		_edge_colors.push_back(EDGE_COLORS[color_idx]);
 	}
 
@@ -71,6 +81,8 @@ void GLGraphObject::initialize()
 	f->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	_vbo_colors.release();
 }
+
+
 
 void GLGraphObject::paint(bool show_modules)
 {

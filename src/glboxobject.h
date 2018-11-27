@@ -6,7 +6,10 @@
 #include "database.h"
 #include "globject.h"
 
-class GLBoxObject : public GLObject {
+
+
+class GLBoxObject : public GLObject
+{
 private:
 	Database *_db;
 	QVector<node_ref_t> _nodes;
@@ -30,5 +33,7 @@ public:
 private:
 	void update_cube(int i, const vec3_t& C, float L);
 };
+
+
 
 #endif

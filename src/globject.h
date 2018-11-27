@@ -8,7 +8,7 @@ protected:
 	QOpenGLVertexArrayObject _vao;
 
 public:
-	virtual ~GLObject() {};
+	virtual ~GLObject() {}
 
 	virtual void initialize() = 0;
 	virtual void paint() = 0;

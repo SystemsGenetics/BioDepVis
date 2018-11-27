@@ -3,24 +3,27 @@
 
 typedef bool matrix_elem_t;
 
-class Matrix {
+
+
+class Matrix
+{
 private:
-	int _rows;
-	int _cols;
-	matrix_elem_t *_data;
+	int _rows {0};
+	int _cols {0};
+	matrix_elem_t *_data {nullptr};
 
 public:
 	Matrix(int rows, int cols);
 	Matrix(Matrix&& M);
-	Matrix();
+	Matrix() = default;
 	~Matrix();
 
 	void init_zeros();
 
 	// getter functions
-	int rows() const { return this->_rows; }
-	int cols() const { return this->_cols; }
-	matrix_elem_t * data() const { return this->_data; }
+	int rows() const { return _rows; }
+	int cols() const { return _cols; }
+	matrix_elem_t * data() const { return _data; }
 	matrix_elem_t& elem(int i, int j) const { return _data[i * _cols + j]; }
 
 	// operators
@@ -29,5 +32,7 @@ public:
 	// friend functions
 	friend void swap(Matrix& A, Matrix& B);
 };
+
+
 
 #endif

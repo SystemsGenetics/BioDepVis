@@ -6,7 +6,10 @@
 #include "alignment.h"
 #include "globject.h"
 
-class GLAlignObject : public GLObject {
+
+
+class GLAlignObject : public GLObject
+{
 private:
 	Alignment *_align;
 	QVector<color_t> _edge_colors;
@@ -20,5 +23,7 @@ public:
 	void initialize() override;
 	void paint() override;
 };
+
+
 
 #endif

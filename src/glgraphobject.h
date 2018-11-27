@@ -6,7 +6,10 @@
 #include "globject.h"
 #include "graph.h"
 
-class GLGraphObject : public GLObject {
+
+
+class GLGraphObject : public GLObject
+{
 private:
 	Graph *_graph;
 	QVector<color_t> _node_colors;
@@ -22,5 +25,7 @@ public:
 	void paint() override { paint(false); };
 	void paint(bool show_modules);
 };
+
+
 
 #endif

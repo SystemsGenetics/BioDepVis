@@ -1,18 +1,26 @@
 #include <QOpenGLFunctions>
 #include "glboxobject.h"
 
+
+
 const int VERTICES_PER_BOX = 24;
 
-GLBoxObject::GLBoxObject(Database *db)
+
+
+GLBoxObject::GLBoxObject(Database *db):
+	_db(db)
 {
-	this->_db = db;
 }
+
+
 
 GLBoxObject::~GLBoxObject()
 {
 	_vbo_positions.destroy();
 	_vbo_colors.destroy();
 }
+
+
 
 void GLBoxObject::initialize()
 {
@@ -40,6 +48,8 @@ void GLBoxObject::initialize()
 	_vbo_colors.release();
 }
 
+
+
 void GLBoxObject::paint()
 {
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
@@ -56,13 +66,16 @@ void GLBoxObject::paint()
 	f->glDrawArrays(GL_LINES, 0, _positions.size());
 }
 
+
+
 void GLBoxObject::append(const QVector<node_ref_t>& nodes, float L, const color_t& color)
 {
 	// update nodes and sizes
 	_nodes.append(nodes);
 
 	_sizes.reserve(_nodes.size());
-	for ( int i = 0; i < _nodes.size(); i++ ) {
+	for ( int i = 0; i < _nodes.size(); i++ )
+	{
 		_sizes.push_back(L);
 	}
 
@@ -74,7 +87,8 @@ void GLBoxObject::append(const QVector<node_ref_t>& nodes, float L, const color_
 	// allocate, initialize colors for boxes
 	_colors.reserve(num_positions);
 
-	for ( int i = 0; i < nodes.size() * VERTICES_PER_BOX; i++ ) {
+	for ( int i = 0; i < nodes.size() * VERTICES_PER_BOX; i++ )
+	{
 		_colors.push_back(color);
 	}
 
@@ -91,6 +105,8 @@ void GLBoxObject::append(const QVector<node_ref_t>& nodes, float L, const color_
 	_vbo_colors.release();
 }
 
+
+
 void GLBoxObject::clear()
 {
 	_nodes.clear();
@@ -99,15 +115,20 @@ void GLBoxObject::clear()
 	_colors.clear();
 }
 
+
+
 void GLBoxObject::update()
 {
-	for ( int i = 0; i < _nodes.size(); i++ ) {
+	for ( int i = 0; i < _nodes.size(); i++ )
+	{
 		const node_ref_t& ref = _nodes[i];
 		const vec3_t& center = _db->graphs()[ref.graph_id]->positions()[ref.node_id];
 
 		update_cube(i, center, _sizes[i]);
 	}
 }
+
+
 
 void GLBoxObject::update_cube(int i, const vec3_t& C, float L)
 {

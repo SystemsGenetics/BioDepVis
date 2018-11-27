@@ -1,6 +1,8 @@
 #include <QOpenGLFunctions>
 #include "glalignobject.h"
 
+
+
 const color_t EDGE_COLORS[] = {
 	{ 0.70f, 0.19f, 0.29f, 0.05f },
 	{ 0.89f, 0.50f, 0.79f, 0.05f },
@@ -8,16 +10,22 @@ const color_t EDGE_COLORS[] = {
 };
 const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(color_t);
 
-GLAlignObject::GLAlignObject(Alignment *align)
+
+
+GLAlignObject::GLAlignObject(Alignment *align):
+	_align(align)
 {
-	_align = align;
 }
+
+
 
 GLAlignObject::~GLAlignObject()
 {
 	_vbo_positions.destroy();
 	_vbo_colors.destroy();
 }
+
+
 
 void GLAlignObject::initialize()
 {
@@ -28,7 +36,8 @@ void GLAlignObject::initialize()
 	int num_positions = _align->edges().size() * 2;
 
 	_edge_colors.reserve(num_positions);
-	for ( int i = 0; i < num_positions; i++ ) {
+	for ( int i = 0; i < num_positions; i++ )
+	{
 		_edge_colors.push_back(EDGE_COLORS[color_idx]);
 	}
 
@@ -57,6 +66,8 @@ void GLAlignObject::initialize()
 	f->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	_vbo_colors.release();
 }
+
+
 
 void GLAlignObject::paint()
 {

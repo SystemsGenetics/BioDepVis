@@ -4,40 +4,45 @@
 #include <QtWidgets>
 #include "database.h"
 
+
+
 class MainWindow : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 private:
-    Database *_db;
-    QVector<node_ref_t> _genes;
-    int _gene_index;
-    QStringList _go_terms;
-    int _go_term_index;
+	Database *_db;
+	QVector<node_ref_t> _genes;
+	int _gene_index;
+	QStringList _go_terms;
+	int _go_term_index;
 
-    QListWidget *_gene_list;
-    QTextEdit *_gene_desc;
-    QListWidget *_go_term_list;
-    QTextEdit *_go_term_desc;
-    QLineEdit *_search;
+	QListWidget *_gene_list;
+	QTextEdit *_gene_desc;
+	QListWidget *_go_term_list;
+	QTextEdit *_go_term_desc;
+	QLineEdit *_search;
 
 public:
-    MainWindow(Database *db);
+	MainWindow(Database *db);
 
 public slots:
-    void setSelectedGenes(const QVector<node_ref_t>& genes);
-    void selectGene();
-    void selectGoTerm();
-    void search();
-    void clear();
-    void extractSubgraphs();
+	void setSelectedGenes(const QVector<node_ref_t>& genes);
+	void selectGene();
+	void selectGoTerm();
+	void search();
+	void clear();
+	void extractSubgraphs();
 
 signals:
-    void genesSelected(const QVector<node_ref_t>& genes);
+	void genesSelected(const QVector<node_ref_t>& genes);
 
 private:
-    void init_controls();
-    void create_gui();
-    void update_gui();
+	void init_controls();
+	void create_gui();
+	void update_gui();
 };
+
+
+
 #endif // MAINWINDOW_H
