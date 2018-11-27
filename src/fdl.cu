@@ -1,6 +1,3 @@
-#include <cstdlib>
-#include <cuda_runtime.h>
-#include <iostream>
 #include "fdl.h"
 
 
@@ -10,52 +7,6 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 
 #define ELEM(data, cols, i, j) (data)[(i) * (cols) + (j)]
-
-
-
-#define CUDA_SAFE_CALL(x)                              \
-{                                                      \
-	cudaError_t result = x;                            \
-	if ( result != cudaSuccess )                       \
-	{                                                  \
-		std::cerr                                      \
-			<< "CUDA Error: " #x " failed with error " \
-			<< cudaGetErrorString(result) << '\n';     \
-		exit(1);                                       \
-	}                                                  \
-}
-
-
-
-void * gpu_malloc(int size)
-{
-	void *ptr = nullptr;
-
-	CUDA_SAFE_CALL(cudaMalloc(&ptr, size));
-
-	return ptr;
-}
-
-
-
-void gpu_free(void *ptr)
-{
-	CUDA_SAFE_CALL(cudaFree(ptr));
-}
-
-
-
-void gpu_read(void *dst, void *src, int size)
-{
-	CUDA_SAFE_CALL(cudaMemcpy(dst, src, size, cudaMemcpyDeviceToHost));
-}
-
-
-
-void gpu_write(void *dst, void *src, int size)
-{
-	CUDA_SAFE_CALL(cudaMemcpyAsync(dst, src, size, cudaMemcpyHostToDevice));
-}
 
 
 
@@ -82,7 +33,7 @@ void fdl_kernel_2d(int n, vec3_t *positions, vec3_t *positions_d, const bool *ed
 
 		float dx = positions[j].x - positions[i].x;
 		float dy = positions[j].y - positions[i].y;
-		float dist = sqrtf(dx * dx + dy * dy);
+		float dist = sqrt(dx * dx + dy * dy);
 
 		if ( dist != 0 )
 		{
@@ -105,8 +56,8 @@ void fdl_kernel_2d(int n, vec3_t *positions, vec3_t *positions_d, const bool *ed
 
 	if ( disp_sqr > MAX_DISPLACEMENT_SQR )
 	{
-		dx *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
-		dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+		dx *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
+		dy *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
 	}
 
 	positions[i].x += dx;
@@ -141,7 +92,7 @@ void fdl_kernel_3d(int n, vec3_t *positions, vec3_t *positions_d, const bool *ed
 		float dx = positions[j].x - positions[i].x;
 		float dy = positions[j].y - positions[i].y;
 		float dz = positions[j].z - positions[i].z;
-		float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+		float dist = sqrt(dx * dx + dy * dy + dz * dz);
 
 		if ( dist != 0 )
 		{
@@ -167,9 +118,9 @@ void fdl_kernel_3d(int n, vec3_t *positions, vec3_t *positions_d, const bool *ed
 
 	if ( disp_sqr > MAX_DISPLACEMENT_SQR )
 	{
-		dx *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
-		dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
-		dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+		dx *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
+		dy *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
+		dz *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
 	}
 
 	positions[i].x += dx;

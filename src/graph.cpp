@@ -92,9 +92,9 @@ Graph::Graph(
 
 	// initialize GPU data
 	int n = _nodes.size();
-	_positions_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
-	_positions_d_gpu = (vec3_t *)gpu_malloc(n * sizeof(vec3_t));
-	_edge_matrix_gpu = (bool *)gpu_malloc(n * n * sizeof(bool));
+	CUDA_SAFE_CALL(cudaMalloc(&_positions_gpu, n * sizeof(vec3_t)));
+	CUDA_SAFE_CALL(cudaMalloc(&_positions_d_gpu, n * sizeof(vec3_t)));
+	CUDA_SAFE_CALL(cudaMalloc(&_edge_matrix_gpu, n * n * sizeof(bool)));
 
 	write_gpu();
 }
@@ -103,9 +103,9 @@ Graph::Graph(
 
 Graph::~Graph()
 {
-	gpu_free(_positions_gpu);
-	gpu_free(_positions_d_gpu);
-	gpu_free(_edge_matrix_gpu);
+	CUDA_SAFE_CALL(cudaFree(_positions_gpu));
+	CUDA_SAFE_CALL(cudaFree(_positions_d_gpu));
+	CUDA_SAFE_CALL(cudaFree(_edge_matrix_gpu));
 }
 
 
@@ -113,9 +113,9 @@ Graph::~Graph()
 void Graph::read_gpu()
 {
 	int n = _nodes.size();
-	gpu_read(_positions.data(), _positions_gpu, n * sizeof(vec3_t));
-	gpu_read(_positions_d.data(), _positions_d_gpu, n * sizeof(vec3_t));
-	gpu_read(_edge_matrix.data(), _edge_matrix_gpu, n * n * sizeof(bool));
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions.data(), _positions_gpu, n * sizeof(vec3_t), cudaMemcpyDeviceToHost));
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions_d.data(), _positions_d_gpu, n * sizeof(vec3_t), cudaMemcpyDeviceToHost));
+	CUDA_SAFE_CALL(cudaMemcpy(_edge_matrix.data(), _edge_matrix_gpu, n * n * sizeof(bool), cudaMemcpyDeviceToHost));
 }
 
 
@@ -123,9 +123,9 @@ void Graph::read_gpu()
 void Graph::write_gpu()
 {
 	int n = _nodes.size();
-	gpu_write(_positions_gpu, _positions.data(), n * sizeof(vec3_t));
-	gpu_write(_positions_d_gpu, _positions_d.data(), n * sizeof(vec3_t));
-	gpu_write(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool));
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions_gpu, _positions.data(), n * sizeof(vec3_t), cudaMemcpyHostToDevice));
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions_d_gpu, _positions_d.data(), n * sizeof(vec3_t), cudaMemcpyHostToDevice));
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool), cudaMemcpyHostToDevice));
 }
 
 

@@ -28,7 +28,7 @@ void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 
 			float dx = positions[j].x - positions[i].x;
 			float dy = positions[j].y - positions[i].y;
-			float dist = sqrtf(dx * dx + dy * dy);
+			float dist = sqrt(dx * dx + dy * dy);
 
 			if ( dist != 0 )
 			{
@@ -50,8 +50,8 @@ void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR )
 		{
-			dx *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
-			dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+			dx *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
+			dy *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
 		positions[i].x += dx;
@@ -81,7 +81,7 @@ void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 			float dx = positions[j].x - positions[i].x;
 			float dy = positions[j].y - positions[i].y;
 			float dz = positions[j].z - positions[i].z;
-			float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+			float dist = sqrt(dx * dx + dy * dy + dz * dz);
 
 			if ( dist != 0 )
 			{
@@ -106,9 +106,9 @@ void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR )
 		{
-			dx *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
-			dy *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
-			dz *= sqrtf(MAX_DISPLACEMENT_SQR / disp_sqr);
+			dx *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
+			dy *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
+			dz *= sqrt(MAX_DISPLACEMENT_SQR / disp_sqr);
 		}
 
 		positions[i].x += dx;

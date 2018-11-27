@@ -20,6 +20,8 @@ isEmpty(CUDADIR) {
 CUDADIR = /usr/local/cuda
 }
 
+INCLUDEPATH += $$CUDADIR/include
+
 LIBS += \
     -L$$CUDADIR/lib64 -lcudart
 
