@@ -1,6 +1,8 @@
 #include <cmath>
 #include "fdl.h"
 
+
+
 const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 
@@ -58,6 +60,8 @@ void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 		positions_d[i].y *= 0.1f;
 	}
 }
+
+
 
 void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
 {

@@ -163,8 +163,6 @@ void GLWidget::run_animation()
 
 	if ( _gpu )
 	{
-		gpu_sync();
-
 		// copy graph data from GPU
 		for ( Graph *g : _db->graphs().values() )
 		{
