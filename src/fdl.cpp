@@ -11,7 +11,7 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 
 
-void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
+void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
 {
 	const float K_r = 0.2f;
 	const float K_s = 1.0f;
@@ -36,16 +36,16 @@ void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 					? K_s * (L - dist) / dist
 					: K_r / (dist * dist * dist);
 
-				positions_d[i].x -= force * dx;
-				positions_d[i].y -= force * dy;
+				velocities[i].x -= force * dx;
+				velocities[i].y -= force * dy;
 
-				positions_d[j].x += force * dx;
-				positions_d[j].y += force * dy;
+				velocities[j].x += force * dx;
+				velocities[j].y += force * dy;
 			}
 		}
 
-		float dx = positions_d[i].x;
-		float dy = positions_d[i].y;
+		float dx = velocities[i].x;
+		float dy = velocities[i].y;
 		float disp_sqr = dx * dx + dy * dy;
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR )
@@ -56,14 +56,14 @@ void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 
 		positions[i].x += dx;
 		positions[i].y += dy;
-		positions_d[i].x *= 0.1f;
-		positions_d[i].y *= 0.1f;
+		velocities[i].x *= 0.1f;
+		velocities[i].y *= 0.1f;
 	}
 }
 
 
 
-void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_matrix)
+void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
 {
 	const float K_r = 0.2f;
 	const float K_s = 1.0f;
@@ -89,19 +89,19 @@ void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 					? K_s * (L - dist) / dist
 					: K_r / (dist * dist * dist);
 
-				positions_d[i].x -= force * dx;
-				positions_d[i].y -= force * dy;
-				positions_d[i].z -= force * dz;
+				velocities[i].x -= force * dx;
+				velocities[i].y -= force * dy;
+				velocities[i].z -= force * dz;
 
-				positions_d[j].x += force * dx;
-				positions_d[j].y += force * dy;
-				positions_d[j].z += force * dz;
+				velocities[j].x += force * dx;
+				velocities[j].y += force * dy;
+				velocities[j].z += force * dz;
 			}
 		}
 
-		float dx = positions_d[i].x;
-		float dy = positions_d[i].y;
-		float dz = positions_d[i].z;
+		float dx = velocities[i].x;
+		float dy = velocities[i].y;
+		float dz = velocities[i].z;
 		float disp_sqr = dx * dx + dy * dy + dz * dz;
 
 		if ( disp_sqr > MAX_DISPLACEMENT_SQR )
@@ -114,8 +114,8 @@ void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *positions_d, const bool *edge_
 		positions[i].x += dx;
 		positions[i].y += dy;
 		positions[i].z += dz;
-		positions_d[i].x *= 0.1f;
-		positions_d[i].y *= 0.1f;
-		positions_d[i].z *= 0.1f;
+		velocities[i].x *= 0.1f;
+		velocities[i].y *= 0.1f;
+		velocities[i].z *= 0.1f;
 	}
 }

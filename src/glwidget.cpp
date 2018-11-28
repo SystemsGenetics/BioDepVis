@@ -54,6 +54,8 @@ GLWidget::GLWidget(Database *db, QWidget *parent):
 	startTimer(1000 / MAX_FPS);
 }
 
+
+
 GLWidget::~GLWidget()
 {
 	makeCurrent();
@@ -74,6 +76,8 @@ GLWidget::~GLWidget()
 	doneCurrent();
 }
 
+
+
 void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 {
 	_rot.setX(_rot.x() + deltaX);
@@ -86,6 +90,8 @@ void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 	_model.rotate(_rot.z(), 0, 0, 1);
 }
 
+
+
 void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
 {
 	_selected_nodes = nodes;
@@ -96,10 +102,14 @@ void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
 	update();
 }
 
+
+
 void GLWidget::translate(float deltaX, float deltaY, float deltaZ)
 {
 	_view.translate(deltaX, deltaY, deltaZ);
 }
+
+
 
 void GLWidget::zoom(float delta)
 {
@@ -112,6 +122,8 @@ void GLWidget::zoom(float delta)
 		0.0001f, 1000.0f
 	);
 }
+
+
 
 void GLWidget::init_camera()
 {
@@ -128,10 +140,13 @@ void GLWidget::init_camera()
 	zoom(0);
 }
 
+
+
 void GLWidget::run_animation()
 {
 	static bool running = false;
 
+	// skip this frame if previous frame is still processing
 	if ( running )
 	{
 		return;
@@ -139,47 +154,57 @@ void GLWidget::run_animation()
 
 	running = true;
 
-	for ( Graph *g : _db->graphs().values() )
+	// perform FDL on GPU if it is enabled
+	if ( _gpu )
 	{
-		if ( _gpu )
+		for ( Graph *g : _db->graphs().values() )
 		{
+			// execute FDL kernel on GPU
 			fdl_2d_gpu(
 				g->nodes().size(),
 				g->positions_gpu(),
-				g->positions_d_gpu(),
+				g->velocities_gpu(),
 				g->edge_matrix_gpu()
 			);
+
+			// read position data from GPU
+			g->gpu_read_positions();
 		}
-		else
+
+		// wait for GPU to process all graphs
+		CUDA_SAFE_CALL(cudaStreamSynchronize(0));
+	}
+
+	// otherwise perform FDL on CPU
+	else
+	{
+		for ( Graph *g : _db->graphs().values() )
 		{
 			fdl_2d_cpu(
 				g->nodes().size(),
 				g->positions().data(),
-				g->positions_d().data(),
+				g->velocities().data(),
 				g->edge_matrix().data()
 			);
 		}
 	}
 
-	if ( _gpu )
-	{
-		// copy graph data from GPU
-		for ( Graph *g : _db->graphs().values() )
-		{
-			g->read_gpu();
-		}
-	}
-
+	// update alignment positions
 	for ( Alignment *a : _db->alignments() )
 	{
 		a->update();
 	}
 
+	// update box positions
 	_boxes->update();
+
+	// render this frame
 	update();
 
 	running = false;
 }
+
+
 
 void GLWidget::initializeGL()
 {
@@ -228,6 +253,8 @@ void GLWidget::initializeGL()
 	_program->release();
 }
 
+
+
 void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -260,10 +287,14 @@ void GLWidget::paintGL()
 	_program->release();
 }
 
+
+
 void GLWidget::resizeGL(int /*w*/, int /*h*/)
 {
 	zoom(0);
 }
+
+
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -314,12 +345,25 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 	case Qt::Key_G:
 		_gpu = !_gpu;
 
+		// copy graph data to GPU if it is enabled
 		if ( _gpu )
 		{
-			// copy graph data to GPU
 			for ( Graph *g : _db->graphs().values() )
 			{
-				g->write_gpu();
+				g->gpu_write_positions();
+				g->gpu_write_velocities();
+			}
+
+			CUDA_SAFE_CALL(cudaStreamSynchronize(0));
+		}
+
+		// otherwise copy graph data to CPU
+		else
+		{
+			for ( Graph *g : _db->graphs().values() )
+			{
+				g->gpu_read_positions();
+				g->gpu_read_velocities();
 			}
 		}
 		break;
@@ -343,6 +387,8 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 	update();
 	event->accept();
 }
+
+
 
 void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
@@ -387,6 +433,8 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 	event->accept();
 }
 
+
+
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	int dx = event->x() - _prev_pos.x();
@@ -406,20 +454,27 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 	event->accept();
 }
 
+
+
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
 	_prev_pos = event->pos();
 	event->accept();
 }
 
+
+
 void GLWidget::timerEvent(QTimerEvent *event)
 {
-	if ( _animate ) {
+	if ( _animate )
+	{
 		run_animation();
 	}
 
 	event->accept();
 }
+
+
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {

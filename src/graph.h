@@ -51,11 +51,11 @@ private:
 	QVector<color_t> _colors;
 
 	QVector<vec3_t> _positions;
-	QVector<vec3_t> _positions_d;
+	QVector<vec3_t> _velocities;
 	Matrix _edge_matrix;
 
 	vec3_t *_positions_gpu {nullptr};
-	vec3_t *_positions_d_gpu {nullptr};
+	vec3_t *_velocities_gpu {nullptr};
 	bool *_edge_matrix_gpu {nullptr};
 
 public:
@@ -76,15 +76,17 @@ public:
 	QVector<color_t>& colors() { return _colors; }
 
 	QVector<vec3_t>& positions() { return _positions; }
-	QVector<vec3_t>& positions_d() { return _positions_d; }
+	QVector<vec3_t>& velocities() { return _velocities; }
 	Matrix& edge_matrix() { return _edge_matrix; }
 
 	vec3_t * positions_gpu() { return _positions_gpu; }
-	vec3_t * positions_d_gpu() { return _positions_d_gpu; }
+	vec3_t * velocities_gpu() { return _velocities_gpu; }
 	bool * edge_matrix_gpu() const { return _edge_matrix_gpu; }
 
-	void read_gpu();
-	void write_gpu();
+	void gpu_read_positions();
+	void gpu_read_velocities();
+	void gpu_write_positions();
+	void gpu_write_velocities();
 
 	int find_node(const QString& name);
 

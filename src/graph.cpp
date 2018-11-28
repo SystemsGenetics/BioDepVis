@@ -40,10 +40,10 @@ Graph::Graph(
 	}
 
 	// initialize delta positions
-	_positions_d.reserve(_nodes.size());
+	_velocities.reserve(_nodes.size());
 
 	for ( int i = 0; i < _nodes.size(); i++ ) {
-		_positions_d.push_back({ 0, 0, 0 });
+		_velocities.push_back({ 0, 0, 0 });
 	}
 
 	// determine number of modules
@@ -93,10 +93,12 @@ Graph::Graph(
 	// initialize GPU data
 	int n = _nodes.size();
 	CUDA_SAFE_CALL(cudaMalloc(&_positions_gpu, n * sizeof(vec3_t)));
-	CUDA_SAFE_CALL(cudaMalloc(&_positions_d_gpu, n * sizeof(vec3_t)));
-	CUDA_SAFE_CALL(cudaMalloc(&_edge_matrix_gpu, n * n * sizeof(bool)));
+	CUDA_SAFE_CALL(cudaMalloc(&_velocities_gpu, n * sizeof(vec3_t)));
+	gpu_write_positions();
+	gpu_write_velocities();
 
-	write_gpu();
+	CUDA_SAFE_CALL(cudaMalloc(&_edge_matrix_gpu, n * n * sizeof(bool)));
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool), cudaMemcpyHostToDevice));
 }
 
 
@@ -104,28 +106,40 @@ Graph::Graph(
 Graph::~Graph()
 {
 	CUDA_SAFE_CALL(cudaFree(_positions_gpu));
-	CUDA_SAFE_CALL(cudaFree(_positions_d_gpu));
+	CUDA_SAFE_CALL(cudaFree(_velocities_gpu));
 	CUDA_SAFE_CALL(cudaFree(_edge_matrix_gpu));
 }
 
 
 
-void Graph::read_gpu()
+void Graph::gpu_read_positions()
 {
 	int n = _nodes.size();
 	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions.data(), _positions_gpu, n * sizeof(vec3_t), cudaMemcpyDeviceToHost));
-	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions_d.data(), _positions_d_gpu, n * sizeof(vec3_t), cudaMemcpyDeviceToHost));
-	CUDA_SAFE_CALL(cudaMemcpy(_edge_matrix.data(), _edge_matrix_gpu, n * n * sizeof(bool), cudaMemcpyDeviceToHost));
 }
 
 
 
-void Graph::write_gpu()
+void Graph::gpu_read_velocities()
+{
+	int n = _nodes.size();
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_velocities.data(), _velocities_gpu, n * sizeof(vec3_t), cudaMemcpyDeviceToHost));
+}
+
+
+
+void Graph::gpu_write_positions()
 {
 	int n = _nodes.size();
 	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions_gpu, _positions.data(), n * sizeof(vec3_t), cudaMemcpyHostToDevice));
-	CUDA_SAFE_CALL(cudaMemcpyAsync(_positions_d_gpu, _positions_d.data(), n * sizeof(vec3_t), cudaMemcpyHostToDevice));
-	CUDA_SAFE_CALL(cudaMemcpyAsync(_edge_matrix_gpu, _edge_matrix.data(), n * n * sizeof(bool), cudaMemcpyHostToDevice));
+}
+
+
+
+void Graph::gpu_write_velocities()
+{
+	int n = _nodes.size();
+	CUDA_SAFE_CALL(cudaMemcpyAsync(_velocities_gpu, _velocities.data(), n * sizeof(vec3_t), cudaMemcpyHostToDevice));
 }
 
 
