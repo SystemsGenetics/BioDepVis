@@ -12,7 +12,7 @@ class GLAlignObject : public GLObject
 {
 private:
 	Alignment *_align;
-	QVector<color_t> _edge_colors;
+	QVector<Color> _edge_colors;
 	QOpenGLBuffer _vbo_positions;
 	QOpenGLBuffer _vbo_colors;
 

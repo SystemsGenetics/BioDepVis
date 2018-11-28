@@ -92,12 +92,12 @@ void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 
 
 
-void GLWidget::setSelectedNodes(const QVector<node_ref_t>& nodes)
+void GLWidget::setSelectedNodes(const QVector<NodeRef>& nodes)
 {
 	_selected_nodes = nodes;
 
 	_boxes->clear();
-	_boxes->append(_selected_nodes, 3.0f, color_t { 1, 0, 0, 1 });
+	_boxes->append(_selected_nodes, 3.0f, Color { 1, 0, 0, 1 });
 	_boxes->update();
 	update();
 }
@@ -400,7 +400,7 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 	QVector3D end = QVector3D(x, y, 1.0f).unproject(mv, _proj, rect());
 	QVector3D dir = (end - start).normalized();
 
-	QVector<node_ref_t> nodes;
+	QVector<NodeRef> nodes;
 	float min_dist = max_dist;
 
 	for ( int i = 0; i < _db->graphs().size(); i++ )
@@ -409,21 +409,21 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 		for ( int j = 0; j < g->nodes().size(); j++ )
 		{
-			vec3_t v = g->positions()[j];
+			Vector3 v = g->positions()[j];
 			float dist = QVector3D(v.x, v.y, v.z).distanceToLine(start, dir);
 
 			if ( dist < max_dist )
 			{
 				if ( _select_multi )
 				{
-					nodes.push_back(node_ref_t { g->id(), j });
+					nodes.push_back(NodeRef { g->id(), j });
 				}
 				else if ( dist < min_dist )
 				{
 					min_dist = dist;
 
 					nodes.clear();
-					nodes.push_back(node_ref_t { g->id(), j });
+					nodes.push_back(NodeRef { g->id(), j });
 				}
 			}
 		}

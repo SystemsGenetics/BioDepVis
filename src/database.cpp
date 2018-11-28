@@ -94,7 +94,7 @@ void Database::load_ontology(const QString& filename)
 	qInfo() << "Loading ontology terms...";
 
 	QTextStream in(&file);
-	ont_term_t ont;
+	OntologyTerm ont;
 
 	while ( !in.atEnd() )
 	{
@@ -121,15 +121,15 @@ void Database::load_ontology(const QString& filename)
 	// populate ontology terms with connected nodes
 	for ( Graph *g : _graphs.values() )
 	{
-		const QVector<node_t>& nodes = g->nodes();
+		const QVector<Node>& nodes = g->nodes();
 
 		for ( int i = 0; i < nodes.size(); i++ )
 		{
 			for ( const QString& term : nodes[i].go_terms )
 			{
-				ont_term_t& ont = _ontology[term];
+				OntologyTerm& ont = _ontology[term];
 
-				ont.connected_nodes.push_back(node_ref_t {
+				ont.connected_nodes.push_back(NodeRef {
 					g->id(), i
 				});
 			}
@@ -158,7 +158,7 @@ void Database::print() const
 	}
 
 	qInfo() << "Ontology terms:\n";
-	for ( const ont_term_t& term : _ontology.values() )
+	for ( const OntologyTerm& term : _ontology.values() )
 	{
 		qInfo() << term.id << term.name;
 		qInfo() << "";

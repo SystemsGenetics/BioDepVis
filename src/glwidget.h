@@ -27,12 +27,12 @@ public:
 
 public slots:
 	void rotate(float deltaX, float deltaY, float deltaZ);
-	void setSelectedNodes(const QVector<node_ref_t>& nodes);
+	void setSelectedNodes(const QVector<NodeRef>& nodes);
 	void translate(float deltaX, float deltaY, float deltaZ);
 	void zoom(float delta);
 
 signals:
-	void nodesSelected(const QVector<node_ref_t>& nodes);
+	void nodesSelected(const QVector<NodeRef>& nodes);
 
 protected:
 	void init_camera();
@@ -59,7 +59,7 @@ private:
 	QPoint _prev_pos;
 	QVector3D _rot;
 	float _zoom;
-	QVector<node_ref_t> _selected_nodes;
+	QVector<NodeRef> _selected_nodes;
 
 	QOpenGLShaderProgram *_program;
 	int _ref_mvp_matrix;

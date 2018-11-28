@@ -89,8 +89,8 @@ void MainWindow::create_gui()
 	visGroup->setLayout(visLayout);
 
 	GLWidget *glWidget = new GLWidget(_db);
-	connect(glWidget, SIGNAL(nodesSelected(const QVector<node_ref_t>&)), this, SLOT(setSelectedGenes(const QVector<node_ref_t>&)));
-	connect(this, SIGNAL(genesSelected(const QVector<node_ref_t>&)), glWidget, SLOT(setSelectedNodes(const QVector<node_ref_t>&)));
+	connect(glWidget, SIGNAL(nodesSelected(const QVector<NodeRef>&)), this, SLOT(setSelectedGenes(const QVector<NodeRef>&)));
+	connect(this, SIGNAL(genesSelected(const QVector<NodeRef>&)), glWidget, SLOT(setSelectedNodes(const QVector<NodeRef>&)));
 
 	visLayout->addWidget(glWidget);
 
@@ -144,7 +144,7 @@ void MainWindow::update_gui()
 		// update gene list
 		_gene_list->clear();
 
-		for ( const node_ref_t& ref : _genes )
+		for ( const NodeRef& ref : _genes )
 		{
 			_gene_list->addItem(_db->node(ref).name);
 		}
@@ -154,7 +154,7 @@ void MainWindow::update_gui()
 	else
 	{
 		// update gene description
-		const node_ref_t& ref = _genes[_gene_index];
+		const NodeRef& ref = _genes[_gene_index];
 
 		_gene_desc->setText(_db->node(ref).name);
 	}
@@ -182,7 +182,7 @@ void MainWindow::update_gui()
 
 
 
-void MainWindow::setSelectedGenes(const QVector<node_ref_t>& genes)
+void MainWindow::setSelectedGenes(const QVector<NodeRef>& genes)
 {
 	init_controls();
 
@@ -203,7 +203,7 @@ void MainWindow::selectGene()
 	}
 
 	// update go term list
-	const node_ref_t& ref = _genes[_gene_index];
+	const NodeRef& ref = _genes[_gene_index];
 
 	_go_terms = _db->node(ref).go_terms;
 	_go_term_index = -1;
@@ -237,7 +237,7 @@ void MainWindow::search()
 
 	init_controls();
 
-	for ( const ont_term_t& ont : _db->ontology().values() )
+	for ( const OntologyTerm& ont : _db->ontology().values() )
 	{
 		if ( ont.def.contains(term) )
 		{

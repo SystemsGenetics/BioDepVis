@@ -6,14 +6,14 @@
 
 
 
-typedef struct
+struct Arguments
 {
 	QString config;
 	QString ont;
 	bool benchmark;
 	bool bm_gpu;
 	int bm_iter;
-} args_t;
+};
 
 
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 
 	// parse command-line arguments
-	args_t args = {
+	Arguments args = {
 		"config/test_M-R.json",
 		"go-basic.obo",
 		false,

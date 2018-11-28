@@ -50,7 +50,7 @@ Graph::Graph(
 	// determine number of modules
 	int num_modules = 0;
 
-	for ( const node_t& node : _nodes )
+	for ( const Node& node : _nodes )
 	{
 		if ( num_modules < node.module_id )
 		{
@@ -61,7 +61,7 @@ Graph::Graph(
 	// initialize colors
 	_colors.reserve(_nodes.size());
 
-	for ( const node_t& node : _nodes )
+	for ( const Node& node : _nodes )
 	{
 		QColor c = QColor::fromHsvF(
 			(float) node.module_id / num_modules,
@@ -82,7 +82,7 @@ Graph::Graph(
 	_edge_matrix = Matrix(_nodes.size(), _nodes.size());
 	_edge_matrix.init_zeros();
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		int i = edge.node1;
 		int j = edge.node2;
@@ -92,8 +92,8 @@ Graph::Graph(
 	}
 
 	// initialize GPU data
-	CUDA_SAFE_CALL(cudaMalloc(&_positions_gpu, _positions.size() * sizeof(vec3_t)));
-	CUDA_SAFE_CALL(cudaMalloc(&_velocities_gpu, _velocities.size() * sizeof(vec3_t)));
+	CUDA_SAFE_CALL(cudaMalloc(&_positions_gpu, _positions.size() * sizeof(Vector3)));
+	CUDA_SAFE_CALL(cudaMalloc(&_velocities_gpu, _velocities.size() * sizeof(Vector3)));
 	gpu_write_positions();
 	gpu_write_velocities();
 
@@ -122,7 +122,7 @@ void Graph::gpu_read_positions()
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
 		_positions.data(),
 		_positions_gpu,
-		_positions.size() * sizeof(vec3_t),
+		_positions.size() * sizeof(Vector3),
 		cudaMemcpyDeviceToHost));
 }
 
@@ -133,7 +133,7 @@ void Graph::gpu_read_velocities()
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
 		_velocities.data(),
 		_velocities_gpu,
-		_velocities.size() * sizeof(vec3_t),
+		_velocities.size() * sizeof(Vector3),
 		cudaMemcpyDeviceToHost));
 }
 
@@ -144,7 +144,7 @@ void Graph::gpu_write_positions()
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
 		_positions_gpu,
 		_positions.data(),
-		_positions.size() * sizeof(vec3_t),
+		_positions.size() * sizeof(Vector3),
 		cudaMemcpyHostToDevice));
 }
 
@@ -155,7 +155,7 @@ void Graph::gpu_write_velocities()
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
 		_velocities_gpu,
 		_velocities.data(),
-		_velocities.size() * sizeof(vec3_t),
+		_velocities.size() * sizeof(Vector3),
 		cudaMemcpyHostToDevice));
 }
 
@@ -181,7 +181,7 @@ void Graph::init_node_map()
 
 	for ( int i = 0; i < _nodes.size(); i++ )
 	{
-		const node_t& node = _nodes[i];
+		const Node& node = _nodes[i];
 
 		if ( !_node_map.contains(node.name) )
 		{
@@ -221,7 +221,7 @@ void Graph::load_nodes(const QString& filename)
 		QString name = list[0];
 		int module_id = list[1].toInt();
 
-		node_t node;
+		Node node;
 		node.name = name;
 		node.module_id = module_id;
 
@@ -337,7 +337,7 @@ void Graph::save_nodes(const QString& filename)
 
 	QTextStream out(&file);
 
-	for ( const node_t& node : _nodes )
+	for ( const Node& node : _nodes )
 	{
 		out << node.name
 			<< "\t" << node.module_id
@@ -369,7 +369,7 @@ void Graph::save_edges(const QString& filename)
 
 	QTextStream out(&file);
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		out << _nodes[edge.node1].name
 			<< "\t"

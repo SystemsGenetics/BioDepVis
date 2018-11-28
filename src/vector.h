@@ -3,12 +3,12 @@
 
 
 
-typedef struct
+struct Vector3
 {
 	float x;
 	float y;
 	float z;
-} vec3_t;
+};
 
 
 

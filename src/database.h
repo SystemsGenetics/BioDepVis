@@ -7,21 +7,21 @@
 
 
 
-typedef struct
+struct NodeRef
 {
 	int graph_id;
 	int node_id;
-} node_ref_t;
+};
 
 
 
-typedef struct
+struct OntologyTerm
 {
 	QString id;
 	QString name;
 	QString def;
-	QVector<node_ref_t> connected_nodes;
-} ont_term_t;
+	QVector<NodeRef> connected_nodes;
+};
 
 
 
@@ -30,16 +30,16 @@ class Database
 private:
 	QMap<int, Graph *> _graphs;
 	QVector<Alignment *> _alignments;
-	QHash<QString, ont_term_t> _ontology;
+	QHash<QString, OntologyTerm> _ontology;
 
 public:
 	Database() = default;
 
 	QMap<int, Graph *>& graphs() { return _graphs; }
 	QVector<Alignment *>& alignments() { return _alignments; }
-	QHash<QString, ont_term_t> ontology() { return _ontology; }
+	const QHash<QString, OntologyTerm>& ontology() const { return _ontology; }
 
-	node_t& node(const node_ref_t& ref) { return _graphs[ref.graph_id]->nodes()[ref.node_id]; }
+	Node& node(const NodeRef& ref) { return _graphs[ref.graph_id]->nodes()[ref.node_id]; }
 
 	void load_config(const QString& filename);
 	void load_ontology(const QString& filename);

@@ -12,7 +12,7 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 
 __global__
-void fdl_kernel_2d(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
+void fdl_kernel_2d(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -70,7 +70,7 @@ void fdl_kernel_2d(int n, vec3_t *positions, vec3_t *velocities, const bool *edg
 
 
 __global__
-void fdl_kernel_3d(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
+void fdl_kernel_3d(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -134,7 +134,7 @@ void fdl_kernel_3d(int n, vec3_t *positions, vec3_t *velocities, const bool *edg
 
 
 
-void fdl_2d_gpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
+void fdl_2d_gpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	const int BLOCK_SIZE = 256;
 	const int GRID_SIZE = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
@@ -149,7 +149,7 @@ void fdl_2d_gpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_m
 
 
 
-void fdl_3d_gpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
+void fdl_3d_gpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	const int BLOCK_SIZE = 256;
 	const int GRID_SIZE = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;

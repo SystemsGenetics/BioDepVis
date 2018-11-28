@@ -9,30 +9,30 @@
 
 
 
-typedef struct
+struct Color
 {
 	float r;
 	float g;
 	float b;
 	float a;
-} color_t;
+};
 
 
 
-typedef struct
+struct Node
 {
 	QString name;
 	int module_id;
 	QStringList go_terms;
-} node_t;
+};
 
 
 
-typedef struct
+struct Edge
 {
 	int node1;
 	int node2;
-} edge_idx_t;
+};
 
 
 
@@ -41,21 +41,21 @@ class Graph
 private:
 	int _id;
 	QString _name;
-	vec3_t _center;
+	Vector3 _center;
 	float _width;
 	float _height;
 
-	QVector<node_t> _nodes;
+	QVector<Node> _nodes;
 	QHash<QString, int> _node_map;
-	QVector<edge_idx_t> _edges;
-	QVector<color_t> _colors;
+	QVector<Edge> _edges;
+	QVector<Color> _colors;
 
-	QVector<vec3_t> _positions;
-	QVector<vec3_t> _velocities;
+	QVector<Vector3> _positions;
+	QVector<Vector3> _velocities;
 	Matrix _edge_matrix;
 
-	vec3_t *_positions_gpu {nullptr};
-	vec3_t *_velocities_gpu {nullptr};
+	Vector3 *_positions_gpu {nullptr};
+	Vector3 *_velocities_gpu {nullptr};
 	bool *_edge_matrix_gpu {nullptr};
 
 public:
@@ -71,16 +71,16 @@ public:
 
 	int id() const { return _id; }
 	const QString& name() const { return _name; }
-	QVector<node_t>& nodes() { return _nodes; }
-	QVector<edge_idx_t>& edges() { return _edges; }
-	QVector<color_t>& colors() { return _colors; }
+	QVector<Node>& nodes() { return _nodes; }
+	QVector<Edge>& edges() { return _edges; }
+	QVector<Color>& colors() { return _colors; }
 
-	QVector<vec3_t>& positions() { return _positions; }
-	QVector<vec3_t>& velocities() { return _velocities; }
+	QVector<Vector3>& positions() { return _positions; }
+	QVector<Vector3>& velocities() { return _velocities; }
 	Matrix& edge_matrix() { return _edge_matrix; }
 
-	vec3_t * positions_gpu() { return _positions_gpu; }
-	vec3_t * velocities_gpu() { return _velocities_gpu; }
+	Vector3 * positions_gpu() { return _positions_gpu; }
+	Vector3 * velocities_gpu() { return _velocities_gpu; }
 	bool * edge_matrix_gpu() const { return _edge_matrix_gpu; }
 
 	void gpu_read_positions();

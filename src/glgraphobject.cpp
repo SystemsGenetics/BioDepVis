@@ -3,8 +3,8 @@
 
 
 
-const color_t NODE_COLOR = { 0, 0, 0, 1 };
-const color_t EDGE_COLORS[] = {
+const Color NODE_COLOR = { 0, 0, 0, 1 };
+const Color EDGE_COLORS[] = {
 	{ 0.65f, 0.81f, 0.89f, 0.10f },
 	{ 0.50f, 0.50f, 0.78f, 0.10f },
 	{ 0.42f, 0.24f, 0.60f, 0.10f },
@@ -12,7 +12,7 @@ const color_t EDGE_COLORS[] = {
 	{ 0.70f, 0.87f, 0.54f, 0.10f },
 	{ 1.00f, 0.50f, 0.00f, 0.10f }
 };
-const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(color_t);
+const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(Color);
 
 
 
@@ -64,7 +64,7 @@ void GLGraphObject::initialize()
 	// initialize position buffer
 	_vbo_positions.create();
 	_vbo_positions.bind();
-	_vbo_positions.allocate(num_nodes * sizeof(vec3_t));
+	_vbo_positions.allocate(num_nodes * sizeof(Vector3));
 
 	f->glEnableVertexAttribArray(0);
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -75,7 +75,7 @@ void GLGraphObject::initialize()
 
 	_vbo_colors.create();
 	_vbo_colors.bind();
-	_vbo_colors.allocate(num_colors * sizeof(color_t));
+	_vbo_colors.allocate(num_colors * sizeof(Color));
 
 	f->glEnableVertexAttribArray(1);
 	f->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -94,12 +94,12 @@ void GLGraphObject::paint(bool show_modules)
 
 	// write node positions
 	_vbo_positions.bind();
-	_vbo_positions.write(0, _graph->positions().data(), num_nodes * sizeof(vec3_t));
+	_vbo_positions.write(0, _graph->positions().data(), num_nodes * sizeof(Vector3));
 	_vbo_positions.release();
 
 	// write edge colors
 	_vbo_colors.bind();
-	_vbo_colors.write(0, _edge_colors.data(), num_edges * sizeof(color_t));
+	_vbo_colors.write(0, _edge_colors.data(), num_edges * sizeof(Color));
 	_vbo_colors.release();
 
 	// draw edges
@@ -108,12 +108,12 @@ void GLGraphObject::paint(bool show_modules)
 	f->glDrawElements(GL_LINES, num_edges, GL_UNSIGNED_INT, _graph->edges().data());
 
 	// write node colors
-	const color_t *color_data = show_modules
+	const Color *color_data = show_modules
 		? _graph->colors().data()
 		: _node_colors.data();
 
 	_vbo_colors.bind();
-	_vbo_colors.write(0, color_data, num_nodes * sizeof(color_t));
+	_vbo_colors.write(0, color_data, num_nodes * sizeof(Color));
 	_vbo_colors.release();
 
 	// draw nodes

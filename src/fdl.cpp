@@ -11,7 +11,7 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 
 
-void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
+void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	const float K_r = 0.2f;
 	const float K_s = 1.0f;
@@ -63,7 +63,7 @@ void fdl_2d_cpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_m
 
 
 
-void fdl_3d_cpu(int n, vec3_t *positions, vec3_t *velocities, const bool *edge_matrix)
+void fdl_3d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	const float K_r = 0.2f;
 	const float K_s = 1.0f;

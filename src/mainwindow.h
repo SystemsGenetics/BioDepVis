@@ -12,7 +12,7 @@ class MainWindow : public QWidget
 
 private:
 	Database *_db;
-	QVector<node_ref_t> _genes;
+	QVector<NodeRef> _genes;
 	int _gene_index;
 	QStringList _go_terms;
 	int _go_term_index;
@@ -27,7 +27,7 @@ public:
 	MainWindow(Database *db);
 
 public slots:
-	void setSelectedGenes(const QVector<node_ref_t>& genes);
+	void setSelectedGenes(const QVector<NodeRef>& genes);
 	void selectGene();
 	void selectGoTerm();
 	void search();
@@ -35,7 +35,7 @@ public slots:
 	void extractSubgraphs();
 
 signals:
-	void genesSelected(const QVector<node_ref_t>& genes);
+	void genesSelected(const QVector<NodeRef>& genes);
 
 private:
 	void init_controls();

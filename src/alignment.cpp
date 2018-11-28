@@ -15,7 +15,7 @@ Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2):
 	_edge_matrix = Matrix(graph1->nodes().size(), graph2->nodes().size());
 	_edge_matrix.init_zeros();
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		int i = edge.node1;
 		int j = edge.node2;
@@ -99,7 +99,7 @@ void Alignment::save_edges(const QString& filename)
 
 	QTextStream out(&file);
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		out << _graph1->nodes()[edge.node1].name
 			<< "\t"
@@ -125,14 +125,12 @@ void Alignment::extract_subgraphs()
 
 	Graph g1;
 	Graph g2;
-	Alignment a1;
-	Alignment a2;
 
 	// extract nodes
 	g1.nodes().reserve(_edges.size());
 	g2.nodes().reserve(_edges.size());
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		g1.nodes().push_back(_graph1->nodes()[edge.node1]);
 		g2.nodes().push_back(_graph2->nodes()[edge.node2]);
@@ -142,42 +140,45 @@ void Alignment::extract_subgraphs()
 	g2.init_node_map();
 
 	// extract edges
-	for ( const edge_idx_t& edge : _graph1->edges() )
+	for ( const Edge& edge : _graph1->edges() )
 	{
 		int i = g1.find_node(_graph1->nodes()[edge.node1].name);
 		int j = g1.find_node(_graph1->nodes()[edge.node2].name);
 
 		if ( i != -1 && j != -1 )
 		{
-			g1.edges().push_back(edge_idx_t { i, j });
+			g1.edges().push_back(Edge { i, j });
 		}
 	}
 
-	for ( const edge_idx_t& edge : _graph2->edges() )
+	for ( const Edge& edge : _graph2->edges() )
 	{
 		int i = g2.find_node(_graph2->nodes()[edge.node1].name);
 		int j = g2.find_node(_graph2->nodes()[edge.node2].name);
 
 		if ( i != -1 && j != -1 )
 		{
-			g2.edges().push_back(edge_idx_t { i, j });
+			g2.edges().push_back(Edge { i, j });
 		}
 	}
 
 	// extract alignment edges
+	Alignment a1;
+	Alignment a2;
+
 	a1._graph1 = a1._graph2 = &g1;
 	a2._graph1 = a2._graph2 = &g2;
 
 	a1._edges.reserve(_edges.size());
 	a2._edges.reserve(_edges.size());
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		int i = g1.find_node(_graph1->nodes()[edge.node1].name);
 		int j = g2.find_node(_graph2->nodes()[edge.node2].name);
 
-		a1._edges.push_back(edge_idx_t { i, i });
-		a2._edges.push_back(edge_idx_t { j, j });
+		a1._edges.push_back(Edge { i, i });
+		a2._edges.push_back(Edge { j, j });
 	}
 
 	// save graphs and alignments
@@ -215,7 +216,7 @@ void Alignment::print() const
 {
 	qInfo() << _graph1->name() << _graph2->name();
 
-	for ( const edge_idx_t& edge : _edges )
+	for ( const Edge& edge : _edges )
 	{
 		qDebug() << edge.node1 << edge.node2;
 	}

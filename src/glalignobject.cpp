@@ -3,12 +3,12 @@
 
 
 
-const color_t EDGE_COLORS[] = {
+const Color EDGE_COLORS[] = {
 	{ 0.70f, 0.19f, 0.29f, 0.05f },
 	{ 0.89f, 0.50f, 0.79f, 0.05f },
 	{ 0.89f, 0.50f, 0.79f, 0.05f }
 };
-const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(color_t);
+const int NUM_EDGE_COLORS = sizeof(EDGE_COLORS) / sizeof(Color);
 
 
 
@@ -51,7 +51,7 @@ void GLAlignObject::initialize()
 	// initialize position buffer
 	_vbo_positions.create();
 	_vbo_positions.bind();
-	_vbo_positions.allocate(num_positions * sizeof(vec3_t));
+	_vbo_positions.allocate(num_positions * sizeof(Vector3));
 
 	f->glEnableVertexAttribArray(0);
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -60,7 +60,7 @@ void GLAlignObject::initialize()
 	// initialize color buffer
 	_vbo_colors.create();
 	_vbo_colors.bind();
-	_vbo_colors.allocate(_edge_colors.data(), num_positions * sizeof(color_t));
+	_vbo_colors.allocate(_edge_colors.data(), num_positions * sizeof(Color));
 
 	f->glEnableVertexAttribArray(1);
 	f->glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -78,7 +78,7 @@ void GLAlignObject::paint()
 
 	// write edge positions
 	_vbo_positions.bind();
-	_vbo_positions.write(0, _align->vertices().data(), num_positions * sizeof(vec3_t));
+	_vbo_positions.write(0, _align->vertices().data(), num_positions * sizeof(Vector3));
 	_vbo_positions.release();
 
 	// draw edges

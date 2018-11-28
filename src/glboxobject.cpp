@@ -57,7 +57,7 @@ void GLBoxObject::paint()
 
 	// write positions
 	_vbo_positions.bind();
-	_vbo_positions.allocate(_positions.data(), _positions.size() * sizeof(vec3_t));
+	_vbo_positions.allocate(_positions.data(), _positions.size() * sizeof(Vector3));
 	_vbo_positions.release();
 
 	// draw boxes
@@ -68,7 +68,7 @@ void GLBoxObject::paint()
 
 
 
-void GLBoxObject::append(const QVector<node_ref_t>& nodes, float L, const color_t& color)
+void GLBoxObject::append(const QVector<NodeRef>& nodes, float L, const Color& color)
 {
 	// update nodes and sizes
 	_nodes.append(nodes);
@@ -96,12 +96,12 @@ void GLBoxObject::append(const QVector<node_ref_t>& nodes, float L, const color_
 
 	// allocate position buffer
 	_vbo_positions.bind();
-	_vbo_positions.allocate(_positions.size() * sizeof(vec3_t));
+	_vbo_positions.allocate(_positions.size() * sizeof(Vector3));
 	_vbo_positions.release();
 
 	// allocate, update color buffer
 	_vbo_colors.bind();
-	_vbo_colors.allocate(_colors.data(), _colors.size() * sizeof(color_t));
+	_vbo_colors.allocate(_colors.data(), _colors.size() * sizeof(Color));
 	_vbo_colors.release();
 }
 
@@ -121,8 +121,8 @@ void GLBoxObject::update()
 {
 	for ( int i = 0; i < _nodes.size(); i++ )
 	{
-		const node_ref_t& ref = _nodes[i];
-		const vec3_t& center = _db->graphs()[ref.graph_id]->positions()[ref.node_id];
+		const NodeRef& ref = _nodes[i];
+		const Vector3& center = _db->graphs()[ref.graph_id]->positions()[ref.node_id];
 
 		update_cube(i, center, _sizes[i]);
 	}
@@ -130,34 +130,34 @@ void GLBoxObject::update()
 
 
 
-void GLBoxObject::update_cube(int i, const vec3_t& C, float L)
+void GLBoxObject::update_cube(int i, const Vector3& C, float L)
 {
 	int j = i * VERTICES_PER_BOX;
 
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y + L/2, C.z - L/2 });
 
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y + L/2, C.z + L/2 });
 
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y + L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y + L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x + L/2, C.y - L/2, C.z + L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z - L/2 });
-	_positions.replace(j++, vec3_t { C.x - L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y + L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y + L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x + L/2, C.y - L/2, C.z + L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y - L/2, C.z - L/2 });
+	_positions.replace(j++, Vector3 { C.x - L/2, C.y - L/2, C.z + L/2 });
 }

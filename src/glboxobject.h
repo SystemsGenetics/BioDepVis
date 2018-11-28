@@ -12,10 +12,10 @@ class GLBoxObject : public GLObject
 {
 private:
 	Database *_db;
-	QVector<node_ref_t> _nodes;
+	QVector<NodeRef> _nodes;
 	QVector<float> _sizes;
-	QVector<vec3_t> _positions;
-	QVector<color_t> _colors;
+	QVector<Vector3> _positions;
+	QVector<Color> _colors;
 	QOpenGLBuffer _vbo_positions;
 	QOpenGLBuffer _vbo_colors;
 
@@ -26,12 +26,12 @@ public:
 	void initialize() override;
 	void paint() override;
 
-	void append(const QVector<node_ref_t>& nodes, float L, const color_t& color);
+	void append(const QVector<NodeRef>& nodes, float L, const Color& color);
 	void clear();
 	void update();
 
 private:
-	void update_cube(int i, const vec3_t& C, float L);
+	void update_cube(int i, const Vector3& C, float L);
 };
 
 
