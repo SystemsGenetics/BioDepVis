@@ -1,6 +1,10 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include <cstdint>
+
+
+
 class Matrix
 {
 private:
@@ -22,8 +26,8 @@ public:
 	int rows() const { return _rows; }
 	int cols() const { return _cols; }
 	elem_t * data() const { return _data; }
-	const elem_t& elem(int i, int j) const { return _data[i * _cols + j]; }
-	elem_t& elem(int i, int j) { return _data[i * _cols + j]; }
+	const elem_t& elem(int i, int j) const { return _data[(int64_t)i * _cols + j]; }
+	elem_t& elem(int i, int j) { return _data[(int64_t)i * _cols + j]; }
 
 	// operators
 	Matrix& operator=(Matrix B) { swap(*this, B); return *this; }

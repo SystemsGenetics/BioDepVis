@@ -1,4 +1,5 @@
 #include "fdl.h"
+#include <cstdint>
 
 
 
@@ -6,7 +7,7 @@ const float MAX_DISPLACEMENT_SQR = 10.0f;
 
 
 
-#define ELEM(data, cols, i, j) (data)[(i) * (cols) + (j)]
+#define ELEM(data, cols, i, j) (data)[(int64_t)(i) * (cols) + (j)]
 
 
 

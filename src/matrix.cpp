@@ -7,7 +7,7 @@
 Matrix::Matrix(int rows, int cols):
 	_rows(rows),
 	_cols(cols),
-	_data(new elem_t[rows * cols])
+	_data(new elem_t[(int64_t)rows * cols])
 {
 }
 
@@ -32,7 +32,7 @@ void Matrix::init_zeros()
 {
 	Matrix& M = *this;
 
-	memset(M._data, 0, M._rows * M._cols * sizeof(elem_t));
+	memset(M._data, 0, (int64_t)M._rows * M._cols * sizeof(elem_t));
 }
 
 
