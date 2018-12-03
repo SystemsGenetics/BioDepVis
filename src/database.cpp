@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTextStream>
@@ -23,28 +24,28 @@ void Database::load_config(const QString& filename)
 	}
 
 	QByteArray data = file.readAll();
-	QJsonObject object = QJsonDocument::fromJson(data).object();
+	QJsonObject config = QJsonDocument::fromJson(data).object();
 
 	qInfo() << "Loading graphs...";
 
-	QJsonObject graphs = object["graph"].toObject();
+	QJsonArray graphs = config["graphs"].toArray();
 
-	for ( const QString& key : graphs.keys() )
+	for ( int i = 0; i < graphs.size(); i++ )
 	{
-		QJsonObject obj = graphs[key].toObject();
+		QJsonObject obj = graphs[i].toObject();
 
 		qInfo() << obj["id"].toInt() << obj["name"].toString();
 
 		Graph *g = new Graph(
 			obj["id"].toInt(),
 			obj["name"].toString(),
-			obj["clusterLocation"].toString(),
-			obj["fileLocation"].toString(),
-			obj["Ontology"].toString(),
+			obj["nodeFile"].toString(),
+			obj["edgeFile"].toString(),
+			obj["ontologyFile"].toString(),
 			obj["x"].toDouble(),
 			obj["y"].toDouble(),
 			obj["z"].toDouble(),
-			obj["w"].toDouble()
+			obj["r"].toDouble()
 		);
 
 		_graphs.insert(g->id(), g);
@@ -52,11 +53,11 @@ void Database::load_config(const QString& filename)
 
 	qInfo() << "Loading alignments...";
 
-	QJsonObject alignments = object["alignment"].toObject();
+	QJsonArray alignments = config["alignments"].toArray();
 
-	for ( const QString& key : alignments.keys() )
+	for ( int i = 0; i < alignments.size(); i++ )
 	{
-		QJsonObject obj = alignments[key].toObject();
+		QJsonObject obj = alignments[i].toObject();
 
 		int id1 = obj["graphID1"].toInt();
 		int id2 = obj["graphID2"].toInt();
@@ -64,7 +65,7 @@ void Database::load_config(const QString& filename)
 		qInfo() << id1 << id2;
 
 		Alignment *a = new Alignment(
-			obj["filelocation"].toString(),
+			obj["edgeFile"].toString(),
 			_graphs[id1],
 			_graphs[id2]
 		);

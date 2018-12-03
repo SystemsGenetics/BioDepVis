@@ -1,51 +1,49 @@
 {
-  "graph": {
-    "graph1": {
+  "graphs": [
+    {
       "id": 1,
       "name": "Maize",
-      "fileLocation": "data/M.tab",
-      "clusterLocation": "data/M.tab.cluster",
-      "Ontology": "data/M.info",
+      "edgeFile": "data/M.tab",
+      "nodeFile": "data/M.tab.cluster",
+      "ontologyFile": "data/M.info",
       "x": -200,
       "y": 100,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     },
-    "graph2": {
+    {
       "id": 2,
       "name": "Rice",
-      "fileLocation": "data/R.tab",
-      "clusterLocation": "data/R.tab.cluster",
-      "Ontology": "data/R.info",
+      "edgeFile": "data/R.tab",
+      "nodeFile": "data/R.tab.cluster",
+      "ontologyFile": "data/R.info",
       "x": 200,
       "y": 100,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     },
-    "graph3": {
+    {
       "id": 3,
       "name": "Arabidopsis",
-      "fileLocation": "data/A.tab",
-      "clusterLocation": "data/A.tab.cluster",
+      "edgeFile": "data/A.tab",
+      "nodeFile": "data/A.tab.cluster",
       "x": 0,
       "y": -100,
       "z": 0,
       "w": 200,
       "h": 200
     }
-  },
-  "alignment": {
-    "alignment1": {
+  ],
+  "alignments": [
+    {
       "graphID1": 1,
       "graphID2": 3,
-      "filelocation": "data/M-A.gna"
+      "edgeFile": "data/M-A.gna"
     },
-    "alignment2": {
+    {
       "graphID1": 2,
       "graphID2": 3,
-      "filelocation": "data/R-A.gna"
+      "edgeFile": "data/R-A.gna"
     }
-  }
+  ]
 }

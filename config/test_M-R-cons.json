@@ -1,67 +1,63 @@
 {
-  "graph": {
-    "graph1": {
+  "graphs": [
+    {
       "id": 1,
       "name": "Maize",
-      "fileLocation": "data/M.tab",
-      "clusterLocation": "data/M.tab.cluster",
-      "Ontology": "data/M.info",
+      "edgeFile": "data/M.tab",
+      "nodeFile": "data/M.tab.cluster",
+      "ontologyFile": "data/M.info",
       "x": -200,
       "y": 200,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     },
-     "graph2": {
+    {
       "id": 2,
-      "name": "MaizeCons",
-      "fileLocation": "data/grow.M.tab.gna",
-      "clusterLocation": "data/M.grow.cluster",
+      "name": "MaizeConserved",
+      "edgeFile": "data/grow.M.tab.gna",
+      "nodeFile": "data/M.grow.cluster",
       "x": -200,
       "y": -200,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     },
-    "graph3": {
+    {
       "id": 3,
       "name": "Rice",
-      "fileLocation": "data/R.tab",
-      "clusterLocation": "data/R.tab.cluster",
-      "Ontology": "data/R.info",
+      "edgeFile": "data/R.tab",
+      "nodeFile": "data/R.tab.cluster",
+      "ontologyFile": "data/R.info",
       "x": 200,
       "y": 200,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     },
-    "graph4": {
+    {
       "id": 4,
-      "name": "RiceCons",
-      "fileLocation": "data/grow.R.tab.gna",
-      "clusterLocation": "data/R.grow.cluster",
+      "name": "RiceConserved",
+      "edgeFile": "data/grow.R.tab.gna",
+      "nodeFile": "data/R.grow.cluster",
       "x": 200,
       "y": -200,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     }
-  },
-  "alignment": {
-    "alignment1": {
+  ],
+  "alignments": [
+    {
       "graphID1": 2,
       "graphID2": 4,
-      "filelocation": "data/M-R.gna"
+      "edgeFile": "data/M-R.gna"
     },
-    "alignment2": {
+    {
       "graphID1": 1,
       "graphID2": 2,
-      "filelocation": "data/M-M.gna"
+      "edgeFile": "data/M-M.gna"
     },
-     "alignment3": {
+    {
       "graphID1": 3,
       "graphID2": 4,
-      "filelocation": "data/R-R.gna"
+      "edgeFile": "data/R-R.gna"
     }
-  }
+  ]
 }

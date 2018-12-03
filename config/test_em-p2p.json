@@ -1,28 +1,25 @@
 {
-  "graph": {
-    "graph1": {
+  "graphs": [
+    {
       "id": 1,
       "name": "Email",
-      "fileLocation": "data/email.tab",
-      "clusterLocation": "data/email.tab.cluster",
+      "edgeFile": "data/email.tab",
+      "nodeFile": "data/email.tab.cluster",
       "x": -100,
       "y": 0,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     },
-    "graph2": {
+    {
       "id": 2,
       "name": "P2P",
-      "fileLocation": "data/p2p.tab",
-      "clusterLocation": "data/p2p.tab.cluster",
+      "edgeFile": "data/p2p.tab",
+      "nodeFile": "data/p2p.tab.cluster",
       "x": 100,
       "y": 0,
       "z": 0,
-      "w": 200,
-      "h": 200
+      "r": 100
     }
-  },
-  "alignment": {
-  }
+  ],
+  "alignments": []
 }
