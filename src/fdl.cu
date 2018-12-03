@@ -87,12 +87,12 @@ void fdl_kernel_3d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 	// get node position
 	float p_x = positions[i].x;
 	float p_y = positions[i].y;
-	float p_z = positions[i].y;
+	float p_z = positions[i].z;
 
 	// compute node velocity
 	float v_x = velocities[i].x;
 	float v_y = velocities[i].y;
-	float v_z = velocities[i].y;
+	float v_z = velocities[i].z;
 
 	for ( int j = 0; j < n; j++ )
 	{

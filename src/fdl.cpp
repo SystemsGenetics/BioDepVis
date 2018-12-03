@@ -43,7 +43,15 @@ void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 			}
 		}
 
+		velocities[i].x = v_x;
+		velocities[i].y = v_y;
+	}
+
+	for ( int i = 0; i < n; i++ )
+	{
 		// adjust velocity to not exceed a certain magnitude
+		float v_x = velocities[i].x;
+		float v_y = velocities[i].y;
 		float v_magnitude_sqr = v_x * v_x + v_y * v_y;
 
 		if ( v_magnitude_sqr > MAX_VELOCITY_MAGNITUDE_SQR )
@@ -94,8 +102,17 @@ void fdl_3d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 				v_z -= force * dz;
 			}
 		}
+		velocities[i].x = v_x;
+		velocities[i].y = v_y;
+		velocities[i].z = v_z;
+	}
 
+	for ( int i = 0; i < n; i++ )
+	{
 		// adjust velocity to not exceed a certain magnitude
+		float v_x = velocities[i].x;
+		float v_y = velocities[i].y;
+		float v_z = velocities[i].z;
 		float v_magnitude_sqr = v_x * v_x + v_y * v_y + v_z * v_z;
 
 		if ( v_magnitude_sqr > MAX_VELOCITY_MAGNITUDE_SQR )

@@ -1,19 +1,9 @@
 #include <QApplication>
 #include <QSurfaceFormat>
+#include "arguments.h"
 #include "database.h"
 #include "fdl.h"
 #include "mainwindow.h"
-
-
-
-struct Arguments
-{
-	QString config;
-	QString ont;
-	bool benchmark;
-	bool bm_gpu;
-	int bm_iter;
-};
 
 
 
@@ -21,20 +11,33 @@ struct Arguments
  * Run a benchmark of the FDL algorithm for CPU.
  *
  * @param db
+ * @param _3d
  * @param num_iterations
  */
-void benchmark_cpu(Database& db, int num_iterations)
+void benchmark_cpu(Database& db, bool _3d, int num_iterations)
 {
 	for ( int t = 0; t < num_iterations; t++ )
 	{
 		for ( Graph *g : db.graphs().values() )
 		{
-			fdl_2d_cpu(
-				g->nodes().size(),
-				g->positions().data(),
-				g->velocities().data(),
-				g->edge_matrix().data()
-			);
+			if ( _3d )
+			{
+				fdl_3d_cpu(
+					g->nodes().size(),
+					g->positions().data(),
+					g->velocities().data(),
+					g->edge_matrix().data()
+				);
+			}
+			else
+			{
+				fdl_2d_cpu(
+					g->nodes().size(),
+					g->positions().data(),
+					g->velocities().data(),
+					g->edge_matrix().data()
+				);
+			}
 		}
 
 		printf("%d\n", t + 1);
@@ -47,21 +50,34 @@ void benchmark_cpu(Database& db, int num_iterations)
  * Run a benchmark of the FDL algorithm for CPU.
  *
  * @param db
+ * @param _3d
  * @param num_iterations
  */
-void benchmark_gpu(Database& db, int num_iterations)
+void benchmark_gpu(Database& db, bool _3d, int num_iterations)
 {
 	for ( int t = 0; t < num_iterations; t++ )
 	{
 		for ( Graph *g : db.graphs().values() )
 		{
 			// execute FDL kernel on GPU
-			fdl_2d_gpu(
-				g->nodes().size(),
-				g->positions_gpu(),
-				g->velocities_gpu(),
-				g->edge_matrix_gpu()
-			);
+			if ( _3d )
+			{
+				fdl_3d_gpu(
+					g->nodes().size(),
+					g->positions_gpu(),
+					g->velocities_gpu(),
+					g->edge_matrix_gpu()
+				);
+			}
+			else
+			{
+				fdl_2d_gpu(
+					g->nodes().size(),
+					g->positions_gpu(),
+					g->velocities_gpu(),
+					g->edge_matrix_gpu()
+				);
+			}
 
 			// read position data from GPU
 			g->gpu_read_positions();
@@ -87,9 +103,10 @@ void print_usage()
 		"Options:\n"
 		"  --config FILE  configuration file [config/test_M-R.json]\n"
 		"  --ont FILE     ontology dictionary file [go-basic.obo]\n"
-		"  --benchmark    run the FDL benchmark\n"
-		"  --bm-gpu       run the FDL benchmark for GPU\n"
-		"  --bm-iter      the number of iterations to run the benchmark\n"
+		"  --fdl          run the FDL benchmark\n"
+		"  --fdl-3d       use 3D FDL\n"
+		"  --fdl-gpu      use GPU for FDL benchmark\n"
+		"  --fdl-iter     the number of iterations to run the benchmark\n"
 		"  --help         list help options\n"
 	);
 }
@@ -101,13 +118,13 @@ int main(int argc, char *argv[])
 	QApplication app(argc, argv);
 
 	// parse command-line arguments
-	Arguments args = {
-		"config/test_M-R.json",
-		"go-basic.obo",
-		false,
-		false,
-		1000
-	};
+	Arguments& args {Arguments::instance()};
+	args.config = "config/test_M-R.json";
+	args.ont = "go-basic.obo";
+	args.fdl = false;
+	args.fdl_3d = false;
+	args.fdl_gpu = false;
+	args.fdl_iter = 1000;
 
 	QStringList options = app.arguments();
 
@@ -123,17 +140,21 @@ int main(int argc, char *argv[])
 			args.ont = options[i + 1];
 			i++;
 		}
-		else if ( options[i] == "--benchmark" )
+		else if ( options[i] == "--fdl" )
 		{
-			args.benchmark = true;
+			args.fdl = true;
 		}
-		else if ( options[i] == "--bm-gpu" )
+		else if ( options[i] == "--fdl-3d" )
 		{
-			args.bm_gpu = true;
+			args.fdl_3d = true;
 		}
-		else if ( options[i] == "--bm-iter" )
+		else if ( options[i] == "--fdl-gpu" )
 		{
-			args.bm_iter = options[i + 1].toInt();
+			args.fdl_gpu = true;
+		}
+		else if ( options[i] == "--fdl-iter" )
+		{
+			args.fdl_iter = options[i + 1].toInt();
 			i++;
 		}
 		else if ( options[i] == "--help" )
@@ -154,15 +175,15 @@ int main(int argc, char *argv[])
 	db.load_ontology(args.ont);
 
 	// run benchmark
-	if ( args.benchmark )
+	if ( args.fdl )
 	{
-		if ( args.bm_gpu )
+		if ( args.fdl_gpu )
 		{
-			benchmark_gpu(db, args.bm_iter);
+			benchmark_gpu(db, args.fdl_3d, args.fdl_iter);
 		}
 		else
 		{
-			benchmark_cpu(db, args.bm_iter);
+			benchmark_cpu(db, args.fdl_3d, args.fdl_iter);
 		}
 
 		return 0;

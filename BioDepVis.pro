@@ -30,6 +30,7 @@ OBJECTS += \
 
 SOURCES += \
     src/alignment.cpp \
+    src/arguments.cpp \
     src/database.cpp \
     src/fdl.cpp \
     src/glalignobject.cpp \

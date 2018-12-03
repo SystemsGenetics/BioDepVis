@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include "arguments.h"
 #include "fdl.h"
 #include "graph.h"
 
@@ -12,16 +13,20 @@ Graph::Graph(
 	const QString& nodefile,
 	const QString& edgefile,
 	const QString& ontfile,
-	float x, float y, float z, float w, float h):
+	float x, float y, float z,
+	float radius):
 	_id(id),
 	_name(name),
-	_center({ x, y, z }),
-	_width(w),
-	_height(h)
+	_center({ x, y, z })
 {
+	// get command-line arguments
+	Arguments& args {Arguments::instance()};
+
+	// load graph data
 	load_nodes(nodefile);
 	load_edges(edgefile);
 
+	// load ontology data
 	if ( ontfile != "" )
 	{
 		load_ontology(ontfile);
@@ -32,11 +37,29 @@ Graph::Graph(
 
 	for ( int i = 0; i < _nodes.size(); i++ )
 	{
-		_positions.push_back({
-			x - w / 2 + w * qrand() / RAND_MAX,
-			y - h / 2 + h * qrand() / RAND_MAX,
-			z
-		});
+		if ( args.fdl_3d )
+		{
+			float r = radius * qrand() / RAND_MAX;
+			float theta = 2 * M_PI * qrand() / RAND_MAX;
+			float phi = 2 * M_PI * qrand() / RAND_MAX;
+
+			_positions.push_back({
+				x + r * sinf(theta) * cosf(phi),
+				y + r * sinf(theta) * sinf(phi),
+				z + r * cosf(theta)
+			});
+		}
+		else
+		{
+			float r = radius * qrand() / RAND_MAX;
+			float theta = 2 * M_PI * qrand() / RAND_MAX;
+
+			_positions.push_back({
+				x + r * cosf(theta),
+				y + r * sinf(theta),
+				z
+			});
+		}
 	}
 
 	// initialize delta positions

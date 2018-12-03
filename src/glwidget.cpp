@@ -3,6 +3,7 @@
 #include <QOpenGLShaderProgram>
 #include <QTimer>
 #include <QWheelEvent>
+#include "arguments.h"
 #include "fdl.h"
 #include "glwidget.h"
 
@@ -38,19 +39,16 @@ static const char *FRAGMENT_SHADER_SOURCE =
 
 GLWidget::GLWidget(Database *db, QWidget *parent):
 	QOpenGLWidget(parent),
-	_db(db),
-	_animate(false),
-	_gpu(true),
-	_select_multi(false),
-	_show_alignments(true),
-	_show_graphs(true),
-	_show_modules(false),
-	_rot(0, 0, 0),
-	_zoom(0),
-	_program(0)
+	_db(db)
 {
-	setFocusPolicy(Qt::ClickFocus);
+	// get command-line arguments
+	Arguments& args {Arguments::instance()};
+	_fdl_3d = args.fdl_3d;
 
+	// allow the widget to enter focus by being clicked
+	setFocusPolicy(Qt::ClickFocus);
+	
+	// register the animation callback
 	startTimer(1000 / MAX_FPS);
 }
 
@@ -155,17 +153,29 @@ void GLWidget::run_animation()
 	running = true;
 
 	// perform FDL on GPU if it is enabled
-	if ( _gpu )
+	if ( _fdl_gpu )
 	{
 		for ( Graph *g : _db->graphs().values() )
 		{
 			// execute FDL kernel on GPU
-			fdl_2d_gpu(
-				g->nodes().size(),
-				g->positions_gpu(),
-				g->velocities_gpu(),
-				g->edge_matrix_gpu()
-			);
+			if ( _fdl_3d )
+			{
+				fdl_3d_gpu(
+					g->nodes().size(),
+					g->positions_gpu(),
+					g->velocities_gpu(),
+					g->edge_matrix_gpu()
+				);
+			}
+			else
+			{
+				fdl_2d_gpu(
+					g->nodes().size(),
+					g->positions_gpu(),
+					g->velocities_gpu(),
+					g->edge_matrix_gpu()
+				);
+			}
 
 			// read position data from GPU
 			g->gpu_read_positions();
@@ -180,12 +190,24 @@ void GLWidget::run_animation()
 	{
 		for ( Graph *g : _db->graphs().values() )
 		{
-			fdl_2d_cpu(
-				g->nodes().size(),
-				g->positions().data(),
-				g->velocities().data(),
-				g->edge_matrix().data()
-			);
+			if ( _fdl_3d )
+			{
+				fdl_3d_cpu(
+					g->nodes().size(),
+					g->positions().data(),
+					g->velocities().data(),
+					g->edge_matrix().data()
+				);
+			}
+			else
+			{
+				fdl_2d_cpu(
+					g->nodes().size(),
+					g->positions().data(),
+					g->velocities().data(),
+					g->edge_matrix().data()
+				);
+			}
 		}
 	}
 
@@ -343,10 +365,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 	case Qt::Key_O:
 		rotate(0, 0, -ROT_DELTA);
 	case Qt::Key_G:
-		_gpu = !_gpu;
+		_fdl_gpu = !_fdl_gpu;
 
 		// copy graph data to GPU if it is enabled
-		if ( _gpu )
+		if ( _fdl_gpu )
 		{
 			for ( Graph *g : _db->graphs().values() )
 			{

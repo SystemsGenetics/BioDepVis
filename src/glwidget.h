@@ -49,19 +49,20 @@ protected:
 
 private:
 	Database *_db;
-	bool _animate;
-	bool _gpu;
-	bool _select_multi;
-	bool _show_alignments;
-	bool _show_graphs;
-	bool _show_modules;
+	bool _animate {false};
+	bool _fdl_gpu {true};
+	bool _fdl_3d {false};
+	bool _select_multi {false};
+	bool _show_alignments {true};
+	bool _show_graphs {true};
+	bool _show_modules {false};
 
 	QPoint _prev_pos;
 	QVector3D _rot;
-	float _zoom;
+	float _zoom {0};
 	QVector<NodeRef> _selected_nodes;
 
-	QOpenGLShaderProgram *_program;
+	QOpenGLShaderProgram *_program {nullptr};
 	int _ref_mvp_matrix;
 	QMatrix4x4 _model;
 	QMatrix4x4 _view;

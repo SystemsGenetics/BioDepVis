@@ -42,8 +42,6 @@ private:
 	int _id;
 	QString _name;
 	Vector3 _center;
-	float _width;
-	float _height;
 
 	QVector<Node> _nodes;
 	QHash<QString, int> _node_map;
@@ -64,7 +62,8 @@ public:
 		const QString& nodefile,
 		const QString& edgefile,
 		const QString& ontfile,
-		float x, float y, float z, float w, float h
+		float x, float y, float z,
+		float radius
 	);
 	Graph() = default;
 	~Graph();
