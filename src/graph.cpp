@@ -134,11 +134,11 @@ Graph::Graph(
 	gpu_write_velocities();
 
 	int n = _nodes.size();
-	CUDA_SAFE_CALL(cudaMalloc(&_edge_matrix_gpu, (int64_t)n * n * sizeof(bool)));
+	CUDA_SAFE_CALL(cudaMalloc(&_edge_matrix_gpu, (size_t)n * n * sizeof(bool)));
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
 		_edge_matrix_gpu,
 		_edge_matrix.data(),
-		(int64_t)n * n * sizeof(bool),
+		(size_t)n * n * sizeof(bool),
 		cudaMemcpyHostToDevice));
 }
 
