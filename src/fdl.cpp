@@ -27,10 +27,10 @@ void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 	const float K_s = 1.0f;
 	const float L = 2.2f;
 
-	// update each node
+	// compute velocity of each node
 	for ( int i = 0; i < n; i++ )
 	{
-		// compute node velocity
+		// apply force from each node in the graph
 		float v_x = velocities[i].x;
 		float v_y = velocities[i].y;
 
@@ -51,15 +51,7 @@ void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 			}
 		}
 
-		velocities[i].x = v_x;
-		velocities[i].y = v_y;
-	}
-
-	for ( int i = 0; i < n; i++ )
-	{
 		// adjust velocity to not exceed a certain magnitude
-		float v_x = velocities[i].x;
-		float v_y = velocities[i].y;
 		float v_magnitude_sqr = v_x * v_x + v_y * v_y;
 
 		if ( v_magnitude_sqr > MAX_VELOCITY_MAGNITUDE_SQR )
@@ -68,10 +60,18 @@ void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 			v_y *= sqrt(MAX_VELOCITY_MAGNITUDE_SQR / v_magnitude_sqr);
 		}
 
-		positions[i].x += v_x;
-		positions[i].y += v_y;
-		velocities[i].x = 0.1f * v_x;
-		velocities[i].y = 0.1f * v_y;
+		// save velocity
+		velocities[i].x = v_x;
+		velocities[i].y = v_y;
+	}
+
+	// update position of each node
+	for ( int i = 0; i < n; i++ )
+	{
+		positions[i].x += velocities[i].x;
+		positions[i].y += velocities[i].y;
+		velocities[i].x *= 0.1f;
+		velocities[i].y *= 0.1f;
 	}
 }
 
@@ -92,10 +92,10 @@ void fdl_3d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 	const float K_s = 1.0f;
 	const float L = 2.2f;
 
-	// update each node
+	// compute velocity of each node
 	for ( int i = 0; i < n; i++ )
 	{
-		// compute node velocity
+		// apply force from each node in the graph
 		float v_x = velocities[i].x;
 		float v_y = velocities[i].y;
 		float v_z = velocities[i].y;
@@ -118,17 +118,8 @@ void fdl_3d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 				v_z -= force * dz;
 			}
 		}
-		velocities[i].x = v_x;
-		velocities[i].y = v_y;
-		velocities[i].z = v_z;
-	}
 
-	for ( int i = 0; i < n; i++ )
-	{
 		// adjust velocity to not exceed a certain magnitude
-		float v_x = velocities[i].x;
-		float v_y = velocities[i].y;
-		float v_z = velocities[i].z;
 		float v_magnitude_sqr = v_x * v_x + v_y * v_y + v_z * v_z;
 
 		if ( v_magnitude_sqr > MAX_VELOCITY_MAGNITUDE_SQR )
@@ -138,11 +129,20 @@ void fdl_3d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 			v_z *= sqrt(MAX_VELOCITY_MAGNITUDE_SQR / v_magnitude_sqr);
 		}
 
-		positions[i].x += v_x;
-		positions[i].y += v_y;
-		positions[i].z += v_z;
-		velocities[i].x = 0.1f * v_x;
-		velocities[i].y = 0.1f * v_y;
-		velocities[i].z = 0.1f * v_z;
+		// save velocity
+		velocities[i].x = v_x;
+		velocities[i].y = v_y;
+		velocities[i].z = v_z;
+	}
+
+	// update position of each node
+	for ( int i = 0; i < n; i++ )
+	{
+		positions[i].x += velocities[i].x;
+		positions[i].y += velocities[i].y;
+		positions[i].z += velocities[i].z;
+		velocities[i].x *= 0.1f;
+		velocities[i].y *= 0.1f;
+		velocities[i].z *= 0.1f;
 	}
 }

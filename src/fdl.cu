@@ -30,7 +30,7 @@ void fdl_kernel_2d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 	float p_x = positions[i].x;
 	float p_y = positions[i].y;
 
-	// compute node velocity
+	// apply force from each node in the graph
 	float v_x = velocities[i].x;
 	float v_y = velocities[i].y;
 
@@ -50,7 +50,6 @@ void fdl_kernel_2d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 			v_y -= force * dy;
 		}
 	}
-	__syncthreads();
 
 	// adjust velocity to not exceed a certain magnitude
 	float v_magnitude_sqr = v_x * v_x + v_y * v_y;
@@ -61,6 +60,9 @@ void fdl_kernel_2d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 		v_y *= sqrt(MAX_VELOCITY_MAGNITUDE_SQR / v_magnitude_sqr);
 	}
 
+	__syncthreads();
+
+	// update node position
 	positions[i].x += v_x;
 	positions[i].y += v_y;
 	velocities[i].x = 0.1f * v_x;
@@ -89,7 +91,7 @@ void fdl_kernel_3d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 	float p_y = positions[i].y;
 	float p_z = positions[i].z;
 
-	// compute node velocity
+	// apply force from each node in the graph
 	float v_x = velocities[i].x;
 	float v_y = velocities[i].y;
 	float v_z = velocities[i].z;
@@ -112,7 +114,6 @@ void fdl_kernel_3d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 			v_z -= force * dz;
 		}
 	}
-	__syncthreads();
 
 	// adjust velocity to not exceed a certain magnitude
 	float v_magnitude_sqr = v_x * v_x + v_y * v_y + v_z * v_z;
@@ -124,6 +125,9 @@ void fdl_kernel_3d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 		v_z *= sqrt(MAX_VELOCITY_MAGNITUDE_SQR / v_magnitude_sqr);
 	}
 
+	__syncthreads();
+
+	// update node position
 	positions[i].x += v_x;
 	positions[i].y += v_y;
 	positions[i].z += v_z;
