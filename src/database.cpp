@@ -45,7 +45,7 @@ void Database::load_config(const QString& filename)
 			obj["x"].toDouble(),
 			obj["y"].toDouble(),
 			obj["z"].toDouble(),
-			obj["r"].toDouble()
+			obj["radius"].toDouble()
 		);
 
 		_graphs.insert(g->id(), g);
