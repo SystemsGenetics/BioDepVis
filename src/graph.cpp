@@ -8,6 +8,19 @@
 
 
 
+/**
+ * Construct a graph.
+ *
+ * @param id
+ * @param name
+ * @param nodefile
+ * @param edgefile
+ * @param ontfile
+ * @param x
+ * @param y
+ * @param z
+ * @param radius
+ */
 Graph::Graph(
 	int id, const QString& name,
 	const QString& nodefile,
@@ -131,6 +144,9 @@ Graph::Graph(
 
 
 
+/**
+ * Destruct a graph.
+ */
 Graph::~Graph()
 {
 	CUDA_SAFE_CALL(cudaFree(_positions_gpu));
@@ -140,6 +156,9 @@ Graph::~Graph()
 
 
 
+/**
+ * Copy position data from the GPU.
+ */
 void Graph::gpu_read_positions()
 {
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
@@ -151,6 +170,9 @@ void Graph::gpu_read_positions()
 
 
 
+/**
+ * Copy velocity data from the GPU.
+ */
 void Graph::gpu_read_velocities()
 {
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
@@ -162,6 +184,9 @@ void Graph::gpu_read_velocities()
 
 
 
+/**
+ * Copy position data to the GPU.
+ */
 void Graph::gpu_write_positions()
 {
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
@@ -173,6 +198,9 @@ void Graph::gpu_write_positions()
 
 
 
+/**
+ * Copy velocity data to the GPU.
+ */
 void Graph::gpu_write_velocities()
 {
 	CUDA_SAFE_CALL(cudaMemcpyAsync(
@@ -198,6 +226,10 @@ int Graph::find_node(const QString& name)
 
 
 
+/**
+ * Initialize the node map from the node list. The node map is used to
+ * access nodes quickly by name.
+ */
 void Graph::init_node_map()
 {
 	_node_map.clear();
@@ -228,6 +260,7 @@ void Graph::load_nodes(const QString& filename)
 {
 	qInfo() << "- Loading nodes...";
 
+	// open input file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::ReadOnly) )
@@ -236,6 +269,7 @@ void Graph::load_nodes(const QString& filename)
 		return;
 	}
 
+	// read nodes from input file
 	QTextStream in(&file);
 
 	while ( !in.atEnd() )
@@ -273,6 +307,7 @@ void Graph::load_edges(const QString& filename)
 {
 	qInfo() << "- Loading edges...";
 
+	// open input file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::ReadOnly) )
@@ -281,6 +316,7 @@ void Graph::load_edges(const QString& filename)
 		return;
 	}
 
+	// read edges from input file
 	QTextStream in(&file);
 
 	while ( !in.atEnd() )
@@ -314,6 +350,7 @@ void Graph::load_edges(const QString& filename)
  */
 void Graph::load_ontology(const QString& filename)
 {
+	// open ontology file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::ReadOnly) )
@@ -322,6 +359,7 @@ void Graph::load_ontology(const QString& filename)
 		return;
 	}
 
+	// read ontology terms from ontology file
 	QTextStream in(&file);
 
 	while ( !in.atEnd() )
@@ -350,6 +388,7 @@ void Graph::save_nodes(const QString& filename)
 {
 	qInfo() << "- Saving nodes...";
 
+	// open output file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::WriteOnly) )
@@ -358,14 +397,14 @@ void Graph::save_nodes(const QString& filename)
 		return;
 	}
 
+	// save nodes to output file
 	QTextStream out(&file);
 
 	for ( const Node& node : _nodes )
 	{
-		out << node.name
-			<< "\t" << node.module_id
-			<< "\t" << node.go_terms.join(',')
-			<< "\n";
+		out << node.name << "\t"
+		    << node.module_id << "\t"
+		    << node.go_terms.join(',') << "\n";
 	}
 
 	qInfo() << "- Saved" << _nodes.size() << "nodes.";
@@ -382,6 +421,7 @@ void Graph::save_edges(const QString& filename)
 {
 	qInfo() << "- Saving edges...";
 
+	// open output file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::WriteOnly) )
@@ -390,14 +430,13 @@ void Graph::save_edges(const QString& filename)
 		return;
 	}
 
+	// save edges to output file
 	QTextStream out(&file);
 
 	for ( const Edge& edge : _edges )
 	{
-		out << _nodes[edge.node1].name
-			<< "\t"
-			<< _nodes[edge.node2].name
-			<< "\n";
+		out << _nodes[edge.node1].name << "\t"
+		    << _nodes[edge.node2].name << "\n";
 	}
 
 	qInfo() << "- Saved" << _edges.size() << "edges.";
@@ -405,6 +444,9 @@ void Graph::save_edges(const QString& filename)
 
 
 
+/**
+ * Print information about a graph.
+ */
 void Graph::print() const
 {
 	qInfo() << _id << _name;

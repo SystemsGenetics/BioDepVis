@@ -134,6 +134,14 @@ void fdl_kernel_3d(int n, Vector3 *positions, Vector3 *velocities, const bool *e
 
 
 
+/**
+ * Perform one iteration of 2D force-directed layout on a graph.
+ *
+ * @param n
+ * @param positions
+ * @param velocities
+ * @param edge_matrix
+ */
 void fdl_2d_gpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	const int BLOCK_SIZE = 256;
@@ -149,6 +157,14 @@ void fdl_2d_gpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 
 
 
+/**
+ * Perform one iteration of 3D force-directed layout on a graph.
+ *
+ * @param n
+ * @param positions
+ * @param velocities
+ * @param edge_matrix
+ */
 void fdl_3d_gpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	const int BLOCK_SIZE = 256;

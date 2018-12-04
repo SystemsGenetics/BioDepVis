@@ -32,9 +32,7 @@ public:
 	void load_edges(const QString& filename);
 	void save_edges(const QString& filename);
 	void extract_subgraphs();
-
 	void update();
-
 	void print() const;
 };
 

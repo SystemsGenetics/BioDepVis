@@ -35,8 +35,8 @@ signals:
 	void nodesSelected(const QVector<NodeRef>& nodes);
 
 protected:
-	void init_camera();
-	void run_animation();
+	void initializeCamera();
+	void runAnimation();
 	void initializeGL() override;
 	void paintGL() override;
 	void resizeGL(int w, int h) override;

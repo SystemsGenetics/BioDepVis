@@ -141,6 +141,9 @@ void Database::load_ontology(const QString& filename)
 
 
 
+/**
+ * Print information about the database.
+ */
 void Database::print() const
 {
 	qInfo() << "Graphs:\n";

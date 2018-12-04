@@ -12,6 +12,14 @@ const float MAX_VELOCITY_MAGNITUDE_SQR = 10.0f;
 
 
 
+/**
+ * Perform one iteration of 2D force-directed layout on a graph.
+ *
+ * @param n
+ * @param positions
+ * @param velocities
+ * @param edge_matrix
+ */
 void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	// define force constants
@@ -69,6 +77,14 @@ void fdl_2d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge
 
 
 
+/**
+ * Perform one iteration of 3D force-directed layout on a graph.
+ *
+ * @param n
+ * @param positions
+ * @param velocities
+ * @param edge_matrix
+ */
 void fdl_3d_cpu(int n, Vector3 *positions, Vector3 *velocities, const bool *edge_matrix)
 {
 	// define force constants

@@ -37,6 +37,12 @@ static const char *FRAGMENT_SHADER_SOURCE =
 
 
 
+/**
+ * Construct a GL widget.
+ *
+ * @param db
+ * @param parent
+ */
 GLWidget::GLWidget(Database *db, QWidget *parent):
 	QOpenGLWidget(parent),
 	_db(db)
@@ -54,6 +60,9 @@ GLWidget::GLWidget(Database *db, QWidget *parent):
 
 
 
+/**
+ * Destruct a GL widget.
+ */
 GLWidget::~GLWidget()
 {
 	makeCurrent();
@@ -76,6 +85,13 @@ GLWidget::~GLWidget()
 
 
 
+/**
+ * Rotate the model.
+ *
+ * @param deltaX
+ * @param deltaY
+ * @param deltaZ
+ */
 void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 {
 	_rot.setX(_rot.x() + deltaX);
@@ -90,6 +106,11 @@ void GLWidget::rotate(float deltaX, float deltaY, float deltaZ)
 
 
 
+/**
+ * Set the list of selected nodes and render a box for each node.
+ *
+ * @param node
+ */
 void GLWidget::setSelectedNodes(const QVector<NodeRef>& nodes)
 {
 	_selected_nodes = nodes;
@@ -102,6 +123,13 @@ void GLWidget::setSelectedNodes(const QVector<NodeRef>& nodes)
 
 
 
+/**
+ * Translate the view.
+ *
+ * @param deltaX
+ * @param deltaY
+ * @param deltaZ
+ */
 void GLWidget::translate(float deltaX, float deltaY, float deltaZ)
 {
 	_view.translate(deltaX, deltaY, deltaZ);
@@ -109,6 +137,11 @@ void GLWidget::translate(float deltaX, float deltaY, float deltaZ)
 
 
 
+/**
+ * Change the zoom level.
+ *
+ * @param delta
+ */
 void GLWidget::zoom(float delta)
 {
 	_zoom = qMin(qMax(1.0f, _zoom + delta), 180.0f);
@@ -123,7 +156,10 @@ void GLWidget::zoom(float delta)
 
 
 
-void GLWidget::init_camera()
+/**
+ * Initialize the model, view, and projection matrices.
+ */
+void GLWidget::initializeCamera()
 {
 	// initialize model matrix
 	_rot = QVector3D(0, 0, 0);
@@ -140,7 +176,10 @@ void GLWidget::init_camera()
 
 
 
-void GLWidget::run_animation()
+/**
+ * Perform a single time-step of the animation.
+ */
+void GLWidget::runAnimation()
 {
 	static bool running = false;
 
@@ -228,6 +267,9 @@ void GLWidget::run_animation()
 
 
 
+/**
+ * Initialize OpenGL resources.
+ */
 void GLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
@@ -270,13 +312,16 @@ void GLWidget::initializeGL()
 	_boxes->initialize();
 
 	// initialize camera
-	init_camera();
+	initializeCamera();
 
 	_program->release();
 }
 
 
 
+/**
+ * Render the current frame.
+ */
 void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -311,13 +356,21 @@ void GLWidget::paintGL()
 
 
 
-void GLWidget::resizeGL(int /*w*/, int /*h*/)
+/**
+ * Resize the GL widget.
+ */
+void GLWidget::resizeGL(int, int)
 {
 	zoom(0);
 }
 
 
 
+/**
+ * Handle key-press events.
+ *
+ * @param event
+ */
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
 	const float ROT_DELTA = 1;
@@ -327,7 +380,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 	switch ( event->key() )
 	{
 	case Qt::Key_R:
-		init_camera();
+		initializeCamera();
 		break;
 	case Qt::Key_W:
 		translate(0, -TRANS_DELTA, 0);
@@ -412,6 +465,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
 
 
+/**
+ * Handle double-click events. Double-clicking selects a node in a graph, or a
+ * group of nodes if multi-select is enabled.
+ *
+ * @param event
+ */
 void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
 	float max_dist = _select_multi ? 5.0f : 40.0f;
@@ -457,6 +516,11 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 
 
+/**
+ * Handle mouse-move events. Dragging the mouse rotates the model.
+ *
+ * @param event
+ */
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	int dx = event->x() - _prev_pos.x();
@@ -478,6 +542,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 
 
+/**
+ * Handle mouse-move events. Clicking the mouse sets the "previous position"
+ * which is used to rotate the model when dragging the mouse.
+ *
+ * @param event
+ */
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
 	_prev_pos = event->pos();
@@ -486,11 +556,16 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 
 
+/**
+ * Handle timer events. The timer is used to run the animation.
+ *
+ * @param event
+ */
 void GLWidget::timerEvent(QTimerEvent *event)
 {
 	if ( _animate )
 	{
-		run_animation();
+		runAnimation();
 	}
 
 	event->accept();
@@ -498,6 +573,11 @@ void GLWidget::timerEvent(QTimerEvent *event)
 
 
 
+/**
+ * Handle mouse-wheel events. Scrolling is used to zoom in and out.
+ *
+ * @param event
+ */
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
 	QPoint pixels = event->pixelDelta();

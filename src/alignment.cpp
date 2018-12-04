@@ -5,10 +5,18 @@
 
 
 
+/**
+ * Construct an alignment from an edge list.
+ *
+ * @param filename
+ * @param graph1
+ * @param graph2
+ */
 Alignment::Alignment(const QString& filename, Graph *graph1, Graph *graph2):
 	_graph1(graph1),
 	_graph2(graph2)
 {
+	// load edges from file
 	load_edges(filename);
 
 	// initialize edge matrix
@@ -40,6 +48,7 @@ void Alignment::load_edges(const QString& filename)
 {
 	qInfo() << "- Loading edges...";
 
+	// open input file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::ReadOnly) )
@@ -48,6 +57,7 @@ void Alignment::load_edges(const QString& filename)
 		return;
 	}
 
+	// read edges from input file
 	QTextStream in(&file);
 
 	while ( !in.atEnd() )
@@ -89,6 +99,7 @@ void Alignment::save_edges(const QString& filename)
 {
 	qInfo() << "- Saving edges...";
 
+	// open output file
 	QFile file(filename);
 
 	if ( !file.open(QIODevice::WriteOnly) )
@@ -97,14 +108,13 @@ void Alignment::save_edges(const QString& filename)
 		return;
 	}
 
+	// save edges to output file
 	QTextStream out(&file);
 
 	for ( const Edge& edge : _edges )
 	{
-		out << _graph1->nodes()[edge.node1].name
-			<< "\t"
-			<< _graph2->nodes()[edge.node2].name
-			<< "\n";
+		out << _graph1->nodes()[edge.node1].name << "\t"
+		    << _graph2->nodes()[edge.node2].name << "\n";
 	}
 
 	qInfo() << "- Saved" << _edges.size() << "edges.";
@@ -195,8 +205,8 @@ void Alignment::extract_subgraphs()
 
 
 /**
- * Update the vertices of each alignment edge to
- * the positions of the corresponding graph nodes.
+ * Update the vertices of each alignment edge to the positions of
+ * the corresponding graph nodes.
  */
 void Alignment::update()
 {
@@ -212,6 +222,9 @@ void Alignment::update()
 
 
 
+/**
+ * Print information about an alignment.
+ */
 void Alignment::print() const
 {
 	qInfo() << _graph1->name() << _graph2->name();

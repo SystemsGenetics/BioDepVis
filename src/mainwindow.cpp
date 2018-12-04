@@ -3,6 +3,9 @@
 
 
 
+/**
+ * Construct the main window.
+ */
 MainWindow::MainWindow(Database *db):
 	_db(db)
 {
@@ -12,6 +15,9 @@ MainWindow::MainWindow(Database *db):
 
 
 
+/**
+ * Initialize the search controls.
+ */
 void MainWindow::init_controls()
 {
 	_genes.clear();
@@ -22,6 +28,9 @@ void MainWindow::init_controls()
 
 
 
+/**
+ * Initialize the main window GUI.
+ */
 void MainWindow::create_gui()
 {
 	QGridLayout *layout = new QGridLayout;
@@ -137,6 +146,9 @@ void MainWindow::create_gui()
 
 
 
+/**
+ * Update the main window GUI.
+ */
 void MainWindow::update_gui()
 {
 	if ( _gene_index == -1 )
@@ -182,6 +194,11 @@ void MainWindow::update_gui()
 
 
 
+/**
+ * Set the list of selected genes.
+ *
+ * @param genes
+ */
 void MainWindow::setSelectedGenes(const QVector<NodeRef>& genes)
 {
 	init_controls();
@@ -194,6 +211,9 @@ void MainWindow::setSelectedGenes(const QVector<NodeRef>& genes)
 
 
 
+/**
+ * Select a gene from the gene list.
+ */
 void MainWindow::selectGene()
 {
 	_gene_index = 0;
@@ -213,6 +233,9 @@ void MainWindow::selectGene()
 
 
 
+/**
+ * Select a GO term from the GO term list.
+ */
 void MainWindow::selectGoTerm()
 {
 	_go_term_index = 0;
@@ -226,6 +249,9 @@ void MainWindow::selectGoTerm()
 
 
 
+/**
+ * Search for GO terms in the ontology database.
+ */
 void MainWindow::search()
 {
 	QString term = _search->text();
@@ -251,6 +277,9 @@ void MainWindow::search()
 
 
 
+/**
+ * Clear the search controls.
+ */
 void MainWindow::clear()
 {
 	init_controls();
@@ -261,6 +290,9 @@ void MainWindow::clear()
 
 
 
+/**
+ * Extract conserved subgraphs for each alignment in the database.
+ */
 void MainWindow::extractSubgraphs()
 {
 	for ( Alignment *a : _db->alignments() )

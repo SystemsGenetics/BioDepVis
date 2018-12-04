@@ -4,6 +4,12 @@
 
 
 
+/**
+ * Construct a matrix.
+ *
+ * @param rows
+ * @param cols
+ */
 Matrix::Matrix(int rows, int cols):
 	_rows(rows),
 	_cols(cols),
@@ -13,6 +19,11 @@ Matrix::Matrix(int rows, int cols):
 
 
 
+/**
+ * Move-construct a matrix.
+ *
+ * @param M
+ */
 Matrix::Matrix(Matrix&& M)
 	: Matrix()
 {
@@ -21,6 +32,9 @@ Matrix::Matrix(Matrix&& M)
 
 
 
+/**
+ * Destruct a matrix.
+ */
 Matrix::~Matrix()
 {
 	delete[] _data;
@@ -28,6 +42,9 @@ Matrix::~Matrix()
 
 
 
+/**
+ * Initialize a matrix to all zeros.
+ */
 void Matrix::init_zeros()
 {
 	Matrix& M = *this;
@@ -37,6 +54,12 @@ void Matrix::init_zeros()
 
 
 
+/**
+ * Swap two matrices.
+ *
+ * @param A
+ * @param B
+ */
 void swap(Matrix& A, Matrix& B)
 {
 	std::swap(A._rows, B._rows);
