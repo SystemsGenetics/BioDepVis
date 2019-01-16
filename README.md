@@ -1,4 +1,4 @@
-# BioDep-Vis
+# BioDepVis
 
 A visualizer for gene-coexpression networks (GCNs) and alignments between them.
 
