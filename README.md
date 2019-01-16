@@ -8,14 +8,14 @@ Watch our video demo showcasing some of the features at https://clemson.app.box.
 
 BioDepVis requires CUDA, gcc, and Qt.
 
-#### Ubuntu
+### Ubuntu
 ```
 # CUDA drivers can be downloaded and installed from NVIDIA's website
 
 sudo apt-get install gcc qt5-default
 ```
 
-#### Palmetto
+### Palmetto
 ```
 module load cuda-toolkit/9.2 gcc/5.4.0 Qt/5.9.2
 ```
@@ -101,3 +101,12 @@ To stop recording, enter `Ctrl-C` and an FLV file will be saved.
 ## Launch from CCT
 
 The Complexity Connector Tool (CCT) is a graphical interface for creating config files for BioDepVis, instead of writing the JSON files yourself. With CCT you can create or load a configuration and then launch BioDepVis right from the interface! You can even have multiple instances of BioDepVis running at once! Refer to the CCT docs for installation and usage instructions.
+
+## Run in Docker container
+
+This feature is still incomplete:
+```
+sudo docker run --runtime=nvidia --rm -it \
+  -e DISPLAY=$DISPLAY -u docker -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+  systemsgenetics/biodepvis
+```
